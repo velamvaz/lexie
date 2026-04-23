@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lexie — Device Design Exploration</title>
+<link rel="stylesheet" href="device-design-exploration.css" />
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark" aria-hidden="true">L</div>
+    <div>
+      <h1>Lexie</h1>
+      <p class="tagline">AI word explainer — clip-on bookmark, WiFi, one child / one family</p>
+    </div>
+  </div>
+  <div class="badge-row" role="list">
+    <span class="badge" role="listitem">Public HTTPS API</span>
+    <span class="badge" role="listitem">PTT → record → explain</span>
+    <span class="badge badge--muted" role="listitem">April 2026</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Product hero + how it could look in context -->
+  <section class="section-hero" style="border-bottom:0;padding-bottom:0;">
+    <div class="hero">
+      <div class="hero-copy">
+        <h2>Tap, ask, listen back on the page.</h2>
+        <p class="lead">The device is a <strong>physical surface</strong> for a single <code>age_profile</code> — no BLE data path in v1. Audio goes out over the same <strong>WiFi</strong> the family already uses at home, or a parent <strong>phone hotspot</strong> away, to one <strong>TLS base URL</strong>.</p>
+        <div class="chip-row">
+          <span class="chip chip--accent">STT + GPT-4o + TTS (OpenAI)</span>
+          <span class="chip">Not all-local ML</span>
+        </div>
+        <p class="footnote" style="margin-top:0.9rem">Rendering below is a visual mock; dimensions and exact finishes remain exploratory.</p>
+      </div>
+      <div class="device-showcase" aria-label="Stylized device in reading context">
+        <div class="book-peek" aria-hidden="true"></div>
+        <div class="device-frame" role="img" aria-label="Narrow vertical bookmark with clip, speaker grille, and LED ring">
+          <div class="device-clip" aria-hidden="true"></div>
+          <div class="device-top-label" aria-hidden="true">CLP</div>
+          <div class="speaker-mock" aria-hidden="true"></div>
+          <div class="led-mock" aria-hidden="true"></div>
+          <div class="usb-mock" aria-label="USB-C (bottom)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <p class="flow-title">Data path (Phase 2)</p>
+      <div class="flow-diag">
+        <div class="flow-node">
+          <div class="flow-icon" aria-hidden="true">📎</div>
+          <h4>Bookmark</h4>
+          <p>Mic, speaker, PTT, LED (no app screen)</p>
+        </div>
+        <span class="flow-connector" aria-hidden="true">→</span>
+        <div class="flow-node">
+          <div class="flow-icon" aria-hidden="true">📡</div>
+          <h4>WiFi</h4>
+          <p>Home AP or parent hotspot; same <code>BASE_URL</code></p>
+        </div>
+        <span class="flow-connector" aria-hidden="true">→</span>
+        <div class="flow-node">
+          <div class="flow-icon" aria-hidden="true">🌐</div>
+          <h4>Lexie host</h4>
+          <p>Public HTTPS; FastAPI; <code>POST /explain</code></p>
+        </div>
+        <span class="flow-connector" aria-hidden="true">→</span>
+        <div class="flow-node">
+          <div class="flow-icon" aria-hidden="true">☁️</div>
+          <h4>OpenAI</h4>
+          <p>Whisper, model, TTS; billing = cost truth</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin:2.25rem 0 0.75rem;">01 — Where it goes online</div>
+    <h2 style="margin-top:0;">Same URL at home and on the go</h2>
+    <p class="subtitle">v1 is WiFi to the public Lexie service — not Bluetooth for transcripts or TTS. Parents configure the device once; routing changes when the access point does.</p>
+
+    <div class="conn-grid">
+      <div class="conn-card">
+        <h3>🏠 At home</h3>
+        <p>Bookmark joins the household WiFi. Packets route over normal broadband to the deployed Lexie app on your chosen host (for example, Fly, Railway, or a VPS).</p>
+        <span class="url-pill">https://&lt;your-lexie-host&gt;/v1/…  <span style="color:var(--text-dim)">(TLS required)</span></span>
+      </div>
+      <div class="conn-card">
+        <h3>📱 Away / car / cafe</h3>
+        <p>Parent turns on a phone hotspot. The device reconnects; firmware still points at the <strong>same</strong> <code>BASE_URL</code> as at home. No BLE data bridge.</p>
+        <span class="url-pill">One profile · one org child · single age policy</span>
+      </div>
+    </div>
+
+    <div class="software-strip" role="note">
+      <span><strong>Server:</strong> FastAPI · CORS/HTTPS as in SPEC</span>
+      <span>·</span>
+      <span><strong>Device job:</strong> <code>POST /explain</code> (audio in → explanation + audio out)</span>
+      <span>·</span>
+      <span><strong>Ops:</strong> optional local <code>lexie-ops</code> polls <code>GET /health</code> only</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">02 — Form factor</div>
+    <h2>Physical design</h2>
+    <p class="subtitle">A slim, book-width clip-on that sits against the page edge. Premium bookmark — not a bright “toy remote” aesthetic. Rely on the <strong>teal-green</strong> LED ring and matte enclosure.</p>
+
+    <div class="views-grid">
+      <div class="view-card">
+        <div class="view-label">Front view</div>
+        <svg width="140" height="380" viewBox="0 0 140 380" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Front view diagram">
+          <rect x="52" y="0" width="36" height="50" rx="6" fill="#1e2236" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+          <rect x="20" y="44" width="100" height="316" rx="18" fill="url(#bodyGradF)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+          <defs>
+            <linearGradient id="bodyGradF" x1="20" y1="44" x2="120" y2="360" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#1e2340"/>
+              <stop offset="100%" stop-color="#13162a"/>
+            </linearGradient>
+            <filter id="glowF">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g opacity="0.35">
+            <line x1="40" y1="110" x2="100" y2="110" stroke="#7b82a8" stroke-width="1"/>
+            <line x1="40" y1="120" x2="100" y2="120" stroke="#7b82a8" stroke-width="1"/>
+            <line x1="40" y1="130" x2="100" y2="130" stroke="#7b82a8" stroke-width="1"/>
+          </g>
+          <circle cx="70" cy="218" r="30" fill="none" stroke="rgba(0,180,166,0.5)" stroke-width="3" stroke-dasharray="8 4" filter="url(#glowF)"/>
+          <circle cx="70" cy="218" r="22" fill="url(#btnG)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+          <defs>
+            <radialGradient id="btnG" cx="40%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#2d3260"/>
+              <stop offset="100%" stop-color="#1a1e38"/>
+            </radialGradient>
+          </defs>
+          <text x="70" y="90" text-anchor="middle" fill="rgba(255,255,255,0.12)" font-size="11" font-weight="700" letter-spacing="4">LEXIE</text>
+          <text x="70" y="364" text-anchor="middle" fill="rgba(255,255,255,0.2)" font-size="7" font-family="system-ui, sans-serif">USB-C</text>
+        </svg>
+        <div class="view-caption">Matte soft-touch face · LED ring around the main button · mic under grille (conceptual)</div>
+      </div>
+      <div class="view-card">
+        <div class="view-label">Back view</div>
+        <svg width="130" height="380" viewBox="0 0 130 380" fill="none" aria-label="Back view diagram">
+          <rect x="15" y="44" width="100" height="316" rx="18" fill="url(#backG)" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+          <defs>
+            <linearGradient id="backG" x1="15" y1="44" x2="115" y2="360" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#161927"/>
+              <stop offset="100%" stop-color="#0f1118"/>
+            </linearGradient>
+          </defs>
+          <text x="65" y="200" text-anchor="middle" fill="rgba(255,255,255,0.2)" font-size="8" font-weight="700">lexie</text>
+        </svg>
+        <div class="view-caption">Back shell · internal antenna keep-out · no kid-facing “spec sticker forest” in production if avoidable</div>
+      </div>
+      <div class="view-card">
+        <div class="view-label">Side profile</div>
+        <svg width="60" height="380" viewBox="0 0 60 380" fill="none" aria-label="Side view diagram">
+          <rect x="10" y="44" width="18" height="316" rx="9" fill="url(#sideG)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+          <defs>
+            <linearGradient id="sideG" x1="10" y1="0" x2="28" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#1a1e36"/>
+              <stop offset="100%" stop-color="#13162a"/>
+            </linearGradient>
+          </defs>
+          <text x="42" y="184" fill="rgba(255,255,255,0.3)" font-size="7" font-family="system-ui, sans-serif" transform="rotate(90, 42, 184)">9mm</text>
+        </svg>
+        <div class="view-caption">~9mm ESP32-S3 class stack · bottom USB-C for charge</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="detail-card">
+        <h3>Spring clip</h3>
+        <p>Leaf spring at the top slides over book cover or page. Tension tuned for ~3–12mm covers; recess in the body so the profile stays slim.</p>
+      </div>
+      <div class="detail-card">
+        <h3>LED ring (primary output)</h3>
+        <p>Micro-LEDs around the button. <strong>Listening</strong> = blue pulse. <strong>Thinking</strong> = teal motion. <strong>Speaking</strong> = <strong>solid teal-green</strong> while audio plays. Idle = off. Error = red flash pattern. No always-on “decorative” light.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">03 — Internals</div>
+    <h2>Exploded view</h2>
+    <p class="subtitle">All major parts stack in the shell. Two MCU families remain on the table; WiFi to the public API is the constant.</p>
+
+    <div class="panel" style="padding:2rem;">
+      <div class="pill-wrap">
+        <span class="pill pill-teal">Option A: ESP32-S3</span>
+        <span class="view-caption" style="text-align:left;margin:0;flex:1;min-width:12rem">Integrated 2.4&nbsp;GHz, I2S, reasonable thickness — production candidate.</span>
+      </div>
+
+      <div class="exploded-grid" style="border-top:1px solid var(--border);">
+        <div class="part">
+          <div class="part-body" style="background:rgba(0,180,166,0.06);border-color:rgba(0,180,166,0.3)">
+            <div class="part-icon" aria-hidden="true">🛡️</div>
+            <div class="part-name">Front shell</div>
+            <div class="part-spec">Matte PC+ABS · soft feel · 3.5mm walls</div>
+          </div>
+          <div class="view-label">L1</div>
+        </div>
+        <div class="part">
+          <div class="part-body">
+            <div class="part-icon" aria-hidden="true">🔊</div>
+            <div class="part-name">Speaker</div>
+            <div class="part-spec">~23mm · I2S + Class-D (e.g. MAX98357A)</div>
+          </div>
+          <div class="view-label">L2</div>
+        </div>
+        <div class="part">
+          <div class="part-body" style="background:rgba(59,91,219,0.06);border-color:rgba(59,91,219,0.3)">
+            <div class="part-icon" aria-hidden="true">💡</div>
+            <div class="part-name">LED + button PCB</div>
+            <div class="part-spec">8× addressable + tactile switch</div>
+          </div>
+          <div class="view-label">L3</div>
+        </div>
+        <div class="part">
+          <div class="part-body" style="background:rgba(245,159,0,0.06);border-color:rgba(245,159,0,0.3)">
+            <div class="part-icon" aria-hidden="true">🧠</div>
+            <div class="part-name">Main board</div>
+            <div class="part-spec">S3 + MEMS I2S mic + antenna</div>
+          </div>
+          <div class="view-label">L4</div>
+        </div>
+        <div class="part">
+          <div class="part-body" style="background:rgba(0,180,166,0.04);border-color:rgba(0,180,166,0.2)">
+            <div class="part-icon" aria-hidden="true">🔋</div>
+            <div class="part-name">Battery</div>
+            <div class="part-spec">~1200mAh LiPo · USB-C charge</div>
+          </div>
+          <div class="view-label">L5</div>
+        </div>
+      </div>
+
+      <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border)">
+        <div class="pill-wrap">
+          <span class="pill pill-gold">Option B: Pi Zero 2W + audio HAT</span>
+          <span class="view-caption" style="text-align:left;margin:0;flex:1">Linux, faster bring-up, thicker Z stack. Useful dev mule; migrate to S3 for thin production.</span>
+        </div>
+        <div class="three-col" style="margin-top:1.25rem;">
+          <div class="detail-card" style="border-color:rgba(245,159,0,0.2)">
+            <h3 style="color:var(--gold)">SBC</h3>
+            <p>512MB, WiFi onboard. Python-native firmware paths possible.</p>
+          </div>
+          <div class="detail-card" style="border-color:rgba(245,159,0,0.2)">
+            <h3 style="color:var(--gold)">HAT / WM8960 class</h3>
+            <p>MEMS mics + line/speaker. Adds stack height; swap early if enclosure demands.</p>
+          </div>
+          <div class="detail-card" style="border-color:rgba(245,159,0,0.2)">
+            <h3 style="color:var(--gold)">Trade</h3>
+            <p>Thicker vs faster iteration. Pick per prototype phase, not for marketing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">04 — Assembly</div>
+    <h2>Layer order</h2>
+    <p class="subtitle">Back shell to front — clip may be pre-inserted on the back piece. No visible screws in a consumer polish.</p>
+    <div class="panel" style="padding:1.5rem;overflow-x:auto">
+      <div class="assembly-row">
+        <div class="assembly-step">
+          <div class="assembly-num">01</div>
+          <div class="assembly-layer" style="border-color:rgba(0,180,166,0.35);background:rgba(0,180,166,0.06)">
+            <span aria-hidden="true">🛡️</span>
+            <span>Back + clip</span>
+          </div>
+        </div>
+        <div class="assembly-arrow" aria-hidden="true">→</div>
+        <div class="assembly-step">
+          <div class="assembly-num">02</div>
+          <div class="assembly-layer" style="border-color:rgba(245,159,0,0.3);background:rgba(245,159,0,0.06)">
+            <span aria-hidden="true">🔋</span>
+            <span>Battery</span>
+          </div>
+        </div>
+        <div class="assembly-arrow" aria-hidden="true">→</div>
+        <div class="assembly-step">
+          <div class="assembly-num">03</div>
+          <div class="assembly-layer" style="border-color:rgba(59,91,219,0.3);background:rgba(59,91,219,0.06)">
+            <span aria-hidden="true">🧠</span>
+            <span>Main PCB</span>
+          </div>
+        </div>
+        <div class="assembly-arrow" aria-hidden="true">→</div>
+        <div class="assembly-step">
+          <div class="assembly-num">04</div>
+          <div class="assembly-layer" style="border-color:rgba(0,180,166,0.3);background:rgba(0,180,166,0.06)">
+            <span aria-hidden="true">🔊</span>
+            <span>Speaker</span>
+          </div>
+        </div>
+        <div class="assembly-arrow" aria-hidden="true">→</div>
+        <div class="assembly-step">
+          <div class="assembly-num">05</div>
+          <div class="assembly-layer" style="border-color:rgba(255,107,107,0.3);background:rgba(255,107,107,0.06)">
+            <span aria-hidden="true">💡</span>
+            <span>LED + button</span>
+          </div>
+        </div>
+        <div class="assembly-arrow" aria-hidden="true">→</div>
+        <div class="assembly-step">
+          <div class="assembly-num">06</div>
+          <div class="assembly-layer" style="border-color:rgba(0,180,166,0.3);background:rgba(0,180,166,0.08)">
+            <span aria-hidden="true">✅</span>
+            <span>Front snap</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">05 — Specs</div>
+    <h2>Dimensions (targets)</h2>
+    <p class="subtitle">Book-sized, low drama on a nightstand. Adjust after mechanical CAD.</p>
+    <div class="dims-card">
+      <div class="dim-row">
+        <div>
+          <div class="dim-value">170 <span class="dim-unit">mm</span></div>
+          <div class="dim-label">Length (incl. clip)</div>
+        </div>
+      </div>
+      <div class="dim-divider" aria-hidden="true"></div>
+      <div class="dim-row">
+        <div>
+          <div class="dim-value">35 <span class="dim-unit">mm</span></div>
+          <div class="dim-label">Width</div>
+        </div>
+      </div>
+      <div class="dim-divider" aria-hidden="true"></div>
+      <div class="dim-row">
+        <div>
+          <div class="dim-value">9 <span class="dim-unit">mm</span></div>
+          <div class="dim-label">Thick (S3 class)</div>
+        </div>
+      </div>
+      <div class="dim-divider" aria-hidden="true"></div>
+      <div class="dim-row">
+        <div>
+          <div class="dim-value">~48 <span class="dim-unit">g</span></div>
+          <div class="dim-label">Est. weight</div>
+        </div>
+      </div>
+      <div class="dim-divider" aria-hidden="true"></div>
+      <div class="dim-row">
+        <div>
+          <div class="dim-value">8 <span class="dim-unit">h</span></div>
+          <div class="dim-label">Active (ballpark)</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:1.5rem;overflow-x:auto">
+      <table class="spec-table" style="background:var(--surface);border:1px solid var(--border);border-radius:16px">
+        <thead>
+          <tr><th colspan="2">Component spec sheet (draft)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Network</td><td>2.4&nbsp;GHz WiFi, WPA2-PSK to known SSIDs. Roam between home and hotspot; same <code>BASE_URL</code>.</td></tr>
+          <tr><td>Backhaul</td><td>Public HTTPS; no private LAN server required. Auth headers per <code>lexie-word-explainer.SPEC.md</code>.</td></tr>
+          <tr><td>Audio path</td><td>PTT hold → record → <code>POST /explain</code> (multipart) → play returned audio. Not offline LLM on device.</td></tr>
+          <tr><td>Child profile</td><td>Single <code>age_profile</code> in v1; one org “kid” in metrics.</td></tr>
+          <tr><td>LED</td><td>Addressable ring; “speaking” uses teal-green to read clearly as “sound”, not the same as thinking teal.</td></tr>
+          <tr><td>Charging</td><td>USB-C bottom, ~5V. Parent-facing only.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">06 — Color</div>
+    <h2>Enclosure directions</h2>
+    <p class="subtitle">Favor a midnight / ink palette with teal and warm white accents, not primary-plastic “toy primary” colors. LED colors carry the affordance.</p>
+    <div class="colors-row">
+      <div class="color-card is-active">
+        <div class="color-swatch" style="background:linear-gradient(160deg, #1e2340, #0f1117);border:1px solid rgba(255,255,255,0.1)"></div>
+        <div>
+          <div class="color-name">Midnight</div>
+          <div class="color-desc">Navy-black matte · default hero look</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:linear-gradient(160deg, #f5f5f5, #e0e0e0);border:1px solid rgba(0,0,0,0.1)"></div>
+        <div>
+          <div class="color-name">Chalk</div>
+          <div class="color-desc">Optional lighter SKU later</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:linear-gradient(160deg, #2d4a3e, #1a2e27);border:1px solid rgba(255,255,255,0.08)"></div>
+        <div>
+          <div class="color-name">Forest</div>
+          <div class="color-desc">Deeper green, still matte</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:linear-gradient(160deg, #3b1f5e, #1e1030);border:1px solid rgba(255,255,255,0.08)"></div>
+        <div>
+          <div class="color-name">Cosmos</div>
+          <div class="color-desc">Lifestyle / “magic edition” (careful: still not toy-bright)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">07 — Feedback</div>
+    <h2>LED &amp; interaction (rendered states)</h2>
+    <p class="subtitle">The ring is the UI. <strong>Speaking</strong> is intentionally a distinct <strong>teal-green</strong> solid fill so kids learn “on” = sound, not the blue used while recording.</p>
+
+    <div class="led-states">
+      <div class="led-card">
+        <div class="led-card__ring led--idle" aria-hidden="true"><div class="led-dot"></div></div>
+        <h4>Idle / rest</h4>
+        <p>Off · low quiescent draw</p>
+      </div>
+      <div class="led-card">
+        <div class="led-card__ring led--listen" aria-hidden="true"><div class="led-dot"></div></div>
+        <h4>Listening</h4>
+        <p>Blue pulse · PTT active</p>
+      </div>
+      <div class="led-card">
+        <div class="led-card__ring led--think" aria-hidden="true"><div class="led-dot"></div></div>
+        <h4>Thinking</h4>
+        <p>Teal motion · request in flight</p>
+      </div>
+      <div class="led-card">
+        <div class="led-card__ring led--speak" aria-hidden="true"><div class="led-dot"></div></div>
+        <h4>Speaking</h4>
+        <p>Teal-green <strong>solid</strong> · TTS output</p>
+      </div>
+      <div class="led-card led-card--wide">
+        <div class="led-card__ring led--err" aria-hidden="true"><div class="led-dot"></div></div>
+        <h4>Fault</h4>
+        <p>Red flash (e.g. no WiFi, 5xx, or empty audio response)</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">08 — Ops / cost</div>
+    <h2>Monitoring without another kid-facing app (v1)</h2>
+    <p class="subtitle">A parent or builder can run a small <strong>lexie-ops</strong> dashboard on a laptop that proxies <code>/health</code> to the public host. Usage and cost truth stay in <strong>OpenAI billing + server logs</strong>, not on-device counters.</p>
+    <div class="two-col">
+      <div class="detail-card" style="border-color:rgba(0,180,166,0.25)">
+        <h3>What the ops app shows</h3>
+        <p>Reachability, last deploy, maybe queue depth. Not a second voice surface for the child. Keep it unglamorous: engineering UI is fine for now.</p>
+      </div>
+      <div class="detail-card" style="border-color:rgba(59,91,219,0.3)">
+        <h3>What we do <em>not</em> claim in hardware copy</h3>
+        <p>“100% on-device” or “fully private to the home” is false when STT/LLM/TTS are in the cloud. Be explicit: privacy posture is the usual hosted API story plus your retention settings.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">09 — Open</div>
+    <h2>Still TBD in hardware</h2>
+    <div class="three-col">
+      <div class="detail-card" style="border-color:rgba(245,159,0,0.25)">
+        <div class="chip-row" style="margin-bottom:0.6rem">
+          <span class="pill pill-gold">Open</span>
+        </div>
+        <h3>MCU + thickness</h3>
+        <p>ESP32-S3 vs Pi stack — see exploded section. Gates enclosure minimum Z.</p>
+      </div>
+      <div class="detail-card" style="border-color:rgba(245,159,0,0.25)">
+        <div class="chip-row" style="margin-bottom:0.6rem">
+          <span class="pill pill-gold">Open</span>
+        </div>
+        <h3>Enclosure process</h3>
+        <p>SLA/FDM prototype vs eventual injection. SLA first for look/feel, not for flex life testing alone.</p>
+      </div>
+      <div class="detail-card" style="border-color:rgba(245,159,0,0.25)">
+        <div class="chip-row" style="margin-bottom:0.6rem">
+          <span class="pill pill-gold">Later</span>
+        </div>
+        <h3>Wake word (Phase 2+)</h3>
+        <p>Push-to-talk stays primary; on-mic “always on” is extra power and policy surface.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

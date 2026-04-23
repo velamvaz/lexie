@@ -1,0 +1,11 @@
+# Lexie monorepo
+.DS_Store
+.env
+.env.local
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+.venv/
+venv/
+node_modules/
+dist/
