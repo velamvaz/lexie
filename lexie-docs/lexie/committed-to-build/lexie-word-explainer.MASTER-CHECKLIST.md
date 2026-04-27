@@ -10,8 +10,8 @@
 
 | When | Done |
 |------|------|
-| 2026-04-26 | **A1** — OpenAI Platform + API billing in use. **A2** — API key in **1Password** (API Credentials, Private); budget/alerts on org (earlier). **V1, V2** — vault + item for OpenAI key. |
-| (next) | **V3** — Confirm any key ever pasted in **chat** is **revoked** in OpenAI; only the 1Password key active. **A6, A7** — `LEXIE_DEVICE_KEY` + `LEXIE_ADMIN_TOKEN` in 1Password. **Part B** — implement FastAPI server in monorepo. |
+| 2026-04-26 | **A1, A2** — OpenAI + API key in **1Password**; org budget/alerts. **V1, V2** — Private vault + API item. **V3** — Key that was once exposed in **chat** is **revoked**; only the current 1Password key is active. |
+| (next) | **A6, A7** — `LEXIE_DEVICE_KEY` + `LEXIE_ADMIN_TOKEN` in 1Password. **A3–A5** (optional) when you deploy. **Part B** — implement FastAPI server in monorepo. |
 
 **Reality check:** this repo (Lexie) currently has **no FastAPI `lexie-server` package in-tree** — Part B is “implement or import the app,” then run this checklist. If the server already lives in another repo, start at **Part C (M0)** with that code.
 
@@ -23,7 +23,7 @@ Use **1Password** as the **canonical** store for every long-lived secret. **Neve
 
 - [x] **V1** — In 1Password, use (or create) a **Private** or **Personal** vault you control.
 - [x] **V2** — Create one item per secret type — for example: **Lexie — OpenAI API** (API key in the **password** field or a field labeled `OPENAI_API_KEY`), **Lexie — `LEXIE_DEVICE_KEY`**, **Lexie — `LEXIE_ADMIN_TOKEN`**. You may use **Secure Notes** for the latter two or custom fields.  
-- [ ] **V3** — **Revoke and replace** any key that was ever exposed (chat, email, ticket); save **only** the new value in 1Password.
+- [x] **V3** — **Revoke and replace** any key that was ever exposed (chat, email, ticket); save **only** the new value in 1Password.
 - [ ] **V4** — For **local dev**, **Copy** from 1Password into a **gitignored** `.env` file in the server project (see **C1**), or type once by hand. **For deploy**, use **Copy** when pasting into the **host** secret UI (Fly/Railway/Render) — 1Password remains the master record.  
 - [ ] **V5 — (Optional) [1Password CLI](https://developer.1password.com/docs/cli) (`op`) to inject env for a process without keeping secrets in shell history; still do **not** commit `.env`. Example pattern: `op run -- <command>` with references to vault items, per 1Password docs.
 
