@@ -6,6 +6,13 @@
 **ROM costs & M0–M5 overview:** [lexie-word-explainer.BUDGET-AND-ROLLOUT.md](lexie-word-explainer.BUDGET-AND-ROLLOUT.md) · [phased-delivery-plan.md](phased-delivery-plan.md)  
 **Spec exit criteria (normative):** [lexie-word-explainer.SPEC.md](lexie-word-explainer.SPEC.md) §10–11
 
+### Builder progress (log)
+
+| When | Done |
+|------|------|
+| 2026-04-26 | **A1** — OpenAI Platform + API billing in use. **A2** — API key in **1Password** (API Credentials, Private); budget/alerts on org (earlier). **V1, V2** — vault + item for OpenAI key. |
+| (next) | **V3** — Confirm any key ever pasted in **chat** is **revoked** in OpenAI; only the 1Password key active. **A6, A7** — `LEXIE_DEVICE_KEY` + `LEXIE_ADMIN_TOKEN` in 1Password. **Part B** — implement FastAPI server in monorepo. |
+
 **Reality check:** this repo (Lexie) currently has **no FastAPI `lexie-server` package in-tree** — Part B is “implement or import the app,” then run this checklist. If the server already lives in another repo, start at **Part C (M0)** with that code.
 
 **Convention:** copy this file or tick boxes in your editor. Items marked **(you)** require your account / billing / domain — a collaborator cannot do them for you.
@@ -14,8 +21,8 @@
 
 Use **1Password** as the **canonical** store for every long-lived secret. **Never** commit secrets to git, paste them into issue trackers or chat, or put them in screenshots.
 
-- [ ] **V1** — In 1Password, use (or create) a **Private** or **Personal** vault you control.
-- [ ] **V2** — Create one item per secret type — for example: **Lexie — OpenAI API** (API key in the **password** field or a field labeled `OPENAI_API_KEY`), **Lexie — `LEXIE_DEVICE_KEY`**, **Lexie — `LEXIE_ADMIN_TOKEN`**. You may use **Secure Notes** for the latter two or custom fields.  
+- [x] **V1** — In 1Password, use (or create) a **Private** or **Personal** vault you control.
+- [x] **V2** — Create one item per secret type — for example: **Lexie — OpenAI API** (API key in the **password** field or a field labeled `OPENAI_API_KEY`), **Lexie — `LEXIE_DEVICE_KEY`**, **Lexie — `LEXIE_ADMIN_TOKEN`**. You may use **Secure Notes** for the latter two or custom fields.  
 - [ ] **V3** — **Revoke and replace** any key that was ever exposed (chat, email, ticket); save **only** the new value in 1Password.
 - [ ] **V4** — For **local dev**, **Copy** from 1Password into a **gitignored** `.env` file in the server project (see **C1**), or type once by hand. **For deploy**, use **Copy** when pasting into the **host** secret UI (Fly/Railway/Render) — 1Password remains the master record.  
 - [ ] **V5 — (Optional) [1Password CLI](https://developer.1password.com/docs/cli) (`op`) to inject env for a process without keeping secrets in shell history; still do **not** commit `.env`. Example pattern: `op run -- <command>` with references to vault items, per 1Password docs.
@@ -24,8 +31,8 @@ Use **1Password** as the **canonical** store for every long-lived secret. **Neve
 
 ## Part A — Accounts and one-time setup **(you)**
 
-- [ ] **A1** — Create or use an [OpenAI Platform](https://platform.openai.com/) account; enable **API** billing (ChatGPT **Plus** is **not** the same as API access).
-- [ ] **A2** — In OpenAI: create an API key; **save it in 1Password** (see **V2**); set a **monthly budget / alert** in the OpenAI dashboard (SPEC §2, [BUDGET-AND-ROLLOUT](lexie-word-explainer.BUDGET-AND-ROLLOUT.md) §4).
+- [x] **A1** — Create or use an [OpenAI Platform](https://platform.openai.com/) account; enable **API** billing (ChatGPT **Plus** is **not** the same as API access).
+- [x] **A2** — In OpenAI: create an API key; **save it in 1Password** (see **V2**); set a **monthly budget / alert** in the OpenAI dashboard (SPEC §2, [BUDGET-AND-ROLLOUT](lexie-word-explainer.BUDGET-AND-ROLLOUT.md) §4).
 - [ ] **A3 — Choose a **host** (e.g. Fly, Railway, Render, or a VPS) and create an account; add a payment method if the tier requires it. (Optional) Save **host login** in 1Password if not already.
 - [ ] **A4 — (Optional) Register a **domain** and note where **DNS** is managed (or use the host’s subdomain only). You can store **registrar** credentials in 1Password.
 - [ ] **A5 — (Optional) Create a free **external uptime** account (e.g. UptimeRobot) for `GET /health` against your public URL later. Save that login in 1Password if you like.
