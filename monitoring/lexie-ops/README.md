@@ -23,6 +23,8 @@ Open the URL Vite prints (default `http://localhost:5173`).
 
 - It does not show OpenAI spend. Use the [OpenAI usage dashboard](https://platform.openai.com/usage).
 
+**Broader triage** (CORS, device key, admin token, opt-in request logging): [lexie docs — RUNBOOK](../../lexie-docs/lexie/committed-to-build/lexie-word-explainer.RUNBOOK.md).
+
 ## Build
 
 `npm run build` emits static files to `dist/`. Serve with any static host, or use `npx serve dist` — CORS to your production Lexie base URL will apply.
