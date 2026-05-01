@@ -130,6 +130,19 @@ eval "$(/usr/local/bin/brew shellenv)"
 
 Then open a new terminal or run `exec zsh -l` and check `brew --version`. Official docs: [Homebrew — Installation](https://docs.brew.sh/Installation).
 
+### Admin: “Load profile” fails
+
+- **`Error 401`** — The token in the box does **not** match **`LEXIE_ADMIN_TOKEN`** in the server’s **`.env`** (no extra spaces; restart **`uvicorn`** after editing **`.env`**).
+- **`Error 500`** with `internal` — **`LEXIE_ADMIN_TOKEN`** is **empty** in **`.env`** (set a non-empty value), or the DB has no profile row (rare on first run; restart after a clean **`data/`** if you moved DB files).
+
+Check from a terminal (same machine, same port):
+
+```bash
+curl -s -H "Authorization: Bearer YOUR_TOKEN" http://127.0.0.1:8000/profile
+```
+
+Expect JSON with `child_name`, etc. If this works but the browser does not, use the **same URL** you opened for **`/admin`** (e.g. don’t mix **`localhost`** and **`127.0.0.1`** if cookies/storage ever differ—usually both work when the server matches).
+
 ## Environment
 
 See **`.env.example`**.

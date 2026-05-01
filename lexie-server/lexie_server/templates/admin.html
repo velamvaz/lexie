@@ -41,13 +41,22 @@
       if (!t) return null;
       return { Authorization: "Bearer " + t };
     };
+    async function showFetchError(r) {
+      let t = "Error " + r.status;
+      try {
+        const j = await r.json();
+        if (j.detail !== undefined) t += ": " + (typeof j.detail === "object" ? JSON.stringify(j.detail) : String(j.detail));
+      } catch (e) { /* ignore */ }
+      $("msg").textContent = t;
+      $("msg").className = "msg err";
+    }
     $("load").onclick = async () => {
       const h = authHeader();
       $("msg").textContent = "";
       if (!h) { $("msg").textContent = "Enter admin token first."; $("msg").className = "msg err"; return; }
       sessionStorage.setItem(tokenKey, $("admin").value.trim());
       const r = await fetch(base + "/profile", { headers: h });
-      if (!r.ok) { $("msg").textContent = "Error " + r.status; $("msg").className = "msg err"; return; }
+      if (!r.ok) { await showFetchError(r); return; }
       const j = await r.json();
       $("child_name").value = j.child_name;
       $("age_years").value = j.age_years;
@@ -68,7 +77,7 @@
         explanation_style: $("explanation_style").value.trim() || null
       };
       const r = await fetch(base + "/profile", { method: "PATCH", headers: { ...h, "Content-Type": "application/json" }, body: JSON.stringify(body) });
-      if (!r.ok) { $("msg").textContent = "Error " + r.status; $("msg").className = "msg err"; return; }
+      if (!r.ok) { await showFetchError(r); return; }
       $("msg").textContent = "Saved.";
       $("msg").className = "msg";
     };
