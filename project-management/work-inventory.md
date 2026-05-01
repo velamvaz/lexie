@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-04-22  
+**Last updated:** 2026-04-30  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -54,13 +54,17 @@
 
 ## Section B — In progress
 
-**Today:** No `WX-*` row in [`registry.md`](registry.md) is set to **`in_progress`**.
+**Active:** [**WX-013**](registry.md) ([§ detail](#wx-013--preflight-pytest-on-python-311-or-newer)) — **Preflight:** run **`pytest`** on **Python 3.11+** in `lexie-server` (contract tests + mocked pipeline; no live OpenAI).
 
-**How to start work:** (1) Pick the next item (often **WX-002** or **WX-001**). (2) In `registry.md`, set **Status** to `in_progress` and **Updated** to today’s date (`YYYY-MM-DD`). (3) Append one line to the current month file under [`work-log/`](work-log/) (e.g. `work-log/2026-04.md`) describing what you started. (4) When finished, set **Status** to `done` (or `blocked` / `cancelled` with **Notes**), bump **Updated**, and append another work-log line with outcome or commit hash.
+**Next after WX-013:** Mark **WX-013** `done` in [`registry.md`](registry.md), set **WX-014** to `in_progress`, and continue through **WX-018** (M0 manual checks). Complete or partially overlap **WX-002** (tokens in 1Password) before **WX-015**–**WX-017** if you want real device/admin auth (dev can use empty `LEXIE_DEVICE_KEY` only where the server allows).
+
+**How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/) (e.g. `work-log/2026-04.md`).
 
 ---
 
-## Section C — Planned next (WX-001, WX-002, WX-003)
+## Section C — Planned next (WX-002; M0 test track WX-013–WX-018)
+
+**Superseded (see registry):** **WX-001** and **WX-003** were broad umbrellas; execution is now **WX-013** (pytest) and **WX-014–WX-018** (checklist C1–C6 steps). Do **not** reopen WX-001 / WX-003.
 
 ### WX-002 — Device and admin tokens in 1Password (A6 / A7)
 
@@ -75,56 +79,114 @@
 
 **Done when:** Both values exist in 1Password per **V2**; master checklist **A6** and **A7** can be ticked; you can copy them into `lexie-server/.env` for local testing.
 
-**Depends on:** Nothing technical—can run before or in parallel with **WX-003**. **WX-001** (full M0 auth checks) is easier once **WX-002** is done so `.env` can include real device and admin tokens.
+**Depends on:** Nothing technical—can run before or in parallel with **WX-013**–**WX-018**. **WX-015**–**WX-017** are easier once **WX-002** is done so `.env` has real device and admin tokens.
 
 ---
 
-### WX-003 — Verify tests on Python 3.11 or newer
+### WX-013 — Preflight: pytest on Python 3.11 or newer
 
-**Objective:** Confirm the contract test suite passes on a supported Python (**3.11+** per `pyproject.toml`; runtime stack needs **3.10+**).
+**Objective:** Prove automated contract tests pass locally (mocked explain; **no** live OpenAI).
 
 **Steps:**
 
-1. Install **Python 3.11+** (e.g. from python.org, Homebrew, or `pyenv`).
-2. `cd lexie-server && python3.11 -m venv .venv && source .venv/bin/activate`
-3. `pip install -e ".[dev]"` (or `pip install --upgrade pip` first if needed).
-4. `pytest -v`
-5. *(Optional follow-up, not required to close WX-003)*: add a GitHub Actions workflow that runs `pytest` on `push`/`pull_request` with `python-version: "3.11"`—document in [`lexie-server/README.md`](../lexie-server/README.md) if added.
+1. Install **Python 3.11+** (python.org, Homebrew, or `pyenv`).
+2. `cd lexie-server && python3.11 -m venv .venv && source .venv/bin/activate` (Windows: `.venv\Scripts\activate`).
+3. `pip install -U pip && pip install -e ".[dev]"`.
+4. `pytest -v`.
 
-**Done when:** `pytest` exits **0** on your machine; note any **ffmpeg** requirement for future integration tests (duration/pydub) in README if you hit environment issues.
+**Done when:** `pytest` exits **0**. Optional: add a GitHub Actions workflow later (not required to close this item).
 
-**Depends on:** Nothing blocking; can run before **WX-001**.
+**Depends on:** Nothing. **Do this before WX-014** so regressions show up before manual M0.
 
 ---
 
-### WX-001 — Part C (M0) local smoke
+### WX-014 — M0: dotenv, server, and health (C1–C2)
 
-**Objective:** Prove the stack works **on your laptop** with a **real** `OPENAI_API_KEY` (and tokens after **WX-002**) before relying on a public URL.
+**Objective:** Run the app locally with secrets from 1Password and confirm the process is healthy.
 
-**Steps (maps to checklist C1–C6):**
+**Steps:**
 
-1. **C1 — `.env`:** Copy [`lexie-server/.env.example`](../lexie-server/.env.example) to **`lexie-server/.env`** (gitignored). Fill `OPENAI_API_KEY` from 1Password; add `LEXIE_DEVICE_KEY` and `LEXIE_ADMIN_TOKEN` when **WX-002** is done; set `LEXIE_DATA_DIR` if needed.
-2. **C2 — Run server:** `uvicorn lexie_server.main:app --reload --host 0.0.0.0 --port 8000` from `lexie-server/`. Open `GET http://127.0.0.1:8000/health` → **200** JSON with `"ok": true`.
-3. **C3 — Profile API:** `GET /profile` without `Authorization` → **401**. With `Authorization: Bearer <LEXIE_ADMIN_TOKEN>` → **200** and profile JSON. Optionally `PATCH` a field and verify response.
-4. **C4 — Admin page:** Browser `GET http://127.0.0.1:8000/admin` → **200** HTML. Paste admin token (e.g. via page flow / sessionStorage per template), load/save profile, refresh.
-5. **C5 — Explain:** Use **`/prototype/`** or `curl`/client to `POST /explain` with a short audio clip and device auth header → **200** `audio/mpeg` (or **400** with JSON for too-short/unintelligible per SPEC).
-6. **C6 — No raw audio on disk:** With **`LEXIE_LOG_REQUESTS=0`** (default), confirm you are not persisting uploaded audio blobs to disk; optional DB logging only stores metadata/transcript policy per SPEC §7.
+1. Copy [`lexie-server/.env.example`](../lexie-server/.env.example) to **`lexie-server/.env`**. Set **`OPENAI_API_KEY`**; set **`LEXIE_DATA_DIR`** if needed; add device/admin tokens when **WX-002** is done.
+2. `uvicorn lexie_server.main:app --reload --host 0.0.0.0 --port 8000` from `lexie-server/`.
+3. `GET http://127.0.0.1:8000/health` → **200** JSON, `"ok": true`.
 
-**Done when:** C1–C6 are satisfied on your side; master checklist **Part C** can be ticked.
+**Done when:** C1–C2 satisfied.
 
-**Depends on:** **WX-003** recommended first (green tests); **WX-002** for realistic auth during C3–C5 (or use empty device key only where SPEC allows dev bypass).
+**Depends on:** **WX-013** done. **WX-002** optional for this step (no profile/explain auth yet).
+
+---
+
+### WX-015 — M0: profile admin auth (C3)
+
+**Objective:** Verify admin-only access to `/profile`.
+
+**Steps:**
+
+1. `GET /profile` with no `Authorization` → **401**.
+2. `GET /profile` with `Authorization: Bearer <LEXIE_ADMIN_TOKEN>` → **200** and JSON body.
+3. Optionally `PATCH /profile` with a small change and verify response.
+
+**Done when:** C3 satisfied.
+
+**Depends on:** **WX-014**; **`LEXIE_ADMIN_TOKEN`** in `.env` (typically **WX-002**).
+
+---
+
+### WX-016 — M0: admin HTML (C4)
+
+**Objective:** Exercise the browser admin page against a running server.
+
+**Steps:**
+
+1. Open `http://127.0.0.1:8000/admin` → **200** `text/html`.
+2. Paste admin token (per [`admin.html`](../lexie-server/lexie_server/templates/admin.html) / `sessionStorage` flow), load profile, save, refresh and confirm persistence.
+
+**Done when:** C4 satisfied.
+
+**Depends on:** **WX-014**; **WX-002** for token.
+
+---
+
+### WX-017 — M0: `POST /explain` real pipeline (C5)
+
+**Objective:** End-to-end Whisper → chat → TTS (or clear **400** JSON for bad input).
+
+**Steps:**
+
+1. Ensure **`ffmpeg`** is on **`PATH`** (pydub duration / MP3 handling).
+2. Use **`/prototype/`** or another client; send **`POST /explain`** with `multipart` field **`audio`**, plus **`Authorization: Bearer <LEXIE_DEVICE_KEY>`** if `LEXIE_DEVICE_KEY` is set (**WX-002**).
+3. Expect **200** `audio/mpeg` with MP3 bytes, or **400** with JSON for too-short / empty transcript / policy per SPEC.
+
+**Done when:** C5 satisfied at least once with acceptable audio.
+
+**Depends on:** **WX-014**; **WX-002** if device key enforcement is on; **WX-013** recommended first.
+
+---
+
+### WX-018 — M0: privacy — no raw audio on disk (C6)
+
+**Objective:** Confirm default behavior matches SPEC §7 (no raw uploads persisted as files).
+
+**Steps:**
+
+1. Keep **`LEXIE_LOG_REQUESTS=0`** (default).
+2. After **WX-017**, confirm you are not writing uploaded blobs to disk as part of normal operation; DB rows (if any) should match logging policy in SPEC / data-model doc.
+
+**Done when:** C6 satisfied; master checklist **Part C** can be ticked when **WX-014**–**WX-018** are all **done**.
+
+**Depends on:** **WX-017** (or a skipped explain if you only verify logging flags—prefer running explain once).
 
 ---
 
 ## Section D — Future milestones (master checklist Parts C–J and extras)
 
-The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.MASTER-CHECKLIST.md) items with **what**, **why it matters**, and **typical dependency**. Part **C** step-by-step is **WX-001** (Section C); items below add context or post-M0 scope.
+The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.MASTER-CHECKLIST.md) items with **what**, **why it matters**, and **typical dependency**. Part **C** step-by-step is **WX-013**–**WX-018** (Section C); items below add context or post-M0 scope.
 
 ### Dev workflow: V4, V5
 
 | Item | What | Why it matters | Typical owner / dependency |
 |------|------|----------------|----------------------------|
-| **V4** | Copy secrets from 1Password into **gitignored** `.env` locally; on deploy, paste into **host** secret UI—1Password stays canonical. | Prevents secrets in git and keeps a single source of truth. | You; before **WX-001** / production. |
+| **V4** | Copy secrets from 1Password into **gitignored** `.env` locally; on deploy, paste into **host** secret UI—1Password stays canonical. | Prevents secrets in git and keeps a single source of truth. | You; before **WX-014** / production. |
 | **V5** | *(Optional)* 1Password CLI (`op run`) to inject env without leaving secrets in shell history. | Safer local and CI patterns. | Optional anytime. |
 
 ### Optional setup: A3, A4, A5
@@ -139,12 +201,12 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 
 | Item | What | Why it matters | Typical owner / dependency |
 |------|------|----------------|----------------------------|
-| **C1** | Local `.env` with real keys from vault. | Safe dev and parity with prod secrets pattern. | **WX-001** |
-| **C2** | `uvicorn` + `/health` **200**. | Confirms process and routing. | **WX-001** |
-| **C3** | `/profile` **401** without admin; **200** with Bearer. | Validates admin gate. | **WX-001** + **WX-002** |
-| **C4** | `/admin` HTML + token + save profile. | Parent journey locally. | **WX-001** |
-| **C5** | `POST /explain` returns audio or structured error. | Core product path. | **WX-001**; **ffmpeg** on PATH if pipeline needs it |
-| **C6** | No raw audio files on disk; default logging off. | Privacy per SPEC §7. | **WX-001** |
+| **C1** | Local `.env` with real keys from vault. | Safe dev and parity with prod secrets pattern. | **WX-014** |
+| **C2** | `uvicorn` + `/health` **200**. | Confirms process and routing. | **WX-014** |
+| **C3** | `/profile` **401** without admin; **200** with Bearer. | Validates admin gate. | **WX-015** + **WX-002** |
+| **C4** | `/admin` HTML + token + save profile. | Parent journey locally. | **WX-016** |
+| **C5** | `POST /explain` returns audio or structured error. | Core product path. | **WX-017**; **ffmpeg** on PATH |
+| **C6** | No raw audio files on disk; default logging off. | Privacy per SPEC §7. | **WX-018** |
 
 ### Part D (M1) — Public HTTPS and reachability (WX-006)
 
@@ -224,9 +286,9 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 
 | WX | Focus |
 |----|--------|
-| WX-001 | M0 local smoke (Part C) |
+| WX-001 | *(cancelled — use WX-014–018)* |
 | WX-002 | A6/A7 tokens in 1Password |
-| WX-003 | Pytest on 3.11+ |
+| WX-003 | *(cancelled — use WX-013)* |
 | WX-004 | PM folder *(done)* |
 | WX-005 | `lexie-server` Part B *(done)* |
 | WX-006 | Part D M1 public deploy |
@@ -236,5 +298,11 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-010 | Part H M5 ops |
 | WX-011 | Part I lexie-ops optional |
 | WX-012 | Part J final sign-off |
+| WX-013 | Preflight pytest 3.11+ *(in progress)* |
+| WX-014 | M0 C1–C2 `.env` + health |
+| WX-015 | M0 C3 profile auth |
+| WX-016 | M0 C4 `/admin` browser |
+| WX-017 | M0 C5 `POST /explain` |
+| WX-018 | M0 C6 privacy |
 
 See [`registry.md`](registry.md) for status and dates.
