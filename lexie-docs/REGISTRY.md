@@ -20,3 +20,7 @@ Prefix: **LX**
 | **LX-4** — Physical Device Firmware | Consumes the LX-1 server API. |
 | **LX-5** — Wake Word | Deferred; requires always-on microphone. |
 | **LX-6** — Platform hardening | “Hosted” is not a separate gate — **deploy in Phase 1**; later hardening TBD. |
+
+## Execution work (WX-*)
+
+Engineering tasks (deploy, tests, secrets) use **`WX-*`** ids in the monorepo **[`project-management/registry.md`](../project-management/registry.md)** and are **not** listed in this LX table.
