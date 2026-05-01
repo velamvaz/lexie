@@ -33,6 +33,17 @@ uvicorn lexie_server.main:app --reload --host 0.0.0.0 --port 8000
 
 SQLite DB file defaults to `<LEXIE_DATA_DIR>/lexie.db` unless `LEXIE_DATABASE_URL` is set.
 
+## First manual smoke (WX-014)
+
+Goal: prove the process runs on your machine and **`GET /health`** returns **200** (checklist C1–C2). You do **not** need a valid `OPENAI_API_KEY` for `/health` (add it before **`POST /explain`** in WX-017).
+
+1. Finish **Setup** above (venv + `pip install -e ".[dev]"`).
+2. `cp .env.example .env` — optional edits for now; defaults create `./data/` for SQLite.
+3. Start: `uvicorn lexie_server.main:app --reload --host 127.0.0.1 --port 8000`
+4. In another terminal: `curl -s http://127.0.0.1:8000/health` — expect JSON with `"ok": true`.
+
+When that works, mark **WX-014** done in [`project-management/registry.md`](../project-management/registry.md) and continue with **WX-015** (`/profile` auth).
+
 ## Tests (preflight / WX-013)
 
 Contract tests use **mocks** for the explain pipeline; they do **not** call OpenAI. Requires **Python 3.11+**.
