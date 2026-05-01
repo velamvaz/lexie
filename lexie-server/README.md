@@ -73,6 +73,28 @@ pytest -v
 
 For integration tests that hit **pydub** / real audio duration, install **ffmpeg** on the runner or keep those tests mocked.
 
+## Troubleshooting
+
+### macOS: Homebrew installed but `brew: command not found`
+
+Homebrew’s binaries are not on your **`PATH`**. Add **`brew shellenv`** once (Apple Silicon vs Intel):
+
+**Apple Silicon** — if `ls /opt/homebrew/bin/brew` succeeds:
+
+```bash
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+
+**Intel** — if `ls /usr/local/bin/brew` succeeds:
+
+```bash
+echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/usr/local/bin/brew shellenv)"
+```
+
+Then open a new terminal or run `exec zsh -l` and check `brew --version`. Official docs: [Homebrew — Installation](https://docs.brew.sh/Installation).
+
 ## Environment
 
 See **`.env.example`**.
