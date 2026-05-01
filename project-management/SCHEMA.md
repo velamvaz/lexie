@@ -1,5 +1,7 @@
 # Work item schema (minimal)
 
+**Elaboration:** Long-form objectives, steps, and roadmap tables live in [`work-inventory.md`](work-inventory.md). **`registry.md`** remains the canonical place for **current status** per `WX-*` row.
+
 ## Identity
 
 | Field | Required | Description |

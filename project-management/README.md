@@ -6,6 +6,7 @@ This folder tracks **execution work**: what is planned, in flight, blocked, or d
 |----------|---------|
 | [SCHEMA.md](SCHEMA.md) | Field definitions and status rules |
 | [registry.md](registry.md) | **Current** work items (single table; update in place) |
+| [work-inventory.md](work-inventory.md) | **Elaborated** narrative: done / in progress / planned steps, and full future milestone detail (Parts C–J); links from **Notes** in `registry.md` |
 | [work-log/](work-log/) | **Append-only** narrative log by month (decisions, progress, links to commits/PRs) |
 | [items/TEMPLATE.md](items/TEMPLATE.md) | Optional long-form notes for a work item (link from registry) |
 
