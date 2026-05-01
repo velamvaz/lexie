@@ -58,6 +58,25 @@ Goal: prove the process runs on your machine and **`GET /health`** returns **200
 
 When that works, mark **WX-014** done in [`project-management/registry.md`](../project-management/registry.md) and continue with **WX-015** (`/profile` auth).
 
+## Profile API auth (WX-015)
+
+**Set `LEXIE_ADMIN_TOKEN` in `.env` to a non-empty secret.** If it is empty, `GET /profile` returns **500** (`internal`) — the app treats missing admin config as misconfiguration, not “unauthorized.”
+
+With the server running (`uvicorn` as above), in a second terminal:
+
+```bash
+# Expect 401 (no header)
+curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/profile
+
+# Expect 401 (wrong token)
+curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: Bearer wrong" http://127.0.0.1:8000/profile
+
+# Expect 200 + JSON (use the same string as LEXIE_ADMIN_TOKEN in .env)
+curl -s http://127.0.0.1:8000/profile -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+```
+
+Optional: `PATCH /profile` with a JSON body and `Authorization: Bearer …` to confirm updates (same admin token).
+
 ## Tests (preflight / WX-013)
 
 Contract tests use **mocks** for the explain pipeline; they do **not** call OpenAI. Requires **Python 3.11+**.

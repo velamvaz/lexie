@@ -54,11 +54,11 @@
 
 ## Section B — In progress
 
-**Active:** [**WX-015**](registry.md) — **`/profile`**: 401 without admin Bearer, 200 with token (checklist C3). See [§ WX-015](#wx-015--m0-profile-admin-auth-c3). Set **`LEXIE_ADMIN_TOKEN`** in **`.env`** and use the same value in `Authorization: Bearer …` when testing with `curl`.
+**Active:** [**WX-016**](registry.md) — Open **`/admin`** in a browser, paste **`LEXIE_ADMIN_TOKEN`**, load and save profile (checklist C4). See [§ WX-016](#wx-016--m0-admin-html-c4). Server: `http://127.0.0.1:8000/admin` (or your port).
 
-**Done recently:** **WX-013** (7× `pytest` passed on Python 3.11 venv). **WX-014** (`cp .env.example .env`, `uvicorn`, **`GET /health`** → `ok: true`).
+**Done recently:** **WX-015** — with **`LEXIE_ADMIN_TOKEN`** set, **`GET /profile`** returns **401** without/with wrong Bearer and **200** with correct token (see [`README`](../lexie-server/README.md) § Profile API auth).
 
-**Next:** Finish **WX-015**, then **WX-016**–**WX-018**. Add **WX-002** (1Password tokens) when you want production-like secrets.
+**Next:** Finish **WX-016**, then **WX-017**–**WX-018**. **WX-002** (1Password) when you rotate to real secrets.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/) (e.g. `work-log/2026-04.md`).
 
@@ -302,8 +302,8 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-012 | Part J final sign-off |
 | WX-013 | Preflight pytest 3.11+ *(done; CI + local 3.11+)* |
 | WX-014 | M0 C1–C2 `.env` + health *(done)* |
-| WX-015 | M0 C3 profile auth *(in progress)* |
-| WX-016 | M0 C4 `/admin` browser |
+| WX-015 | M0 C3 profile auth *(done)* |
+| WX-016 | M0 C4 `/admin` browser *(in progress)* |
 | WX-017 | M0 C5 `POST /explain` |
 | WX-018 | M0 C6 privacy |
 
