@@ -33,13 +33,20 @@ uvicorn lexie_server.main:app --reload --host 0.0.0.0 --port 8000
 
 SQLite DB file defaults to `<LEXIE_DATA_DIR>/lexie.db` unless `LEXIE_DATABASE_URL` is set.
 
-## Tests
+## Tests (preflight / WX-013)
+
+Contract tests use **mocks** for the explain pipeline; they do **not** call OpenAI. Requires **Python 3.11+**.
 
 ```bash
-pytest
+cd lexie-server
+python3.11 -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+pytest -v
 ```
 
-The suite mocks the explain pipeline; it does not call OpenAI. CI should install **ffmpeg** or use mocks for audio-length checks if you add more integration tests.
+**CI:** On push/PR, [`.github/workflows/lexie-server-pytest.yml`](../.github/workflows/lexie-server-pytest.yml) runs the same suite on **Python 3.11** (Ubuntu). Check the **Actions** tab on GitHub after you push.
+
+For integration tests that hit **pydub** / real audio duration, install **ffmpeg** on the runner or keep those tests mocked.
 
 ## Environment
 

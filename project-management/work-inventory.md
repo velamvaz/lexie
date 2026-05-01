@@ -54,9 +54,11 @@
 
 ## Section B — In progress
 
-**Active:** [**WX-013**](registry.md) ([§ detail](#wx-013--preflight-pytest-on-python-311-or-newer)) — **Preflight:** run **`pytest`** on **Python 3.11+** in `lexie-server` (contract tests + mocked pipeline; no live OpenAI).
+**Active:** [**WX-014**](registry.md) — **M0** manual smoke: **`.env`**, **`uvicorn`**, **`GET /health`** (checklist C1–C2). See [§ WX-014](#wx-014--m0-dotenv-server-and-health-c1c2).
 
-**Next after WX-013:** Mark **WX-013** `done` in [`registry.md`](registry.md), set **WX-014** to `in_progress`, and continue through **WX-018** (M0 manual checks). Complete or partially overlap **WX-002** (tokens in 1Password) before **WX-015**–**WX-017** if you want real device/admin auth (dev can use empty `LEXIE_DEVICE_KEY` only where the server allows).
+**WX-013 (done):** GitHub Actions runs **`pytest`** on **Python 3.11** for every push/PR touching `lexie-server/` ([workflow](../.github/workflows/lexie-server-pytest.yml)). Run **`pytest -v` locally** when you have **Python 3.11+** installed (this environment had only 3.9; CI is the verified green path).
+
+**Next after WX-014:** Mark **WX-014** `done`, set **WX-015** `in_progress`, and continue through **WX-018**. Overlap **WX-002** (1Password tokens) before **WX-015**–**WX-017** if you want enforced device/admin auth.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/) (e.g. `work-log/2026-04.md`).
 
@@ -83,9 +85,9 @@
 
 ---
 
-### WX-013 — Preflight: pytest on Python 3.11 or newer
+### WX-013 — Preflight: pytest on Python 3.11 or newer *(done)*
 
-**Objective:** Prove automated contract tests pass locally (mocked explain; **no** live OpenAI).
+**Objective:** Prove automated contract tests pass (mocked explain; **no** live OpenAI).
 
 **Steps:**
 
@@ -94,9 +96,9 @@
 3. `pip install -U pip && pip install -e ".[dev]"`.
 4. `pytest -v`.
 
-**Done when:** `pytest` exits **0**. Optional: add a GitHub Actions workflow later (not required to close this item).
+**Done when:** `pytest` exits **0**. **CI:** [`.github/workflows/lexie-server-pytest.yml`](../.github/workflows/lexie-server-pytest.yml) runs the same on **Ubuntu** / **Python 3.11** on push and PR (paths: `lexie-server/**`). Confirm the workflow is **green** on `main` after push.
 
-**Depends on:** Nothing. **Do this before WX-014** so regressions show up before manual M0.
+**Depends on:** Nothing. **Complete before WX-014** so regressions show up before manual M0.
 
 ---
 
@@ -298,7 +300,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-010 | Part H M5 ops |
 | WX-011 | Part I lexie-ops optional |
 | WX-012 | Part J final sign-off |
-| WX-013 | Preflight pytest 3.11+ *(in progress)* |
+| WX-013 | Preflight pytest 3.11+ *(done; CI + local 3.11+)* |
 | WX-014 | M0 C1–C2 `.env` + health |
 | WX-015 | M0 C3 profile auth |
 | WX-016 | M0 C4 `/admin` browser |
