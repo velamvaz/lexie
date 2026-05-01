@@ -54,11 +54,11 @@
 
 ## Section B — In progress
 
-**Active:** [**WX-014**](registry.md) — **M0** manual smoke: **`.env`**, **`uvicorn`**, **`GET /health`** (checklist C1–C2). See [§ WX-014](#wx-014--m0-dotenv-server-and-health-c1c2).
+**Active:** [**WX-015**](registry.md) — **`/profile`**: 401 without admin Bearer, 200 with token (checklist C3). See [§ WX-015](#wx-015--m0-profile-admin-auth-c3). Set **`LEXIE_ADMIN_TOKEN`** in **`.env`** and use the same value in `Authorization: Bearer …` when testing with `curl`.
 
-**WX-013 (done):** GitHub Actions runs **`pytest`** on **Python 3.11** for every push/PR touching `lexie-server/` ([workflow](../.github/workflows/lexie-server-pytest.yml)). Run **`pytest -v` locally** when you have **Python 3.11+** installed (this environment had only 3.9; CI is the verified green path).
+**Done recently:** **WX-013** (7× `pytest` passed on Python 3.11 venv). **WX-014** (`cp .env.example .env`, `uvicorn`, **`GET /health`** → `ok: true`).
 
-**Next after WX-014:** Mark **WX-014** `done`, set **WX-015** `in_progress`, and continue through **WX-018**. Overlap **WX-002** (1Password tokens) before **WX-015**–**WX-017** if you want enforced device/admin auth.
+**Next:** Finish **WX-015**, then **WX-016**–**WX-018**. Add **WX-002** (1Password tokens) when you want production-like secrets.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/) (e.g. `work-log/2026-04.md`).
 
@@ -301,8 +301,8 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-011 | Part I lexie-ops optional |
 | WX-012 | Part J final sign-off |
 | WX-013 | Preflight pytest 3.11+ *(done; CI + local 3.11+)* |
-| WX-014 | M0 C1–C2 `.env` + health |
-| WX-015 | M0 C3 profile auth |
+| WX-014 | M0 C1–C2 `.env` + health *(done)* |
+| WX-015 | M0 C3 profile auth *(in progress)* |
 | WX-016 | M0 C4 `/admin` browser |
 | WX-017 | M0 C5 `POST /explain` |
 | WX-018 | M0 C6 privacy |

@@ -4,7 +4,7 @@ Single table for **current** work items. IDs are **`WX-*`** (execution). For pro
 
 **Elaborated narrative** (objectives, steps, acceptance, full milestone tables): **[`work-inventory.md`](work-inventory.md)**. Use this file for **status** and quick scanning; use `work-inventory.md` for detail.
 
-**M0 preflight** is **WX-013** (done: CI + docs) then **WX-014–WX-018**. **WX-014** is **`in_progress`** (manual smoke). Complete **WX-002** (tokens) when you need real device/admin auth for **WX-015**–**WX-017**.
+**M0 preflight:** **WX-013** and **WX-014** are **done** locally (pytest + `/health`). **WX-015** is **`in_progress`** (`/profile` auth). Complete **WX-002** (tokens) when you need real device/admin auth for stricter checks.
 
 | ID | Title | Status | Feature | Area | Updated | Notes |
 |----|-------|--------|---------|------|---------|-------|
@@ -20,9 +20,9 @@ Single table for **current** work items. IDs are **`WX-*`** (execution). For pro
 | WX-010 | Part H (M5) — steady operation and cost | backlog | LX-1 | ops | 2026-04-22 | [§ Future — Part H](work-inventory.md#part-h-m5--steady-operation-wx-010) |
 | WX-011 | Part I — lexie-ops optional local monitor | backlog | LX-1 | ops | 2026-04-22 | [§ Future — Part I](work-inventory.md#part-i--lexie-ops-optional-wx-011) |
 | WX-012 | Part J — SPEC §11 definition-of-done sign-off | backlog | LX-1 | release | 2026-04-22 | [§ Future — Part J](work-inventory.md#part-j--definition-of-done-spec-11-wx-012) |
-| WX-013 | **Preflight:** `pytest` passes on Python 3.11+ in `lexie-server` | done | LX-1 | lexie-server | 2026-04-30 | [§ WX-013](work-inventory.md#wx-013--preflight-pytest-on-python-311-or-newer). CI: [`.github/workflows/lexie-server-pytest.yml`](../.github/workflows/lexie-server-pytest.yml) on push/PR. Local: `python3.11 -m venv .venv && pip install -e ".[dev]" && pytest -v`. |
-| WX-014 | **M0:** `.env` + `uvicorn` + `GET /health` → 200 (checklist C1–C2) | **in_progress** | LX-1 | lexie-server | 2026-04-30 | [§ WX-014](work-inventory.md#wx-014--m0-dotenv-server-and-health-c1c2) |
-| WX-015 | **M0:** `GET`/`PATCH /profile` — 401 without admin, 200 with Bearer (C3) | planned | LX-1 | lexie-server | 2026-04-30 | [§ WX-015](work-inventory.md#wx-015--m0-profile-admin-auth-c3) |
+| WX-013 | **Preflight:** `pytest` passes on Python 3.11+ in `lexie-server` | done | LX-1 | lexie-server | 2026-04-30 | [§ WX-013](work-inventory.md#wx-013--preflight-pytest-on-python-311-or-newer). CI + **local:** 7 passed (`/opt/homebrew/bin/python3.11` venv). |
+| WX-014 | **M0:** `.env` + `uvicorn` + `GET /health` → 200 (checklist C1–C2) | done | LX-1 | lexie-server | 2026-04-30 | [§ WX-014](work-inventory.md#wx-014--m0-dotenv-server-and-health-c1c2). `.env` from example; `curl /health` → `ok: true`. |
+| WX-015 | **M0:** `GET`/`PATCH /profile` — 401 without admin, 200 with Bearer (C3) | **in_progress** | LX-1 | lexie-server | 2026-04-30 | [§ WX-015](work-inventory.md#wx-015--m0-profile-admin-auth-c3) |
 | WX-016 | **M0:** Browser `/admin` — token, load profile, save, refresh (C4) | planned | LX-1 | lexie-server | 2026-04-30 | [§ WX-016](work-inventory.md#wx-016--m0-admin-html-c4) |
 | WX-017 | **M0:** `POST /explain` with real or prototype audio — 200 MP3 or 400 JSON (C5) | planned | LX-1 | lexie-server | 2026-04-30 | [§ WX-017](work-inventory.md#wx-017--m0-post-explain-real-pipeline-c5); needs **ffmpeg** on PATH for duration/pipeline. |
 | WX-018 | **M0:** No raw audio on disk; `LEXIE_LOG_REQUESTS=0` default (C6) | planned | LX-1 | lexie-server | 2026-04-30 | [§ WX-018](work-inventory.md#wx-018--m0-privacy-no-raw-audio-c6) |
