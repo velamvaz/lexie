@@ -10,10 +10,24 @@ FastAPI app for the Word Explainer: `POST /explain` (Push-to-Talk audio), profil
 
 ## Setup
 
+**Requires Python 3.11+ on your PATH** (`python3.11`, or `python3.12` / `python3.13`). If macOS only has 3.9, install from [python.org](https://www.python.org/downloads/) or `brew install python@3.11`.
+
+**Option A — helper script** (picks the newest 3.11+ it finds):
+
+```bash
+cd lexie-server
+chmod +x scripts/bootstrap-venv.sh   # once
+./scripts/bootstrap-venv.sh
+source .venv/bin/activate
+```
+
+**Option B — manual**
+
 ```bash
 cd lexie-server
 python3.11 -m venv .venv
 source .venv/bin/activate
+pip install -U pip
 pip install -e ".[dev]"
 cp .env.example .env
 # Set OPENAI_API_KEY and optional LEXIE_DEVICE_KEY / LEXIE_ADMIN_TOKEN
