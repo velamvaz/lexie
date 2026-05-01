@@ -54,11 +54,11 @@
 
 ## Section B — In progress
 
-**Active:** [**WX-016**](registry.md) — Open **`/admin`** in a browser, paste **`LEXIE_ADMIN_TOKEN`**, load and save profile (checklist C4). See [§ WX-016](#wx-016--m0-admin-html-c4). Server: `http://127.0.0.1:8000/admin` (or your port).
+**Active:** [**WX-017**](registry.md) — **`POST /explain`** with real audio (OpenAI + **ffmpeg**). See [§ WX-017](#wx-017--m0-post-explain-real-pipeline-c5) and [`README`](../lexie-server/README.md) § Run / prototype.
 
-**Done recently:** **WX-015** — with **`LEXIE_ADMIN_TOKEN`** set, **`GET /profile`** returns **401** without/with wrong Bearer and **200** with correct token (see [`README`](../lexie-server/README.md) § Profile API auth).
+**Done recently:** **WX-016** — **`/admin`** fixed (Starlette `TemplateResponse`); browser flow: token → Load → Save → reload. **`curl /admin`** → **200**.
 
-**Next:** Finish **WX-016**, then **WX-017**–**WX-018**. **WX-002** (1Password) when you rotate to real secrets.
+**Next:** **`OPENAI_API_KEY`** + **`ffmpeg`**; then **WX-018** (privacy).
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/) (e.g. `work-log/2026-04.md`).
 
@@ -303,8 +303,8 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-013 | Preflight pytest 3.11+ *(done; CI + local 3.11+)* |
 | WX-014 | M0 C1–C2 `.env` + health *(done)* |
 | WX-015 | M0 C3 profile auth *(done)* |
-| WX-016 | M0 C4 `/admin` browser *(in progress)* |
-| WX-017 | M0 C5 `POST /explain` |
+| WX-016 | M0 C4 `/admin` browser *(done)* |
+| WX-017 | M0 C5 `POST /explain` *(in progress)* |
 | WX-018 | M0 C6 privacy |
 
 See [`registry.md`](registry.md) for status and dates.

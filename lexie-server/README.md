@@ -77,6 +77,22 @@ curl -s http://127.0.0.1:8000/profile -H "Authorization: Bearer YOUR_ADMIN_TOKEN
 
 Optional: `PATCH /profile` with a JSON body and `Authorization: Bearer …` to confirm updates (same admin token).
 
+## Admin page in browser (WX-016)
+
+1. Set **`LEXIE_ADMIN_TOKEN`** in **`.env`** (same as [WX-015](#profile-api-auth-wx-015)).
+2. Start **`uvicorn`** (e.g. `http://127.0.0.1:8000`).
+3. Open **`http://127.0.0.1:8000/admin`** — expect **200** and the “Lexie — child profile” form (no token in the URL).
+4. Paste the admin token → **Load profile** → fields fill from **`GET /profile`**.
+5. Change a field → **Save** → should show “Saved.” Reload the page, paste token again, **Load profile** → changes should persist.
+
+The page stores the token in **`sessionStorage`** only for this tab (`lexie_admin_bearer`).
+
+Quick check without a browser:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/admin   # expect 200
+```
+
 ## Tests (preflight / WX-013)
 
 Contract tests use **mocks** for the explain pipeline; they do **not** call OpenAI. Requires **Python 3.11+**.

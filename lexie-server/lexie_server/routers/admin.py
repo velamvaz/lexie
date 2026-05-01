@@ -11,4 +11,5 @@ router = APIRouter(tags=["admin"])
 
 @router.get("/admin", response_class=HTMLResponse)
 def admin_page(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse("admin.html", {"request": request})
+    # Starlette ≥0.45: TemplateResponse(request, name, context=...)
+    return templates.TemplateResponse(request, "admin.html")
