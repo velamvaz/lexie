@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lexie PTT prototype</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 1rem auto; padding: 0.5rem; }
+    button { font-size: 1.1rem; padding: 0.5rem 1rem; }
+    .hint { color: #555; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>Push-to-talk (browser)</h1>
+  <p class="hint">Use <strong>localhost</strong> or <strong>HTTPS</strong> so the mic works. Set device key to match <code>LEXIE_DEVICE_KEY</code>.</p>
+  <label>Device key <input id="dk" type="password" style="width:100%;" /></label>
+  <p><button id="rec" type="button">Hold to talk</button></p>
+  <p id="st"></p>
+  <audio id="out" controls style="width:100%"></audio>
+  <script>
+    const base = location.origin;
+    const k = "lexie_device_bearer";
+    if (sessionStorage.getItem(k)) document.getElementById("dk").value = sessionStorage.getItem(k);
+    let m = null, chunks = [];
+    const st = (t) => { document.getElementById("st").textContent = t; };
+    const rec = document.getElementById("rec");
+    rec.onmousedown = rec.ontouchstart = async (e) => { e.preventDefault(); await start(); };
+    rec.onmouseup = rec.onmouseleave = rec.ontouchend = () => stop();
+    async function start() {
+      chunks = [];
+      m = new MediaRecorder(await navigator.mediaDevices.getUserMedia({ audio: true }), { mimeType: "audio/webm" });
+      m.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+      m.start();
+      st("Recording…");
+    }
+    async function stop() {
+      if (!m || m.state === "inactive") return;
+      await new Promise((r) => { m.onstop = r; m.stop(); });
+      st("Sending…");
+      const blob = new Blob(chunks, { type: "audio/webm" });
+      const fd = new FormData();
+      fd.append("audio", blob, "rec.webm");
+      const t = document.getElementById("dk").value.trim();
+      if (t) sessionStorage.setItem(k, t);
+      const headers = {};
+      if (t) headers["Authorization"] = "Bearer " + t;
+      const res = await fetch(base + "/explain", { method: "POST", body: fd, headers });
+      if (!res.ok) { st("Error: " + res.status + " " + await res.text()); return; }
+      const b = await res.blob();
+      document.getElementById("out").src = URL.createObjectURL(b);
+      st("Play below.");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lexie — parent profile</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; line-height: 1.4; }
+    body { max-width: 28rem; margin: 1rem auto; padding: 0 0.75rem; }
+    label { display: block; margin-top: 0.75rem; font-weight: 600; }
+    input, textarea, button { width: 100%; box-sizing: border-box; font-size: 1rem; margin-top: 0.25rem; }
+    button { margin-top: 1rem; padding: 0.5rem; }
+    .msg { margin-top: 0.5rem; color: #333; }
+    .err { color: #a30; }
+  </style>
+</head>
+<body>
+  <h1>Lexie — child profile</h1>
+  <p>Enter your <strong>admin token</strong> once (kept in this browser session only, not the URL).</p>
+  <label for="admin">Admin token</label>
+  <input id="admin" type="password" autocomplete="off" />
+  <button type="button" id="load">Load profile</button>
+  <hr />
+  <label for="child_name">Child name / nickname</label>
+  <input id="child_name" />
+  <label for="age_years">Age (years)</label>
+  <input id="age_years" type="number" min="3" max="15" />
+  <label for="reading_level">Reading level (short text)</label>
+  <input id="reading_level" />
+  <label for="explanation_style">Explanation style (optional)</label>
+  <textarea id="explanation_style" rows="2"></textarea>
+  <button type="button" id="save">Save</button>
+  <p id="msg" class="msg" role="status"></p>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const base = location.origin;
+    const tokenKey = "lexie_admin_bearer";
+    if (sessionStorage.getItem(tokenKey)) $("admin").value = sessionStorage.getItem(tokenKey);
+    const authHeader = () => {
+      const t = $("admin").value.trim();
+      if (!t) return null;
+      return { Authorization: "Bearer " + t };
+    };
+    $("load").onclick = async () => {
+      const h = authHeader();
+      $("msg").textContent = "";
+      if (!h) { $("msg").textContent = "Enter admin token first."; $("msg").className = "msg err"; return; }
+      sessionStorage.setItem(tokenKey, $("admin").value.trim());
+      const r = await fetch(base + "/profile", { headers: h });
+      if (!r.ok) { $("msg").textContent = "Error " + r.status; $("msg").className = "msg err"; return; }
+      const j = await r.json();
+      $("child_name").value = j.child_name;
+      $("age_years").value = j.age_years;
+      $("reading_level").value = j.reading_level;
+      $("explanation_style").value = j.explanation_style || "";
+      $("msg").textContent = "Loaded.";
+      $("msg").className = "msg";
+    };
+    $("save").onclick = async () => {
+      const h = authHeader();
+      $("msg").textContent = "";
+      if (!h) { $("msg").textContent = "Enter admin token first."; $("msg").className = "msg err"; return; }
+      sessionStorage.setItem(tokenKey, $("admin").value.trim());
+      const body = {
+        child_name: $("child_name").value.trim(),
+        age_years: parseInt($("age_years").value, 10),
+        reading_level: $("reading_level").value.trim(),
+        explanation_style: $("explanation_style").value.trim() || null
+      };
+      const r = await fetch(base + "/profile", { method: "PATCH", headers: { ...h, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (!r.ok) { $("msg").textContent = "Error " + r.status; $("msg").className = "msg err"; return; }
+      $("msg").textContent = "Saved.";
+      $("msg").className = "msg";
+    };
+  </script>
+</body>
+</html>

@@ -11,9 +11,10 @@
 | When | Done |
 |------|------|
 | 2026-04-26 | **A1, A2** — OpenAI + API key in **1Password**; org budget/alerts. **V1, V2** — Private vault + API item. **V3** — Key that was once exposed in **chat** is **revoked**; only the current 1Password key is active. |
-| (next) | **A6, A7** — `LEXIE_DEVICE_KEY` + `LEXIE_ADMIN_TOKEN` in 1Password. **A3–A5** (optional) when you deploy. **Part B** — implement FastAPI server in monorepo. |
+| 2026-04-22 | **Part B (B1–B7)** — `lexie-server/` FastAPI app: health, profile, explain, admin HTML, prototype, SQLite + seed, pipeline; **pytest** + mocked explain in `tests/`. **README** + **`.env.example`**. |
+| (next) | **A6, A7** — `LEXIE_DEVICE_KEY` + `LEXIE_ADMIN_TOKEN` in 1Password. **Part C (M0)** — local smoke with **Python 3.11+** and real key (or deploy). **A3–A5** (optional) when you deploy. |
 
-**Reality check:** this repo (Lexie) currently has **no FastAPI `lexie-server` package in-tree** — Part B is “implement or import the app,” then run this checklist. If the server already lives in another repo, start at **Part C (M0)** with that code.
+**Reality check:** the monorepo includes **`lexie-server/`** (FastAPI). Use **Part C (M0)** to smoke-test locally; if you instead use a pre-built image from another repo, align env and routes, then continue from the matching milestone.
 
 **Convention:** copy this file or tick boxes in your editor. Items marked **(you)** require your account / billing / domain — a collaborator cannot do them for you.
 
@@ -46,13 +47,13 @@ Use **1Password** as the **canonical** store for every long-lived secret. **Neve
 
 ## Part B — Implement the server (per SPEC §14–16)
 
-- [ ] **B1** — Create or open the **FastAPI** app project (Python) matching [lexie-word-explainer.SPEC.md](lexie-word-explainer.SPEC.md) and [lexie-word-explainer.API-and-data-model.md](lexie-word-explainer.API-and-data-model.md) (or accept a pre-built image).
-- [ ] **B2** — Wire **`OPENAI_API_KEY`**, **`LEXIE_DEVICE_KEY`**, **`LEXIE_ADMIN_TOKEN`**, `LEXIE_LOG_REQUESTS=0`, `LEXIE_HEADWORD_TTS=0`, optional `LEXIE_CORS_ORIGINS` (see SPEC §2). In **README**, state that values come from **1Password** into **gitignored** `.env` (dev) or the **host** secret UI (prod) — never commit.
-- [ ] **B3** — **SQLite** `age_profile` + optional `explain_request` when `LEXIE_LOG_REQUESTS=1`; seed one profile row; migrations or `create_all` per data-model doc.
-- [ ] **B4** — Implement routes: `GET /health`, `GET`/`PATCH` `/profile`, `POST` `/explain`, `GET` `/admin` (HTML) per SPEC §3.  
-- [ ] **B5** — `POST /explain` pipeline: Whisper → GPT (JSON when needed) → TTS; size/duration limits and error JSON per SPEC §3.5, §5.  
-- [ ] **B6** — Prototype static page (or Vite) that records audio and `POST`s with **Bearer** device key (dev UX per SPEC §6).  
-- [ ] **B7** — **Automated tests:** contract + mocked OpenAI pipeline (see [lexie-word-explainer.TESTING-strategy.md](lexie-word-explainer.TESTING-strategy.md)); merge when green.
+- [x] **B1** — Create or open the **FastAPI** app project (Python) matching [lexie-word-explainer.SPEC.md](lexie-word-explainer.SPEC.md) and [lexie-word-explainer.API-and-data-model.md](lexie-word-explainer.API-and-data-model.md) (or accept a pre-built image). *(Implemented: `lexie-server/` in this repo.)*
+- [x] **B2** — Wire **`OPENAI_API_KEY`**, **`LEXIE_DEVICE_KEY`**, **`LEXIE_ADMIN_TOKEN`**, `LEXIE_LOG_REQUESTS=0`, `LEXIE_HEADWORD_TTS=0`, optional `LEXIE_CORS_ORIGINS` (see SPEC §2). In **README**, state that values come from **1Password** into **gitignored** `.env` (dev) or the **host** secret UI (prod) — never commit.
+- [x] **B3** — **SQLite** `age_profile` + optional `explain_request` when `LEXIE_LOG_REQUESTS=1`; seed one profile row; migrations or `create_all` per data-model doc.
+- [x] **B4** — Implement routes: `GET /health`, `GET`/`PATCH` `/profile`, `POST` `/explain`, `GET` `/admin` (HTML) per SPEC §3.  
+- [x] **B5** — `POST /explain` pipeline: Whisper → GPT (JSON when needed) → TTS; size/duration limits and error JSON per SPEC §3.5, §5.  
+- [x] **B6** — Prototype static page (or Vite) that records audio and `POST`s with **Bearer** device key (dev UX per SPEC §6).  
+- [x] **B7** — **Automated tests:** contract + mocked OpenAI pipeline (see [lexie-word-explainer.TESTING-strategy.md](lexie-word-explainer.TESTING-strategy.md)); merge when green. *Run with **Python 3.11+** (`fastapi` / `anyio` need 3.10+).*
 
 ---
 
