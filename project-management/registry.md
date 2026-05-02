@@ -4,7 +4,7 @@ Single table for **current** work items. IDs are **`WX-*`** (execution). For pro
 
 **Elaborated narrative** (objectives, steps, acceptance, full milestone tables): **[`work-inventory.md`](work-inventory.md)**. Use this file for **status** and quick scanning; use `work-inventory.md` for detail.
 
-**M0 (Part C):** **WX-014**–**WX-018** **done** (local health → admin → real explain → privacy C6). **WX-013** preflight tests green. **Next milestone:** **WX-006** (public HTTPS / M1) or pick **WX-007**–**WX-008** per [`work-inventory.md`](work-inventory.md).
+**M0 (Part C):** **WX-014**–**WX-018** **done**. **Active:** [**WX-006**](registry.md) — **M1** public HTTPS deploy (Dockerfile + docs in repo; you still create the host app and secrets). **WX-013** preflight tests green.
 
 | ID | Title | Status | Feature | Area | Updated | Notes |
 |----|-------|--------|---------|------|---------|-------|
@@ -13,7 +13,7 @@ Single table for **current** work items. IDs are **`WX-*`** (execution). For pro
 | WX-003 | Run `pytest` + optional CI on Python 3.11+ (lumped) | cancelled | LX-1 | lexie-server | 2026-04-30 | Superseded by **WX-013**. |
 | WX-004 | Monorepo PM folder: schema, registry, work-log | done | — | meta | 2026-04-22 | [§ Completed — WX-004](work-inventory.md#wx-004--project-management-folder); commit `c93390f` |
 | WX-005 | Phase 1 FastAPI server in repo + checklist Part B | done | LX-1 | lexie-server | 2026-04-22 | [§ Completed — WX-005](work-inventory.md#wx-005--phase-1-fastapi-server-part-b); commit `b1d6a85` |
-| WX-006 | Part D (M1) — public HTTPS deploy and reachability | backlog | LX-1 | release | 2026-04-22 | [§ Future — Part D](work-inventory.md#part-d-m1--public-https-and-reachability-wx-006) |
+| WX-006 | Part D (M1) — public HTTPS deploy and reachability | **in_progress** | LX-1 | release | 2026-05-03 | [§ Part D — WX-006](work-inventory.md#part-d-m1--public-https-and-reachability-wx-006); [`Dockerfile`](../lexie-server/Dockerfile) + [README deploy](../lexie-server/README.md#deploy-m1--wx-006). **Done when:** **D2** `https://…/health` **200** (you run deploy + DNS). |
 | WX-007 | Part E (M2) — child browser path (CORS, mic, device key, journeys) | backlog | LX-1 | release | 2026-04-22 | [§ Future — Part E](work-inventory.md#part-e-m2--child-browser-path-wx-007) |
 | WX-008 | Part F (M3) — parent admin on production host | backlog | LX-1 | release | 2026-04-22 | [§ Future — Part F](work-inventory.md#part-f-m3--parent-admin-on-real-host-wx-008) |
 | WX-009 | Part G (M4) — E2E shakedown / manual eval set | backlog | LX-1 | release | 2026-04-22 | [§ Future — Part G](work-inventory.md#part-g-m4--e2e-shakedown-wx-009) |

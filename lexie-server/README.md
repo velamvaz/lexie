@@ -129,6 +129,39 @@ Each successful explain does **three sequential OpenAI calls**: **Whisper** (aud
 **Payload limit**  
 Request bodies larger than **2 MiB** get **413** `payload_too_large` before the pipeline runs (see tests).
 
+## Deploy (M1 / WX-006)
+
+Goal: **`https://<BASE_URL>/health` → 200** with TLS (checklist **D2**). Use your host’s **secret UI** for **`OPENAI_API_KEY`**, **`LEXIE_DEVICE_KEY`**, **`LEXIE_ADMIN_TOKEN`** — not only a laptop **`.env`**.
+
+### Docker image (recommended baseline)
+
+The repo includes a **`Dockerfile`** with **Python 3.11** and **`ffmpeg`** (required for **`POST /explain`**). Build from **`lexie-server/`**:
+
+```bash
+cd lexie-server
+docker build -t lexie-server .
+docker run --rm -p 8000:8000 \
+  -e OPENAI_API_KEY="…" \
+  -e LEXIE_DEVICE_KEY="…" \
+  -e LEXIE_ADMIN_TOKEN="…" \
+  -e PORT=8000 \
+  lexie-server
+```
+
+Then **`curl -s http://127.0.0.1:8000/health`**.
+
+**SQLite on ephemeral disks:** the image sets **`LEXIE_DATA_DIR=/data`**. On Fly.io, Railway, Render, etc., attach a **persistent volume** (or mount) at **`/data`** so **`lexie.db`** survives restarts. Alternatively set **`LEXIE_DATABASE_URL`** to a managed Postgres/MySQL URL if you move off file SQLite.
+
+**Platform `PORT`:** the default **`CMD`** reads **`PORT`** (Render/Fly/Heroku-style). Your reverse proxy or platform should set **`PORT`** if not **8000**.
+
+**CORS:** set **`LEXIE_CORS_ORIGINS`** to the exact origin(s) that will call the API in the browser (comma-separated), e.g. your prototype or static site URL. For same-host **`/prototype`**, include your public **`https://<BASE_URL>`** if browsers treat it as a distinct origin in your setup.
+
+### After deploy (manual checks)
+
+1. **`curl -sS https://<BASE_URL>/health`** — JSON with **`"ok": true`**.  
+2. From **phone on cellular** (checklist **D3**): open or curl **`/health`**.  
+3. Store **`BASE_URL`** in 1Password (**D5**).
+
 ## Troubleshooting
 
 ### macOS: Homebrew installed but `brew: command not found`

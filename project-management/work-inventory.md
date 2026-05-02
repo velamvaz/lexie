@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-03  
+**Last updated:** 2026-05-03 (WX-006 started)  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -56,9 +56,9 @@
 
 **M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Active:** None on the M0 track — pick [**WX-006**](registry.md) (M1 deploy / public HTTPS) or [**WX-007**](registry.md) / [**WX-008**](registry.md) per roadmap.
+**Active:** [**WX-006**](registry.md) — **M1** public HTTPS: repo now has **[`Dockerfile`](../lexie-server/Dockerfile)** (Python 3.11 + **ffmpeg**) and **[README § Deploy](../lexie-server/README.md#deploy-m1--wx-006)**. **Your** steps: choose host (**A3**), create app, set secrets, attach **`/data`** volume (or **`LEXIE_DATABASE_URL`**), confirm **D2**/**D3**, save **`BASE_URL`** in 1Password (**D5**).
 
-**Done recently:** **WX-018** — C6 verified: uploads stay in memory on the default path (no raw audio files under **`LEXIE_DATA_DIR`**); **`LEXIE_LOG_REQUESTS=0`** default; optional **`explain_request`** rows only when logging is on. Tests + README § Performance and privacy.
+**Done recently:** **WX-018** — C6 closed. **WX-006** — deploy scaffolding landed in **`lexie-server/`** (not the live URL yet).
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
@@ -216,9 +216,11 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 
 ### Part D (M1) — Public HTTPS and reachability (WX-006)
 
+**Repo status (2026-05-03):** [`Dockerfile`](../lexie-server/Dockerfile), [`.dockerignore`](../lexie-server/.dockerignore), and [README — Deploy (M1 / WX-006)](../lexie-server/README.md#deploy-m1--wx-006) support **D1**; you still run **`docker build` / `fly deploy` / equivalent** and configure TLS + secrets on the host.
+
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
-| **D1** | Deploy app to host; bind env in **dashboard/secrets**, not only laptop `.env`. | Production serving. | **A3**, **WX-001** complete locally |
+| **D1** | Deploy app to host; bind env in **dashboard/secrets**, not only laptop `.env`. | Production serving. | **A3**, **M0** complete locally |
 | **D2** | `https://<BASE_URL>/health` → **200**. | Confirms TLS and routing. | **D1** |
 | **D3** | Hit `/health` from **phone on cellular**. | Rules out home-only networking issues. | **D2** |
 | **D4** | *(Optional)* External uptime ping to `/health`. | Operations visibility. | **D2**, **A5** |
@@ -297,7 +299,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-003 | *(cancelled — use WX-013)* |
 | WX-004 | PM folder *(done)* |
 | WX-005 | `lexie-server` Part B *(done)* |
-| WX-006 | Part D M1 public deploy |
+| WX-006 | Part D M1 public deploy *(in progress)* |
 | WX-007 | Part E M2 browser/CORS/mic |
 | WX-008 | Part F M3 admin on host |
 | WX-009 | Part G M4 manual eval |
