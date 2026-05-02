@@ -1,3 +1,14 @@
+from pathlib import Path
+
+from sqlalchemy import create_engine, text
+
+
+def _count_explain_request_rows(db_path: Path) -> int:
+    eng = create_engine(f"sqlite:///{db_path}")
+    with eng.connect() as conn:
+        return int(conn.execute(text("select count(*) from explain_request")).scalar_one())
+
+
 def test_health(test_client) -> None:
     r = test_client.get("/health")
     assert r.status_code == 200
@@ -59,6 +70,69 @@ def test_explain_200_with_pipeline_mock(test_client, monkeypatch) -> None:
     assert r.content == b"\xff" * 8
     assert r.headers.get("X-Explain-Latency-Ms") == "99"
     assert r.headers.get("content-type", "").startswith("audio/mpeg")
+
+
+def test_explain_413_payload_too_large(test_client, monkeypatch) -> None:
+    from lexie_server.routers import explain as explain_router
+
+    def _boom(*_a, **_k):
+        raise AssertionError("pipeline must not run when body exceeds MAX_BYTES")
+
+    monkeypatch.setattr(
+        explain_router.pipeline, "run_explain_for_profile", _boom
+    )
+    from lexie_server.routers.explain import MAX_BYTES
+
+    huge = b"z" * (MAX_BYTES + 1)
+    r = test_client.post(
+        "/explain",
+        files={"audio": ("a.webm", huge, "audio/webm")},
+        headers={"Authorization": "Bearer devdev"},
+    )
+    assert r.status_code == 413
+    assert r.json()["error"] == "payload_too_large"
+
+
+def test_explain_no_explain_request_row_when_log_off(
+    test_client_and_db, monkeypatch
+) -> None:
+    from lexie_server.routers import explain as explain_router
+
+    def _fake_run(*_a, **_k):
+        return b"\xff" * 8, "{}", 10, "raw", "w"
+
+    monkeypatch.setattr(
+        explain_router.pipeline, "run_explain_for_profile", _fake_run
+    )
+    client, db_path = test_client_and_db
+    r = client.post(
+        "/explain",
+        files={"audio": ("a.webm", b"\x00" * 16, "audio/webm")},
+        headers={"Authorization": "Bearer devdev"},
+    )
+    assert r.status_code == 200
+    assert _count_explain_request_rows(db_path) == 0
+
+
+def test_explain_inserts_explain_request_when_log_on(
+    test_client_log_requests_on, monkeypatch
+) -> None:
+    from lexie_server.routers import explain as explain_router
+
+    def _fake_run(*_a, **_k):
+        return b"\xff" * 8, '{"explanation_text":"x"}', 10, "raw", "w"
+
+    monkeypatch.setattr(
+        explain_router.pipeline, "run_explain_for_profile", _fake_run
+    )
+    client, db_path = test_client_log_requests_on
+    r = client.post(
+        "/explain",
+        files={"audio": ("a.webm", b"\x00" * 16, "audio/webm")},
+        headers={"Authorization": "Bearer devdev"},
+    )
+    assert r.status_code == 200
+    assert _count_explain_request_rows(db_path) == 1
 
 
 def test_prototype_served(test_client) -> None:

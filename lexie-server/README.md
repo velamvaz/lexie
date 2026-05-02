@@ -108,6 +108,27 @@ pytest -v
 
 For integration tests that hit **pydub** / real audio duration, install **ffmpeg** on the runner or keep those tests mocked.
 
+Pipeline **simulations** (call order, duration gate, payload limit, request logging): [`tests/test_pipeline_simulation.py`](tests/test_pipeline_simulation.py) and explain-related tests in [`tests/test_api.py`](tests/test_api.py).
+
+## Performance and privacy (`POST /explain`)
+
+**Latency (what dominates)**  
+Each successful explain does **three sequential OpenAI calls**: **Whisper** (audio → text), **chat** (JSON explanation), **TTS** (text → MP3). Wall time is roughly the **sum** of those round-trips plus local work. They cannot be parallelized on a single utterance: chat needs the transcript first; TTS needs the explanation text first.
+
+**CPU / local work**  
+- **Duration check** uses **pydub** (and **ffmpeg/ffprobe**) on the uploaded bytes **before** Whisper. That decodes audio once to enforce min/max duration and avoid Whisper cost on bad clips; the same bytes are sent to Whisper afterward (tradeoff: extra decode vs. cheaper rejects).  
+- **`LEXIE_HEADWORD_TTS=1`**: second **TTS** call plus **MP3 concat** (decode + re-encode). Default is **off**; turn on only when you need headword audio.  
+- **`POST /explain`** constructs a new **`OpenAI` client per request**. Overhead is usually small compared to API latency; revisit only if you measure high QPS and profile it.  
+- Retries in the pipeline use **`time.sleep`** in the **sync** route, which **blocks a worker** under rate limits; fine at low concurrency.
+
+**Privacy / logging**  
+- **`LEXIE_LOG_REQUESTS=0`** (default): no `explain_request` rows are written after a successful explain.  
+- **`LEXIE_LOG_REQUESTS=1`**: appends a diagnostic row with **raw transcript** and **response text** (and timing). Use only for short-lived debugging; do not leave on in production with real child audio/transcripts.  
+- Normal **`POST /explain`** handling keeps upload bytes **in memory**; it does **not** write raw audio to disk as part of that path.
+
+**Payload limit**  
+Request bodies larger than **2 MiB** get **413** `payload_too_large` before the pipeline runs (see tests).
+
 ## Troubleshooting
 
 ### macOS: Homebrew installed but `brew: command not found`
