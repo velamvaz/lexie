@@ -135,6 +135,38 @@ def test_explain_inserts_explain_request_when_log_on(
     assert _count_explain_request_rows(db_path) == 1
 
 
+def test_explain_does_not_persist_upload_as_audio_files_under_data_dir(
+    test_client_and_db, monkeypatch, tmp_path: Path
+) -> None:
+    """WX-018 / C6: default path keeps uploads in memory; no raw audio files on disk."""
+    from lexie_server.routers import explain as explain_router
+
+    def _fake_run(*_a, **_k):
+        return b"\xff" * 8, "{}", 1, "raw", "w"
+
+    monkeypatch.setattr(
+        explain_router.pipeline, "run_explain_for_profile", _fake_run
+    )
+    client, _db_path = test_client_and_db
+    audio_suffixes = {".webm", ".wav", ".mp3", ".ogg", ".m4a"}
+
+    def _audio_files() -> list[Path]:
+        return [
+            p
+            for p in tmp_path.rglob("*")
+            if p.is_file() and p.suffix.lower() in audio_suffixes
+        ]
+
+    assert not _audio_files()
+    r = client.post(
+        "/explain",
+        files={"audio": ("user.webm", b"\x00" * 400, "audio/webm")},
+        headers={"Authorization": "Bearer devdev"},
+    )
+    assert r.status_code == 200
+    assert not _audio_files()
+
+
 def test_prototype_served(test_client) -> None:
     r = test_client.get("/prototype/")
     assert r.status_code in (200, 307)

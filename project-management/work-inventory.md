@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-02  
+**Last updated:** 2026-05-03  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -54,17 +54,17 @@
 
 ## Section B — In progress
 
-**Active:** [**WX-018**](registry.md) — **M0 C6 privacy** — no raw upload audio persisted as files by default; **`LEXIE_LOG_REQUESTS=0`**. See [§ WX-018](#wx-018--m0-privacy--no-raw-audio-on-disk-c6).
+**M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Done recently:** **WX-017** — **`POST /explain`** real pipeline: **`OPENAI_API_KEY`** in gitignored **`.env`**; **ffmpeg/ffprobe** on **`PATH`**; **`pytest`** **8** passed; live **`POST /explain`** → **200** **`audio/mpeg`** (Whisper → chat → TTS). **WX-002** — 1Password CLI + vault; secrets copied locally (not committed).
+**Active:** None on the M0 track — pick [**WX-006**](registry.md) (M1 deploy / public HTTPS) or [**WX-007**](registry.md) / [**WX-008**](registry.md) per roadmap.
 
-**Next:** Close **WX-018** (code path + spot-check after explains); then master checklist **Part C** is complete when **WX-014**–**WX-018** are all **done**.
+**Done recently:** **WX-018** — C6 verified: uploads stay in memory on the default path (no raw audio files under **`LEXIE_DATA_DIR`**); **`LEXIE_LOG_REQUESTS=0`** default; optional **`explain_request`** rows only when logging is on. Tests + README § Performance and privacy.
 
-**How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/) (e.g. `work-log/2026-04.md`).
+**How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
 ---
 
-## Section C — Planned next (WX-002; M0 test track WX-013–WX-018)
+## Section C — Planned next (M0 **done**; follow-on WX-006+)
 
 **Superseded (see registry):** **WX-001** and **WX-003** were broad umbrellas; execution is now **WX-013** (pytest) and **WX-014–WX-018** (checklist C1–C6 steps). Do **not** reopen WX-001 / WX-003.
 
@@ -167,7 +167,7 @@
 
 ---
 
-### WX-018 — M0: privacy — no raw audio on disk (C6)
+### WX-018 — M0: privacy — no raw audio on disk (C6) *(registry: done, 2026-05-03)*
 
 **Objective:** Confirm default behavior matches SPEC §7 (no raw uploads persisted as files).
 
@@ -179,6 +179,8 @@
 **Done when:** C6 satisfied; master checklist **Part C** can be ticked when **WX-014**–**WX-018** are all **done**.
 
 **Depends on:** **WX-017** (or a skipped explain if you only verify logging flags—prefer running explain once).
+
+**What was done:** [`explain.py`](../lexie-server/lexie_server/routers/explain.py) reads upload into memory only; pipeline uses **`BytesIO`** / OpenAI APIs — no audio **`open()`** for persistence. [`README.md`](../lexie-server/README.md) documents defaults and **`LEXIE_LOG_REQUESTS`**. Contract tests: no **`explain_request`** row when logging off; one row when on; **no `*.webm` / `*.wav` / `*.mp3`** under **`LEXIE_DATA_DIR`** after mocked **`POST /explain`**.
 
 ---
 
@@ -210,7 +212,7 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 | **C3** | `/profile` **401** without admin; **200** with Bearer. | Validates admin gate. | **WX-015** + **WX-002** |
 | **C4** | `/admin` HTML + token + save profile. | Parent journey locally. | **WX-016** |
 | **C5** | `POST /explain` returns audio or structured error. | Core product path. | **WX-017**; **ffmpeg** on PATH |
-| **C6** | No raw audio files on disk; default logging off. | Privacy per SPEC §7. | **WX-018** |
+| **C6** | No raw audio files on disk; default logging off. | Privacy per SPEC §7. | **WX-018** *(done)* |
 
 ### Part D (M1) — Public HTTPS and reachability (WX-006)
 
@@ -307,6 +309,6 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-015 | M0 C3 profile auth *(done)* |
 | WX-016 | M0 C4 `/admin` browser *(done)* |
 | WX-017 | M0 C5 `POST /explain` *(done)* |
-| WX-018 | M0 C6 privacy *(in progress)* |
+| WX-018 | M0 C6 privacy *(done)* |
 
 See [`registry.md`](registry.md) for status and dates.
