@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-04-30  
+**Last updated:** 2026-05-02  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -54,11 +54,11 @@
 
 ## Section B — In progress
 
-**Active:** [**WX-017**](registry.md) — **`POST /explain`** with real audio (OpenAI + **ffmpeg**). See [§ WX-017](#wx-017--m0-post-explain-real-pipeline-c5) and [`README`](../lexie-server/README.md) § Run / prototype.
+**Active:** [**WX-018**](registry.md) — **M0 C6 privacy** — no raw upload audio persisted as files by default; **`LEXIE_LOG_REQUESTS=0`**. See [§ WX-018](#wx-018--m0-privacy--no-raw-audio-on-disk-c6).
 
-**Done recently:** **WX-016** — **`/admin`** fixed (Starlette `TemplateResponse`); browser flow: token → Load → Save → reload. **`curl /admin`** → **200**.
+**Done recently:** **WX-017** — **`POST /explain`** real pipeline: **`OPENAI_API_KEY`** in gitignored **`.env`**; **ffmpeg/ffprobe** on **`PATH`**; **`pytest`** **8** passed; live **`POST /explain`** → **200** **`audio/mpeg`** (Whisper → chat → TTS). **WX-002** — 1Password CLI + vault; secrets copied locally (not committed).
 
-**Next:** **`OPENAI_API_KEY`** + **`ffmpeg`**; then **WX-018** (privacy).
+**Next:** Close **WX-018** (code path + spot-check after explains); then master checklist **Part C** is complete when **WX-014**–**WX-018** are all **done**.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/) (e.g. `work-log/2026-04.md`).
 
@@ -68,9 +68,11 @@
 
 **Superseded (see registry):** **WX-001** and **WX-003** were broad umbrellas; execution is now **WX-013** (pytest) and **WX-014–WX-018** (checklist C1–C6 steps). Do **not** reopen WX-001 / WX-003.
 
-### WX-002 — Device and admin tokens in 1Password (A6 / A7)
+### WX-002 — Device and admin tokens in 1Password (A6 / A7) *(registry: done, 2026-05-02)*
 
 **Objective:** Create two **long random** secrets, store them only in 1Password, and prepare to paste them into **gitignored** `.env` (local) or host secrets (production)—never commit them.
+
+**What was done:** 1Password CLI authenticated; **Private**/**Shared** vaults available; **OpenAI API** credential and device/admin material live in the vault and are copied into **`lexie-server/.env`** for local dev only (gitignored).
 
 **Steps:**
 
@@ -289,7 +291,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX | Focus |
 |----|--------|
 | WX-001 | *(cancelled — use WX-014–018)* |
-| WX-002 | A6/A7 tokens in 1Password |
+| WX-002 | A6/A7 tokens in 1Password *(done)* |
 | WX-003 | *(cancelled — use WX-013)* |
 | WX-004 | PM folder *(done)* |
 | WX-005 | `lexie-server` Part B *(done)* |
@@ -304,7 +306,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-014 | M0 C1–C2 `.env` + health *(done)* |
 | WX-015 | M0 C3 profile auth *(done)* |
 | WX-016 | M0 C4 `/admin` browser *(done)* |
-| WX-017 | M0 C5 `POST /explain` *(in progress)* |
-| WX-018 | M0 C6 privacy |
+| WX-017 | M0 C5 `POST /explain` *(done)* |
+| WX-018 | M0 C6 privacy *(in progress)* |
 
 See [`registry.md`](registry.md) for status and dates.
