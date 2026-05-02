@@ -56,7 +56,10 @@
       if (!h) { $("msg").textContent = "Enter admin token first."; $("msg").className = "msg err"; return; }
       sessionStorage.setItem(tokenKey, $("admin").value.trim());
       const r = await fetch(base + "/profile", { headers: h });
-      if (!r.ok) { await showFetchError(r); return; }
+      if (!r.ok) {
+        await showFetchError(r);
+        return;
+      }
       const j = await r.json();
       $("child_name").value = j.child_name;
       $("age_years").value = j.age_years;
