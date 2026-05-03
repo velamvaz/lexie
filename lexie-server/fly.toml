@@ -1,41 +1,36 @@
-# Lexie server on Fly.io (WX-006). Deploy from this directory: `fly deploy`
+# fly.toml app configuration file generated for lexie-server on 2026-05-02T22:32:42-07:00
 #
-# Before first deploy:
-# - Set `app` to a globally unique name (or run `fly launch` to create an app and sync `app`).
-# - Run `fly auth login`.
-# - Set secrets (see README "Deploy" → Fly.io).
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
-app = "lexie-server"
 
-primary_region = "iad"
+app = 'lexie-server'
+primary_region = 'iad'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
 
 [env]
-  PORT = "8000"
+  PORT = '8000'
+
+[[mounts]]
+  source = 'lexie_data'
+  destination = '/data'
+  initial_size = '1gb'
 
 [http_service]
   internal_port = 8000
   force_https = true
-  auto_stop_machines = "off"
+  auto_stop_machines = 'off'
   auto_start_machines = true
   min_machines_running = 1
 
-[[http_service.checks]]
-  grace_period = "15s"
-  interval = "30s"
-  method = "GET"
-  path = "/health"
-  timeout = "5s"
-
-# SQLite + profile data (matches Dockerfile LEXIE_DATA_DIR=/data).
-# `initial_size` lets first `fly deploy` create the volume if it does not exist yet.
-[mounts]
-  source = "lexie_data"
-  destination = "/data"
-  initial_size = "1gb"
+  [[http_service.checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '15s'
+    method = 'GET'
+    path = '/health'
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "1024mb"
+  size = 'shared-cpu-1x'
+  memory = '1024mb'
