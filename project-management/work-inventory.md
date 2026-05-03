@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-04 (WX-019–WX-021 observability track; WX-020 landed)  
+**Last updated:** 2026-05-04 (WX-006 M1 D2 live on Fly; WX-021 active track)  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -56,9 +56,9 @@
 
 **M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Active:** [**WX-006**](registry.md) — **M1** public HTTPS: **[`Dockerfile`](../lexie-server/Dockerfile)**, **[`fly.toml`](../lexie-server/fly.toml)**, **[README § Deploy / Fly](../lexie-server/README.md#deploy-m1--wx-006)**. **A3 host choice:** **Fly.io** (see **WX-019**). **Your** steps: **`fly auth login`**, **`fly deploy`**, secrets, confirm **D2**/**D3**, **`BASE_URL`** in 1Password (**D5**). **Next build track:** [**WX-021**](registry.md) — admin dashboards + Fly metrics runbook (after **WX-020** table in prod).
+**Active:** [**WX-021**](registry.md) — admin telemetry APIs + custom dashboards + Fly platform runbook (builds on **WX-020**).
 
-**Done recently:** **WX-020** — privacy-safe **`explain_telemetry`** + **`LEXIE_STORE_TELEMETRY`**. **WX-019** — PM records Fly + titration + Fly Prometheus / **`fly-metrics.net`** pointers. **WX-018** — C6 closed. **WX-006** — deploy scaffolding (live URL still on you).
+**Done recently:** [**WX-006**](registry.md) — **M1 D2:** Fly app **`lexie-server`**, **`https://lexie-server.fly.dev/health`** → **200** (2026-05-04). Optional: **D3** (cellular), **D5** (`BASE_URL` in 1Password). **WX-020** — **`explain_telemetry`**. **WX-019** — Fly + metrics pointers in PM. **WX-018** — C6 closed.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
@@ -214,9 +214,11 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 | **C5** | `POST /explain` returns audio or structured error. | Core product path. | **WX-017**; **ffmpeg** on PATH |
 | **C6** | No raw audio files on disk; default logging off. | Privacy per SPEC §7. | **WX-018** *(done)* |
 
-### Part D (M1) — Public HTTPS and reachability (WX-006)
+### Part D (M1) — Public HTTPS and reachability (WX-006) *(registry: done — D2 met, 2026-05-04)*
 
-**Repo status (2026-05-03):** [`Dockerfile`](../lexie-server/Dockerfile), [`.dockerignore`](../lexie-server/.dockerignore), and [README — Deploy (M1 / WX-006)](../lexie-server/README.md#deploy-m1--wx-006) support **D1**; you still run **`docker build` / `fly deploy` / equivalent** and configure TLS + secrets on the host.
+**Live:** **`https://lexie-server.fly.dev`** — **`GET /health`** returns **200** JSON with **`"ok": true`** (checklist **D2**).
+
+**Repo:** [`Dockerfile`](../lexie-server/Dockerfile), [`.dockerignore`](../lexie-server/.dockerignore), [`fly.toml`](../lexie-server/fly.toml), [README — Deploy / Fly](../lexie-server/README.md#deploy-m1--wx-006). **Still on you:** set **`fly secrets`** for real **`POST /explain`** / admin (**`OPENAI_API_KEY`**, **`LEXIE_DEVICE_KEY`**, **`LEXIE_ADMIN_TOKEN`**, **`LEXIE_CORS_ORIGINS`** including `https://lexie-server.fly.dev` if the browser calls from that origin); **D3** phone on cellular **`/health`**; **D5** store **`BASE_URL`** in 1Password.
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
@@ -337,7 +339,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-003 | *(cancelled — use WX-013)* |
 | WX-004 | PM folder *(done)* |
 | WX-005 | `lexie-server` Part B *(done)* |
-| WX-006 | Part D M1 public deploy *(in progress)* |
+| WX-006 | Part D M1 public deploy *(done — `https://lexie-server.fly.dev`)* |
 | WX-007 | Part E M2 browser/CORS/mic |
 | WX-008 | Part F M3 admin on host |
 | WX-009 | Part G M4 manual eval |
