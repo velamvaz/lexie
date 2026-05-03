@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-04 (WX-008 done; **WX-009** M4 Part G active)  
+**Last updated:** 2026-05-05 (**WX-009** done; **WX-010** next)  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -56,9 +56,9 @@
 
 **M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Active:** [**WX-009**](registry.md) — M4 **Part G** (manual E2E / validation-matrix shakedown on **`lexie-server.fly.dev`**). See [**§ Part G**](work-inventory.md#part-g-m4--e2e-shakedown-wx-009) and [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.validation-matrix.md).
+**Active:** [**WX-010**](registry.md) — M5 **Part H** (steady operation, cost, privacy defaults). See [**§ Part H**](work-inventory.md#part-h-m5--steady-operation-wx-010).
 
-**Done recently:** [**WX-008**](registry.md) — **F1–F4** parent **`/admin`** verified on prod. [**WX-007**](registry.md) — M2 prototype. [**WX-021**](registry.md) — telemetry. [**WX-006**](registry.md) — Fly. **WX-018** — C6 closed.
+**Done recently:** [**WX-009**](registry.md) — M4 **Part G** baseline on prod + latency win (**`LEXIE_HEADWORD_TTS=0`**, ~**6.2 s** `X-Explain-Latency-Ms` warm sample). [**WX-008**](registry.md) — **`/admin`**. [**WX-007**](registry.md) — M2 prototype. [**WX-021**](registry.md) — telemetry. [**WX-006**](registry.md) — Fly. **WX-018** — C6 closed.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
@@ -230,7 +230,7 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 
 ### Part E (M2) — Child browser path (WX-007) *(registry: done, 2026-05-04)*
 
-**Execution:** Open **`https://<BASE_URL>/prototype/`** on Fly (e.g. **`https://lexie-server.fly.dev/prototype/`**); paste **`LEXIE_DEVICE_KEY`**; hold-to-talk. Same-origin requests avoid CORS configuration for that URL. Full steps: [README — Child browser prototype (M2 / WX-007)](../lexie-server/README.md#child-browser-prototype-m2--wx-007). **E4–E6** (latency journeys, runbook) remain manual and overlap **WX-009**.
+**Execution:** Open **`https://<BASE_URL>/prototype/`** on Fly (e.g. **`https://lexie-server.fly.dev/prototype/`**); paste **`LEXIE_DEVICE_KEY`**; hold-to-talk. Same-origin requests avoid CORS configuration for that URL. Full steps: [README — Child browser prototype (M2 / WX-007)](../lexie-server/README.md#child-browser-prototype-m2--wx-007). **E4–E6** (latency journeys, runbook) remain manual and overlap **WX-010** / ad hoc matrix checks.
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
@@ -252,7 +252,9 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 | **F3** | Change `age_years` / `reading_level`; save; persist after refresh. | Profile storage on host. | **F2** |
 | **F4** | Next explain reflects new profile (hear or inspect with logging). | End-to-end profile → prompt. | **F3**, **C5** on host |
 
-### Part G (M4) — E2E shakedown (WX-009) *(registry: in_progress)*
+### Part G (M4) — E2E shakedown (WX-009) *(registry: **done** — 2026-05-05)*
+
+**Outcome recorded:** **G1** (short word / **`/prototype/`**) verified on **`https://lexie-server.fly.dev`** after **`LEXIE_HEADWORD_TTS=0`** on Fly and in [`.env.example`](../lexie-server/.env.example); pipeline timing investigation showed second headword TTS + concat was ~**2.7 s** of prior ~**11 s** server time; prod warm sample **`X-Explain-Latency-Ms`** ~**6227**. Deploy: commit **`41448e1`**. Remaining matrix rows **G2–G7** are still valid checks; run anytime or fold into **WX-010** / release hardening.
 
 **Execution:** Run Part **G** rows against **`https://lexie-server.fly.dev`** (**`/prototype/`**, **`/admin`** as needed). Map scenarios to [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.validation-matrix.md). [**RUNBOOK**](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.RUNBOOK.md) for failures.
 
@@ -346,7 +348,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-006 | Part D M1 public deploy *(done — `https://lexie-server.fly.dev`)* |
 | WX-007 | Part E M2 browser/CORS/mic *(done)* |
 | WX-008 | Part F M3 admin on host *(done)* |
-| WX-009 | Part G M4 manual eval *(in progress)* |
+| WX-009 | Part G M4 manual eval *(done — baseline + latency)* |
 | WX-010 | Part H M5 ops |
 | WX-011 | Part I lexie-ops optional |
 | WX-012 | Part J final sign-off |
