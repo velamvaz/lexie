@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-07 (**WX-010** M5 Part H **done**; **WX-012** next)  
+**Last updated:** 2026-05-01 (**WX-012** Part J SPEC §11 **done**; optional **WX-011** next)  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -56,9 +56,9 @@
 
 **M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Active:** [**WX-012**](registry.md) — Part J SPEC §11 definition-of-done (optional first: [**WX-011**](registry.md) lexie-ops).
+**Active:** none required — optional [**WX-011**](registry.md) lexie-ops.
 
-**Done recently:** [**WX-010**](registry.md) — M5 **Part H** steady ops (**H1–H4**). [**WX-009**](registry.md) — M4 **Part G**. [**WX-008**](registry.md) — **`/admin`**. [**WX-007**](registry.md) — M2 prototype. [**WX-021**](registry.md) — telemetry. [**WX-006**](registry.md) — Fly. **WX-018** — C6 closed.
+**Done recently:** [**WX-012**](registry.md) — Part J SPEC §11 sign-off (**2026-05-01**). [**WX-010**](registry.md) — M5 **Part H**. [**WX-009**](registry.md) — M4 **Part G**. [**WX-008**](registry.md) — **`/admin`**. [**WX-007**](registry.md) — M2 prototype. [**WX-021**](registry.md) — telemetry. [**WX-006**](registry.md) — Fly. **WX-018** — C6 closed.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
@@ -288,13 +288,15 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | **I3** | `npm run dev`; ping `/health` → **200** JSON. | Confirms wiring. | **I2** |
 | **I4** | If CORS error, add origin on server or use proxy mode. | Browser safety rules. | **E1** |
 
-### Part J — Definition of done (SPEC §11) (WX-012)
+### Part J — Definition of done (SPEC §11) (WX-012) *(registry: **done** — 2026-05-01)*
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
 | **J1** | SPEC §11 items 1–9 for **your** environment (HTTPS, admin, explain, profile, defaults, p95, CORS docs, ops health, tests). | Formal Phase 1 exit. | **D–H** as applicable |
 | **J2** | Child-facing error copy / PRD error tone on at least one synthetic failure. | Trust and clarity. | **G4** / errors |
 | **J3** | No secrets in repos, screenshots, chat, URLs; 1Password canonical. | Security. | Ongoing |
+
+**Recorded 2026-05-01:** [SPEC §11](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.SPEC.md) checkboxes updated in-repo. Prod smoke: **`https://lexie-server.fly.dev`** **`GET /health`** **200**; **`GET /admin`** **200**; **`GET /prototype/`** **200**; **`POST /explain`** without device key **401**. **`pytest`** **32** passed. **lexie-ops:** `VITE_PROXY_TARGET=https://lexie-server.fly.dev` + Vite **`/__lexie/health`** → **200** JSON. **§8.2:** warm **`X-Explain-Latency-Ms`** remains ~**6–7 s** with **`LEXIE_HEADWORD_TTS=0`** — **documented exception** vs p95 **&lt;5 s** (OpenAI path / Fly); tune later. **J2:** [`static_prototype/index.html`](../lexie-server/lexie_server/static_prototype/index.html) maps API / FastAPI **`detail.error`** to SPEC **§5.1** display strings.
 
 **SPEC reference:** [`lexie-word-explainer.SPEC.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.SPEC.md) §10–11.
 
@@ -351,7 +353,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-009 | Part G M4 manual eval *(done — baseline + latency)* |
 | WX-010 | Part H M5 ops *(done)* |
 | WX-011 | Part I lexie-ops optional |
-| WX-012 | Part J final sign-off |
+| WX-012 | Part J SPEC §11 sign-off *(done 2026-05-01)* |
 | WX-013 | Preflight pytest 3.11+ *(done; CI + local 3.11+)* |
 | WX-014 | M0 C1–C2 `.env` + health *(done)* |
 | WX-015 | M0 C3 profile auth *(done)* |

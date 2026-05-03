@@ -20,6 +20,30 @@
   <script>
     const base = location.origin;
     const k = "lexie_device_bearer";
+    /** SPEC §5.1 — child-adjacent copy (wire code → display string). */
+    const CHILD_ERROR_LINE = {
+      unauthorized: "We couldn’t connect. Ask a grown-up to check the bookmark.",
+      audio_too_short: "That was a little too short. Try the button again.",
+      audio_too_long: "That was a little too long. Say one word, then let go.",
+      transcription_empty: "I didn’t catch that. Try again, a little closer.",
+      unintelligible_audio: "I didn’t quite hear that. Try again.",
+      payload_too_large: "That recording is too big. Try a shorter try.",
+      openai_unavailable: "Lexie is taking a break. Try again in a little bit.",
+      rate_limited: "Too many tries. Wait a little, then try again.",
+      internal: "Something went wrong. Try again, or ask a grown-up.",
+      explanation_invalid: "I couldn’t get that one ready. Try asking again, a little bit slower.",
+    };
+    function wireErrorFromJson(j) {
+      if (!j || typeof j !== "object") return null;
+      if (typeof j.error === "string") return j.error;
+      const d = j.detail;
+      if (d && typeof d === "object" && typeof d.error === "string") return d.error;
+      return null;
+    }
+    function childLineForError(code) {
+      if (code && CHILD_ERROR_LINE[code]) return CHILD_ERROR_LINE[code];
+      return "Something went wrong. Try again, or ask a grown-up.";
+    }
     if (sessionStorage.getItem(k)) document.getElementById("dk").value = sessionStorage.getItem(k);
     let m = null, chunks = [];
     const st = (t) => { document.getElementById("st").textContent = t; };
@@ -46,12 +70,13 @@
       if (t) headers["Authorization"] = "Bearer " + t;
       const res = await fetch(base + "/explain", { method: "POST", body: fd, headers });
       if (!res.ok) {
-        let detail = "";
+        let childLine = childLineForError(null);
         try {
           const j = await res.json();
-          if (j && j.error) detail = " — " + j.error;
+          const wire = wireErrorFromJson(j);
+          if (wire) childLine = childLineForError(wire);
         } catch (e) { /* ignore */ }
-        st("Error: " + res.status + detail);
+        st(childLine + " (" + res.status + ")");
         return;
       }
       const ms = res.headers.get("X-Explain-Latency-Ms");
