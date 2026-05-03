@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-05 (**WX-009** done; **WX-010** next)  
+**Last updated:** 2026-05-06 (**WX-010** M5 Part H in progress)  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -270,7 +270,7 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 
 Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.validation-matrix.md).
 
-### Part H (M5) — Steady operation (WX-010)
+### Part H (M5) — Steady operation (WX-010) *(registry: **in_progress**)*
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
