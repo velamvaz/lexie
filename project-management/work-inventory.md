@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-01 (**WX-012** Part J SPEC §11 **done**; optional **WX-011** next)  
+**Last updated:** 2026-05-03 (**WX-011** Part I lexie-ops **done**; optional **WX-006** D3/D5 remain)  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -56,9 +56,9 @@
 
 **M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Active:** none required — optional [**WX-011**](registry.md) lexie-ops.
+**Active:** none — optional manual follow-ups: [**WX-006**](registry.md) **D3** / **D5** only.
 
-**Done recently:** [**WX-012**](registry.md) — Part J SPEC §11 sign-off (**2026-05-01**). [**WX-010**](registry.md) — M5 **Part H**. [**WX-009**](registry.md) — M4 **Part G**. [**WX-008**](registry.md) — **`/admin`**. [**WX-007**](registry.md) — M2 prototype. [**WX-021**](registry.md) — telemetry. [**WX-006**](registry.md) — Fly. **WX-018** — C6 closed.
+**Done recently:** [**WX-011**](registry.md) — Part I lexie-ops (**2026-05-03**). [**WX-012**](registry.md) — Part J SPEC §11 (**2026-05-01**). [**WX-010**](registry.md) — M5 **Part H**. [**WX-009**](registry.md) — M4 **Part G**. [**WX-008**](registry.md) — **`/admin`**. [**WX-007**](registry.md) — M2 prototype. [**WX-021**](registry.md) — telemetry. [**WX-006**](registry.md) — Fly. **WX-018** — C6 closed.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
@@ -279,7 +279,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | **H3** | Host sized to avoid long **cold** first explain (min instances / RUNBOOK §4). | Latency SPEC. | **D1** |
 | **H4** | Re-read [**journeys-and-observability**](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.journeys-and-observability.md) §3 — default privacy expectations. | Align ops with product. | Before wide use |
 
-### Part I — lexie-ops (optional) (WX-011)
+### Part I — lexie-ops (optional) (WX-011) *(registry: **done** — 2026-05-03)*
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
@@ -287,6 +287,8 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | **I2** | `.env` from `.env.example`; set `VITE_LEXIE_BASE_URL` or proxy per README. | Points UI at your server. | **D2** optional |
 | **I3** | `npm run dev`; ping `/health` → **200** JSON. | Confirms wiring. | **I2** |
 | **I4** | If CORS error, add origin on server or use proxy mode. | Browser safety rules. | **E1** |
+
+**Recorded 2026-05-03:** Part I **I1–I4** closed. [`monitoring/lexie-ops/README.md`](../monitoring/lexie-ops/README.md) documents **Point at production** — **`VITE_PROXY_TARGET=https://lexie-server.fly.dev`** (or your **`BASE_URL`**) so the browser uses same-origin **`/__lexie/health`** and Vite proxies to Lexie (**no `LEXIE_CORS_ORIGINS`** change). Smoke: **`GET http://127.0.0.1:5175/__lexie/health`** → **200** with Fly JSON.
 
 ### Part J — Definition of done (SPEC §11) (WX-012) *(registry: **done** — 2026-05-01)*
 
@@ -352,7 +354,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-008 | Part F M3 admin on host *(done)* |
 | WX-009 | Part G M4 manual eval *(done — baseline + latency)* |
 | WX-010 | Part H M5 ops *(done)* |
-| WX-011 | Part I lexie-ops optional |
+| WX-011 | Part I lexie-ops *(done 2026-05-03)* |
 | WX-012 | Part J SPEC §11 sign-off *(done 2026-05-01)* |
 | WX-013 | Preflight pytest 3.11+ *(done; CI + local 3.11+)* |
 | WX-014 | M0 C1–C2 `.env` + health *(done)* |
