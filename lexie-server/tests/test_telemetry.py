@@ -77,6 +77,35 @@ def test_telemetry_count(test_client) -> None:
     assert r.json()["explain_telemetry_rows"] == 0
 
 
+def test_explain_413_persists_telemetry_when_store_on(
+    test_client_telemetry_on, monkeypatch
+) -> None:
+    """Failed requests still write explain_telemetry when enabled."""
+    from lexie_server.routers import explain as explain_router
+    from lexie_server.routers.explain import MAX_BYTES
+
+    def _boom(*_a, **_k):
+        raise AssertionError("pipeline must not run for oversized body")
+
+    monkeypatch.setattr(
+        explain_router.pipeline, "run_explain_for_profile", _boom
+    )
+    client, db_path = test_client_telemetry_on
+    huge = b"z" * (MAX_BYTES + 1)
+    r = client.post(
+        "/explain",
+        files={"audio": ("a.webm", huge, "audio/webm")},
+        headers={"Authorization": "Bearer devdev"},
+    )
+    assert r.status_code == 413
+    eng = create_engine(f"sqlite:///{db_path}")
+    with eng.connect() as conn:
+        n = conn.execute(
+            text("select count(*) from explain_telemetry where outcome = 'payload_too_large'")
+        ).scalar()
+    assert int(n or 0) == 1
+
+
 def test_telemetry_row_roundtrip_sql(test_client_telemetry_on) -> None:
     """Direct insert + summary picks up row (date filter)."""
     client, db_path = test_client_telemetry_on

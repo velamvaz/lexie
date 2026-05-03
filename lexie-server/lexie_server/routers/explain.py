@@ -1,5 +1,6 @@
 import json
 import uuid
+from functools import lru_cache
 
 from fastapi import APIRouter, Depends, File, Request, Response, UploadFile
 from openai import OpenAI
@@ -16,11 +17,16 @@ MAX_BYTES = 2 * 1024 * 1024
 router = APIRouter(tags=["explain"])
 
 
+@lru_cache(maxsize=8)
+def _openai_client_for_key(api_key: str) -> OpenAI:
+    return OpenAI(api_key=api_key)
+
+
 def _client() -> OpenAI:
     s = get_settings()
     if not s.openai_api_key:
         raise ValueError("missing_openai_key")
-    return OpenAI(api_key=s.openai_api_key)
+    return _openai_client_for_key(s.openai_api_key)
 
 
 def _err(err: str, **extra: object) -> bytes:
@@ -191,9 +197,17 @@ def post_explain(
             "explanation_invalid",
         }:
             persist(400, err, failed_stage=stage, upload_len=upload_len)
-            return Response(400, media_type="application/json", content=_err(err))
+            return Response(
+                status_code=400,
+                media_type="application/json",
+                content=_err(err),
+            )
         persist(400, err or "err_internal", failed_stage=stage, upload_len=upload_len)
-        return Response(400, media_type="application/json", content=_err(err or "internal"))
+        return Response(
+            status_code=400,
+            media_type="application/json",
+            content=_err(err or "internal"),
+        )
     except OpenAIUnavailable as e:
         persist(
             502,
@@ -201,10 +215,18 @@ def post_explain(
             failed_stage=e.stage,
             upload_len=upload_len,
         )
-        return Response(502, media_type="application/json", content=_err("openai_unavailable"))
+        return Response(
+            status_code=502,
+            media_type="application/json",
+            content=_err("openai_unavailable"),
+        )
     except RuntimeError:
         persist(500, "err_internal", upload_len=upload_len)
-        return Response(500, media_type="application/json", content=_err("internal"))
+        return Response(
+            status_code=500,
+            media_type="application/json",
+            content=_err("internal"),
+        )
 
     mp3 = result.mp3
     rtext = result.response_log_text

@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from lexie_server.config import get_settings
-from lexie_server.db import create_tables, init_engine, seed_profile_if_empty
+from lexie_server.db import create_tables, seed_profile_if_empty
 from lexie_server.routers import admin, explain, health, profile, telemetry, usage
 
 
@@ -17,7 +17,6 @@ async def lifespan(app: FastAPI):
     create_tables(s)
     from lexie_server.db import _SessionLocal  # noqa: SLF001
 
-    init_engine(s)
     assert _SessionLocal is not None
     db = _SessionLocal()
     try:

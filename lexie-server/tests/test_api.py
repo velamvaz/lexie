@@ -1,6 +1,8 @@
+import importlib
 from pathlib import Path
 
 from sqlalchemy import create_engine, text
+from starlette.testclient import TestClient
 
 
 def _count_explain_request_rows(db_path: Path) -> int:
@@ -56,6 +58,110 @@ def test_explain_401_no_device_key(test_client) -> None:
         files={"audio": ("a.webm", b"x", "audio/webm")},
     )
     assert r.status_code == 401
+    assert r.json()["detail"]["error"] == "unauthorized"
+
+
+def test_explain_401_wrong_device_key(test_client) -> None:
+    r = test_client.post(
+        "/explain",
+        files={"audio": ("a.webm", b"x", "audio/webm")},
+        headers={"Authorization": "Bearer not-the-device-key"},
+    )
+    assert r.status_code == 401
+    assert r.json()["detail"]["error"] == "unauthorized"
+
+
+def test_explain_200_with_x_device_key_header(test_client, monkeypatch) -> None:
+    """SPEC: X-Device-Key accepted when LEXIE_DEVICE_KEY is set."""
+    from lexie_server.routers import explain as explain_router
+    from lexie_server.services.pipeline import ExplainPipelineResult, PipelineTimings
+
+    def _fake_run(*_a, **_k):
+        return ExplainPipelineResult(
+            mp3=b"\xff" * 4,
+            response_log_text="{}",
+            latency_ms=7,
+            raw_transcript="t",
+            word_or_phrase="w",
+            timings=PipelineTimings(0, 0, 0, 0, 0, 0),
+        )
+
+    monkeypatch.setattr(
+        explain_router.pipeline, "run_explain_for_profile", _fake_run
+    )
+    r = test_client.post(
+        "/explain",
+        files={"audio": ("a.webm", b"\x00" * 16, "audio/webm")},
+        headers={"X-Device-Key": "devdev"},
+    )
+    assert r.status_code == 200
+    assert r.headers.get("X-Explain-Latency-Ms") == "7"
+
+
+def test_explain_502_openai_unavailable(test_client, monkeypatch) -> None:
+    from lexie_server.routers import explain as explain_router
+    from lexie_server.services.pipeline import OpenAIUnavailable
+
+    def _boom(*_a, **_k):
+        raise OpenAIUnavailable("llm")
+
+    monkeypatch.setattr(
+        explain_router.pipeline, "run_explain_for_profile", _boom
+    )
+    r = test_client.post(
+        "/explain",
+        files={"audio": ("a.webm", b"\x00" * 16, "audio/webm")},
+        headers={"Authorization": "Bearer devdev"},
+    )
+    assert r.status_code == 502
+    assert r.json()["error"] == "openai_unavailable"
+
+
+def test_explain_500_missing_openai_key(tmp_path: Path, monkeypatch) -> None:
+    db_path = tmp_path / "t.db"
+    monkeypatch.setenv("LEXIE_DATABASE_URL", f"sqlite:///{db_path}")
+    monkeypatch.setenv("LEXIE_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "")
+    monkeypatch.setenv("LEXIE_DEVICE_KEY", "devdev")
+    monkeypatch.setenv("LEXIE_ADMIN_TOKEN", "admadm")
+    monkeypatch.setenv("LEXIE_LOG_REQUESTS", "0")
+    monkeypatch.setenv("LEXIE_STORE_TELEMETRY", "0")
+
+    from lexie_server.config import get_settings
+    from lexie_server.db import reset_app_state
+    from lexie_server import main as main_mod
+
+    reset_app_state()
+    get_settings.cache_clear()
+    importlib.reload(main_mod)
+    try:
+        with TestClient(main_mod.app) as c:
+            r = c.post(
+                "/explain",
+                files={"audio": ("a.webm", b"\x00" * 16, "audio/webm")},
+                headers={"Authorization": "Bearer devdev"},
+            )
+        assert r.status_code == 500
+        assert r.json()["error"] == "internal"
+    finally:
+        reset_app_state()
+        get_settings.cache_clear()
+        importlib.reload(main_mod)
+
+
+def test_admin_usage_401_without_admin(test_client) -> None:
+    assert test_client.get("/admin/usage").status_code == 401
+
+
+def test_admin_usage_200_with_admin(test_client) -> None:
+    r = test_client.get(
+        "/admin/usage",
+        headers={"Authorization": "Bearer admadm"},
+    )
+    assert r.status_code == 200
+    j = r.json()
+    assert "month" in j and "explain_count" in j
+    assert j["explain_count"] == 0
 
 
 def test_explain_200_with_pipeline_mock(test_client, monkeypatch) -> None:
