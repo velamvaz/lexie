@@ -1,5 +1,8 @@
 # Lexie monorepo
 .DS_Store
+
+# Local PM status snapshot (open in browser; not source of truth)
+project-management/status-report.html
 .env
 .env.local
 **/__pycache__/
