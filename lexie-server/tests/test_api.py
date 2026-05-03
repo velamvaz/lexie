@@ -260,3 +260,4 @@ def test_admin_page_200(test_client) -> None:
     r = test_client.get("/admin")
     assert r.status_code == 200
     assert "Lexie" in r.text
+    assert "telemetry" in r.text.lower()

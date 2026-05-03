@@ -4,7 +4,7 @@ Single table for **current** work items. IDs are **`WX-*`** (execution). For pro
 
 **Elaborated narrative** (objectives, steps, acceptance, full milestone tables): **[`work-inventory.md`](work-inventory.md)**. Use this file for **status** and quick scanning; use `work-inventory.md` for detail.
 
-**M0 (Part C):** **WX-014**–**WX-018** **done**. **M1 Part D:** [**WX-006**](registry.md) **done** (**D2** `https://lexie-server.fly.dev/health` **200**). **Active:** [**WX-021**](registry.md) — admin dashboards from **WX-020** telemetry + Fly metrics runbook. **WX-013** preflight tests green.
+**M0 (Part C):** **WX-014**–**WX-018** **done**. **M1 Part D:** [**WX-006**](registry.md) **done** (**D2** `https://lexie-server.fly.dev/health` **200**). **WX-021** **done** (admin telemetry APIs + `/admin` UI + README Fly runbook). **Next:** [**WX-007**](registry.md) (M2 browser path) or **WX-008** / **WX-009** per roadmap. **WX-013** preflight: **22** tests on **`lexie-server`**.
 
 | ID | Title | Status | Feature | Area | Updated | Notes |
 |----|-------|--------|---------|------|---------|-------|
@@ -20,7 +20,7 @@ Single table for **current** work items. IDs are **`WX-*`** (execution). For pro
 | WX-010 | Part H (M5) — steady operation and cost | backlog | LX-1 | ops | 2026-04-22 | [§ Future — Part H](work-inventory.md#part-h-m5--steady-operation-wx-010) |
 | WX-011 | Part I — lexie-ops optional local monitor | backlog | LX-1 | ops | 2026-04-22 | [§ Future — Part I](work-inventory.md#part-i--lexie-ops-optional-wx-011) |
 | WX-012 | Part J — SPEC §11 definition-of-done sign-off | backlog | LX-1 | release | 2026-04-22 | [§ Future — Part J](work-inventory.md#part-j--definition-of-done-spec-11-wx-012) |
-| WX-013 | **Preflight:** `pytest` passes on Python 3.11+ in `lexie-server` | done | LX-1 | lexie-server | 2026-05-03 | [§ WX-013](work-inventory.md#wx-013--preflight-pytest-on-python-311-or-newer). CI + **local:** **15** passed (contract + explain simulations + privacy checks). |
+| WX-013 | **Preflight:** `pytest` passes on Python 3.11+ in `lexie-server` | done | LX-1 | lexie-server | 2026-05-04 | [§ WX-013](work-inventory.md#wx-013--preflight-pytest-on-python-311-or-newer). CI + **local:** **22** passed (includes **WX-021** telemetry tests). |
 | WX-014 | **M0:** `.env` + `uvicorn` + `GET /health` → 200 (checklist C1–C2) | done | LX-1 | lexie-server | 2026-04-30 | [§ WX-014](work-inventory.md#wx-014--m0-dotenv-server-and-health-c1c2). `.env` from example; `curl /health` → `ok: true`. |
 | WX-015 | **M0:** `GET`/`PATCH /profile` — 401 without admin, 200 with Bearer (C3) | done | LX-1 | lexie-server | 2026-04-30 | [§ WX-015](work-inventory.md#wx-015--m0-profile-admin-auth-c3). Needs **`LEXIE_ADMIN_TOKEN`** set; verified **401/401/200** curl. |
 | WX-016 | **M0:** Browser `/admin` — token, load profile, save, refresh (C4) | done | LX-1 | lexie-server | 2026-04-30 | [§ WX-016](work-inventory.md#wx-016--m0-admin-html-c4). Fixed `TemplateResponse` for Starlette; **`GET /admin`** → 200. |
@@ -28,6 +28,6 @@ Single table for **current** work items. IDs are **`WX-*`** (execution). For pro
 | WX-018 | **M0:** No raw audio on disk; `LEXIE_LOG_REQUESTS=0` default (C6) | **done** | LX-1 | lexie-server | 2026-05-03 | [§ WX-018](work-inventory.md#wx-018--m0-privacy-no-raw-audio-c6); code review + [`lexie-server/README.md`](../lexie-server/README.md) § Performance and privacy; test `test_explain_does_not_persist_upload_as_audio_files_under_data_dir`. |
 | WX-019 | **M1 ops:** Record Fly.io host choice + capacity plan in PM | **done** | LX-1 | meta | 2026-05-04 | [§ WX-019](work-inventory.md#wx-019--m1-ops-record-fly-and-capacity-plan-in-pm); **A3 = Fly**; ~100 explains / 10 days titration; links to Fly metrics / `fly-metrics.net` in inventory. |
 | WX-020 | **Observability:** DB `explain_telemetry` (privacy-safe timings + outcomes) | **done** | LX-1 | lexie-server | 2026-05-04 | [§ WX-020](work-inventory.md#wx-020--db-backed-explain-telemetry-wx-020); **`LEXIE_STORE_TELEMETRY`**; separate from **`LEXIE_LOG_REQUESTS`**. |
-| WX-021 | **Observability:** Admin telemetry APIs + custom dashboards + Fly runbook | backlog | LX-1 | lexie-server | 2026-05-04 | [§ WX-021](work-inventory.md#wx-021--telemetry-dashboards-and-fly-platform-runbook-wx-021); builds on **WX-020**; Fly Prometheus API + optional **`[metrics]`**. |
+| WX-021 | **Observability:** Admin telemetry APIs + custom dashboards + Fly runbook | **done** | LX-1 | lexie-server | 2026-05-04 | [§ WX-021](work-inventory.md#wx-021--telemetry-dashboards-and-fly-platform-runbook-wx-021); **`GET /admin/telemetry/*`**, [`admin.html`](../lexie-server/lexie_server/templates/admin.html) telemetry panel; [README § Observability](../lexie-server/README.md#observability-wx-021). |
 
 When adding a row, use the next free `WX-###` number.

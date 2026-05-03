@@ -128,10 +128,29 @@ Each successful explain does **three sequential OpenAI calls**: **Whisper** (aud
 
 **Telemetry (WX-020)**  
 - **`LEXIE_STORE_TELEMETRY=0`** (default): no `explain_telemetry` rows.  
-- **`LEXIE_STORE_TELEMETRY=1`**: after each **`POST /explain`** (success or structured error), append one row with **HTTP status**, **outcome** code, optional **failed stage** (`duration` / `stt` / `llm` / `tts` / `upload`), **per-stage milliseconds**, **coarse upload size bucket**, and **audio content class** — **no** transcript, explanation text, or audio. Independent of **`LEXIE_LOG_REQUESTS`**. Prune old rows periodically on small disks (e.g. Fly volume). Admin aggregates / dashboards: **WX-021**.
+- **`LEXIE_STORE_TELEMETRY=1`**: after each **`POST /explain`** (success or structured error), append one row with **HTTP status**, **outcome** code, optional **failed stage** (`duration` / `stt` / `llm` / `tts` / `upload`), **per-stage milliseconds**, **coarse upload size bucket**, and **audio content class** — **no** transcript, explanation text, or audio. Independent of **`LEXIE_LOG_REQUESTS`**. Prune old rows periodically on small disks (e.g. Fly volume).
 
 **Payload limit**  
 Request bodies larger than **2 MiB** get **413** `payload_too_large` before the pipeline runs (see tests).
+
+## Observability (WX-021)
+
+**In-app (SQLite `explain_telemetry`)** — Bearer **`LEXIE_ADMIN_TOKEN`**:
+
+- **`GET /admin/telemetry/summary?from=YYYY-MM-DD&to=YYYY-MM-DD`** — counts by outcome, by day, `latency_ms` (n, min, max, p50, p95), and **`stage_ms_p95_ok`** (Whisper / chat / TTS p95 for rows with **`outcome=ok`**). Defaults to the last **30** days if `from`/`to` omitted.
+- **`GET /admin/telemetry/recent?limit=50`** — newest rows (privacy-safe columns only).
+- **`GET /admin/telemetry/count`** — total rows in **`explain_telemetry`**.
+
+**Browser:** open **`/admin`**, paste the admin token, then **Load telemetry summary** / **Load recent rows** (same origin as the API).
+
+**Fly.io platform metrics** (VM / edge, not per-pipeline stage): see [Metrics on Fly.io](https://fly.io/docs/monitoring/metrics/). Query with a Fly access token:
+
+- **Base URL:** `https://api.fly.io/prometheus/<org-slug>/` plus Prometheus paths (e.g. **`/api/v1/query`**, **`/api/v1/query_range`**). Auth: **`Authorization: Bearer <token>`** (`fly auth token`) or **`Authorization: FlyV1 <token>`** (`fly tokens create readonly`). Queries use **MetricsQL** (VictoriaMetrics).
+- **Dashboards:** [fly-metrics.net](https://fly-metrics.net) (managed Grafana for your org).
+- **Useful built-in series (examples):** `fly_app_http_responses_count`, `fly_app_http_response_time_seconds`, `fly_instance_memory_mem_available`, **`fly_instance_exit_oom`**, **`fly_volume_used_pct`**.
+- **Logs:** [Logs API options](https://fly.io/docs/monitoring/logs-api-options/) for programmatic access to app stdout.
+
+Optional: expose app Prometheus text and add **`[metrics]`** in **`fly.toml`** per Fly docs if you want custom counters in the same Prometheus store.
 
 ## Deploy (M1 / WX-006)
 

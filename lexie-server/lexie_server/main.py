@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from lexie_server.config import get_settings
 from lexie_server.db import create_tables, init_engine, seed_profile_if_empty
-from lexie_server.routers import admin, explain, health, profile, usage
+from lexie_server.routers import admin, explain, health, profile, telemetry, usage
 
 
 @asynccontextmanager
@@ -52,6 +52,7 @@ def create_app() -> FastAPI:
     app.include_router(explain.router)
     app.include_router(admin.router)
     app.include_router(usage.router)
+    app.include_router(telemetry.router)
     app.mount(
         "/prototype",
         StaticFiles(

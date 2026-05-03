@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-04 (WX-006 M1 D2 live on Fly; WX-021 active track)  
+**Last updated:** 2026-05-04 (WX-021 observability UI + APIs; WX-006 live on Fly)  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -56,9 +56,9 @@
 
 **M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Active:** [**WX-021**](registry.md) — admin telemetry APIs + custom dashboards + Fly platform runbook (builds on **WX-020**).
+**Active (suggested next):** [**WX-007**](registry.md) — M2 child browser path (CORS, mic, device key, journeys) — or **WX-008** / **WX-009** per checklist.
 
-**Done recently:** [**WX-006**](registry.md) — **M1 D2:** Fly app **`lexie-server`**, **`https://lexie-server.fly.dev/health`** → **200** (2026-05-04). Optional: **D3** (cellular), **D5** (`BASE_URL` in 1Password). **WX-020** — **`explain_telemetry`**. **WX-019** — Fly + metrics pointers in PM. **WX-018** — C6 closed.
+**Done recently:** [**WX-021**](registry.md) — **`GET /admin/telemetry/summary|recent|count`**, **`/admin`** telemetry panel, README § Observability + Fly metrics runbook. [**WX-006**](registry.md) — **`https://lexie-server.fly.dev`** (**D2**). **WX-020** / **WX-019** — telemetry table + PM. **WX-018** — C6 closed.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
@@ -300,7 +300,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 
 - **Host (A3):** **Fly.io** — app config in **[`lexie-server/fly.toml`](../lexie-server/fly.toml)** (`primary_region`, **`[mounts]`** → **`/data`**, **`[http_service.checks]`** → **`/health`**, **`min_machines_running = 1`** to limit cold starts on **`POST /explain`**).
 - **Capacity:** target **~100 explains in the first 10 days**, then titrate using OOM / latency / OpenAI usage (see **[BUDGET-AND-ROLLOUT](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.BUDGET-AND-ROLLOUT.md)** and **WX-010**).
-- **Platform metrics (no code):** Fly **[Prometheus query API](https://fly.io/docs/monitoring/metrics/)** at `https://api.fly.io/prometheus/<org-slug>/` (instant + range queries; **MetricsQL**); managed Grafana **[fly-metrics.net](https://fly-metrics.net)**; built-in series (`fly_app_http_*`, `fly_instance_memory_*`, **`fly_instance_exit_oom`**, **`fly_volume_*`**); optional app **`[metrics]`** scrape in `fly.toml`; **[Logs API](https://fly.io/docs/monitoring/logs-api-options/)** for stdout. Full runbook narrative lands under **WX-021** (README / admin).
+- **Platform metrics (no code):** Fly **[Prometheus query API](https://fly.io/docs/monitoring/metrics/)** at `https://api.fly.io/prometheus/<org-slug>/` (instant + range queries; **MetricsQL**); managed Grafana **[fly-metrics.net](https://fly-metrics.net)**; built-in series (`fly_app_http_*`, `fly_instance_memory_*`, **`fly_instance_exit_oom`**, **`fly_volume_*`**); optional app **`[metrics]`** scrape in `fly.toml`; **[Logs API](https://fly.io/docs/monitoring/logs-api-options/)** for stdout. Runbook + in-app telemetry: **WX-021** ([README § Observability](../lexie-server/README.md#observability-wx-021)).
 
 **Done when:** This section + registry row exist; team agrees Fly remains default host until explicitly changed.
 
@@ -320,13 +320,11 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 
 ---
 
-### WX-021 — Telemetry dashboards and Fly platform runbook *(registry: backlog)*
+### WX-021 — Telemetry dashboards and Fly platform runbook *(registry: done, 2026-05-04)*
 
-**Objective:** **Custom admin** dashboards reading **`explain_telemetry`** (aggregate JSON + optional charts) and a short **runbook** for Fly’s Prometheus API + **`fly-metrics.net`** + alert ideas (OOM, 5xx, volume %, p95 from DB).
+**Objective:** **Custom admin** dashboards reading **`explain_telemetry`** (aggregate JSON) and a **runbook** for Fly’s Prometheus API + **`fly-metrics.net`**.
 
-**Depends on:** **WX-020** (data exists); **WX-006** **D2** optional for Fly dashboard screenshots.
-
-**Done when:** Admin routes + UI (or documented curl examples) + README § observability; optional **`[metrics]`** documented only if implemented.
+**Delivered:** [`lexie_server/routers/telemetry.py`](../lexie-server/lexie_server/routers/telemetry.py) — **`GET /admin/telemetry/summary`**, **`/recent`**, **`/count`** (admin Bearer); [`admin.html`](../lexie-server/lexie_server/templates/admin.html) — “Explain telemetry” buttons + JSON output; [README — Observability (WX-021)](../lexie-server/README.md#observability-wx-021) — Fly query base URL, auth header forms, example series, logs link, optional **`[metrics]`** note. Tests: [`tests/test_telemetry.py`](../lexie-server/tests/test_telemetry.py).
 
 ---
 
@@ -354,6 +352,6 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-018 | M0 C6 privacy *(done)* |
 | WX-019 | M1 ops — Fly + capacity recorded in PM *(done)* |
 | WX-020 | DB `explain_telemetry` *(done)* |
-| WX-021 | Admin telemetry UI + Fly runbook *(backlog)* |
+| WX-021 | Admin telemetry UI + Fly runbook *(done)* |
 
 See [`registry.md`](registry.md) for status and dates.
