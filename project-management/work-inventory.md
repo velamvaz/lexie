@@ -56,7 +56,7 @@
 
 **M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Active (suggested next):** [**WX-007**](registry.md) — M2 child browser path (CORS, mic, device key, journeys) — or **WX-008** / **WX-009** per checklist.
+**Active:** [**WX-007**](registry.md) — M2 **Part E** (browser PTT on prod). See [**§ Part E**](work-inventory.md#part-e-m2--child-browser-path-wx-007) and [README — Child browser prototype (M2 / WX-007)](../lexie-server/README.md#child-browser-prototype-m2--wx-007).
 
 **Done recently:** [**WX-021**](registry.md) — **`GET /admin/telemetry/summary|recent|count`**, **`/admin`** telemetry panel, README § Observability + Fly metrics runbook. [**WX-006**](registry.md) — **`https://lexie-server.fly.dev`** (**D2**). **WX-020** / **WX-019** — telemetry table + PM. **WX-018** — C6 closed.
 
@@ -228,7 +228,9 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 | **D4** | *(Optional)* External uptime ping to `/health`. | Operations visibility. | **D2**, **A5** |
 | **D5** | Store **BASE_URL** in 1Password for firmware/bookmarks. | Stable reference for clients. | **D2** |
 
-### Part E (M2) — Child browser path (WX-007)
+### Part E (M2) — Child browser path (WX-007) *(registry: in_progress)*
+
+**Execution:** Open **`https://<BASE_URL>/prototype/`** on Fly (e.g. **`https://lexie-server.fly.dev/prototype/`**); paste **`LEXIE_DEVICE_KEY`**; hold-to-talk. Same-origin requests avoid CORS configuration for that URL. Full steps: [README — Child browser prototype (M2 / WX-007)](../lexie-server/README.md#child-browser-prototype-m2--wx-007).
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
@@ -338,7 +340,7 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-004 | PM folder *(done)* |
 | WX-005 | `lexie-server` Part B *(done)* |
 | WX-006 | Part D M1 public deploy *(done — `https://lexie-server.fly.dev`)* |
-| WX-007 | Part E M2 browser/CORS/mic |
+| WX-007 | Part E M2 browser/CORS/mic *(in progress)* |
 | WX-008 | Part F M3 admin on host |
 | WX-009 | Part G M4 manual eval |
 | WX-010 | Part H M5 ops |

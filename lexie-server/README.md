@@ -152,6 +152,22 @@ Request bodies larger than **2 MiB** get **413** `payload_too_large` before the 
 
 Optional: expose app Prometheus text and add **`[metrics]`** in **`fly.toml`** per Fly docs if you want custom counters in the same Prometheus store.
 
+## Child browser prototype (M2 / WX-007)
+
+Hosted at **`GET /prototype/`** (same app as the API). **[`static_prototype/index.html`](lexie_server/static_prototype/index.html)** records audio and **`POST`**s to **`/explain`** with **`Authorization: Bearer <LEXIE_DEVICE_KEY>`** (never in the query string).
+
+**On Fly (same origin):** open **`https://<your-app>.fly.dev/prototype/`** — no extra **`LEXIE_CORS_ORIGINS`** entry is required for that page (browser sees same origin). **`LEXIE_CORS_ORIGINS`** still matters if you run a **separate** dev frontend (e.g. `http://localhost:5173`) against the API; add that origin and redeploy.
+
+**Manual checklist (Part E):**
+
+| Step | What |
+|------|------|
+| **E1–E3** | HTTPS or localhost; mic permission; device key in header — satisfied by prototype + Fly TLS + secrets. |
+| **E4** | J1-style utterance (e.g. “sorcerer”); warm latency target ~**&lt; 5 s** — measure via **`X-Explain-Latency-Ms`** (shown in the prototype status line after success). |
+| **E5–E6** | J2/J3 journeys and **RUNBOOK** triage on failures — manual validation. |
+
+See **[Part E in `work-inventory.md`](../project-management/work-inventory.md#part-e-m2--child-browser-path-wx-007)** for the full milestone table.
+
 ## Deploy (M1 / WX-006)
 
 Goal: **`https://<BASE_URL>/health` → 200** with TLS (checklist **D2**). Use your host’s **secret UI** for **`OPENAI_API_KEY`**, **`LEXIE_DEVICE_KEY`**, **`LEXIE_ADMIN_TOKEN`** — not only a laptop **`.env`**.

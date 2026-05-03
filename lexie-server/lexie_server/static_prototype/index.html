@@ -12,7 +12,7 @@
 </head>
 <body>
   <h1>Push-to-talk (browser)</h1>
-  <p class="hint">Use <strong>localhost</strong> or <strong>HTTPS</strong> so the mic works. Set device key to match <code>LEXIE_DEVICE_KEY</code>.</p>
+  <p class="hint">Use <strong>localhost</strong> or <strong>HTTPS</strong> so the mic works (SPEC §6). On Fly, open this page from the same host (e.g. <code>/prototype/</code> on <code>lexie-server.fly.dev</code>)—same-origin, no extra CORS. Set device key to match server <code>LEXIE_DEVICE_KEY</code> (header only, never in the URL).</p>
   <label>Device key <input id="dk" type="password" style="width:100%;" /></label>
   <p><button id="rec" type="button">Hold to talk</button></p>
   <p id="st"></p>
@@ -45,10 +45,19 @@
       const headers = {};
       if (t) headers["Authorization"] = "Bearer " + t;
       const res = await fetch(base + "/explain", { method: "POST", body: fd, headers });
-      if (!res.ok) { st("Error: " + res.status + " " + await res.text()); return; }
+      if (!res.ok) {
+        let detail = "";
+        try {
+          const j = await res.json();
+          if (j && j.error) detail = " — " + j.error;
+        } catch (e) { /* ignore */ }
+        st("Error: " + res.status + detail);
+        return;
+      }
+      const ms = res.headers.get("X-Explain-Latency-Ms");
       const b = await res.blob();
       document.getElementById("out").src = URL.createObjectURL(b);
-      st("Play below.");
+      st(ms ? "Play below. (" + ms + " ms)" : "Play below.");
     }
   </script>
 </body>
