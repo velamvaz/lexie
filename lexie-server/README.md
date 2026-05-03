@@ -126,6 +126,10 @@ Each successful explain does **three sequential OpenAI calls**: **Whisper** (aud
 - **`LEXIE_LOG_REQUESTS=1`**: appends a diagnostic row with **raw transcript** and **response text** (and timing). Use only for short-lived debugging; do not leave on in production with real child audio/transcripts.  
 - Normal **`POST /explain`** handling keeps upload bytes **in memory**; it does **not** write raw audio to disk as part of that path.
 
+**Telemetry (WX-020)**  
+- **`LEXIE_STORE_TELEMETRY=0`** (default): no `explain_telemetry` rows.  
+- **`LEXIE_STORE_TELEMETRY=1`**: after each **`POST /explain`** (success or structured error), append one row with **HTTP status**, **outcome** code, optional **failed stage** (`duration` / `stt` / `llm` / `tts` / `upload`), **per-stage milliseconds**, **coarse upload size bucket**, and **audio content class** — **no** transcript, explanation text, or audio. Independent of **`LEXIE_LOG_REQUESTS`**. Prune old rows periodically on small disks (e.g. Fly volume). Admin aggregates / dashboards: **WX-021**.
+
 **Payload limit**  
 Request bodies larger than **2 MiB** get **413** `payload_too_large` before the pipeline runs (see tests).
 

@@ -5,7 +5,13 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from lexie_server.config import Settings, get_settings
-from lexie_server.models_orm import AgeProfile, Base, utc_now_iso
+from lexie_server.models_orm import (  # noqa: F401 — register models on Base.metadata
+    AgeProfile,
+    Base,
+    ExplainRequest,
+    ExplainTelemetry,
+    utc_now_iso,
+)
 
 _engine: Engine | None = None
 _SessionLocal: sessionmaker[Session] | None = None

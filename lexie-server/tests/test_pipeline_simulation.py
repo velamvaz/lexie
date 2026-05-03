@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from lexie_server.services import pipeline as pipeline_mod
+from lexie_server.services.pipeline import ExplainPipelineResult
 
 _PROFILE = SimpleNamespace(
     child_name="Child",
@@ -45,7 +46,7 @@ def test_run_explain_happy_path_whisper_chat_tts_order(monkeypatch: pytest.Monke
     settings.openai_tts_model = "tts-1"
     settings.openai_tts_voice = "nova"
 
-    mp3, _log, _lat, _raw, _wop = pipeline_mod.run_explain_for_profile(
+    result = pipeline_mod.run_explain_for_profile(
         MagicMock(),
         settings,
         age_profile=_PROFILE,
@@ -54,7 +55,11 @@ def test_run_explain_happy_path_whisper_chat_tts_order(monkeypatch: pytest.Monke
     )
 
     assert calls == ["transcribe", "chat", "tts"]
-    assert mp3 == b"fake-mp3-a"
+    assert isinstance(result, ExplainPipelineResult)
+    assert result.mp3 == b"fake-mp3-a"
+    assert result.timings.whisper_ms >= 0
+    assert result.timings.chat_ms >= 0
+    assert result.timings.tts_ms >= 0
 
 
 def test_run_explain_headword_two_tts_and_concat(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -95,13 +100,14 @@ def test_run_explain_headword_two_tts_and_concat(monkeypatch: pytest.MonkeyPatch
     settings.openai_tts_model = "tts-1"
     settings.openai_tts_voice = "nova"
 
-    mp3, _log, _lat, _raw, _wop = pipeline_mod.run_explain_for_profile(
+    result = pipeline_mod.run_explain_for_profile(
         MagicMock(),
         settings,
         age_profile=_PROFILE,
         audio=b"\x00" * 100,
         content_type="audio/webm",
     )
+    mp3 = result.mp3
 
     assert tts_calls == ["Explanation line.", "sorcerer"]
     assert len(concat_calls) == 1

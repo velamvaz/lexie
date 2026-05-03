@@ -1,5 +1,6 @@
 import json
 import time
+from dataclasses import dataclass
 from io import BytesIO
 from typing import Any
 
@@ -9,6 +10,34 @@ from openai import APIStatusError, OpenAI, RateLimitError
 from lexie_server.audioutil import get_audio_duration_seconds
 from lexie_server.config import Settings
 from lexie_server.prompts import build_system_message, json_user_instruction
+
+
+class OpenAIUnavailable(RuntimeError):
+    """Upstream OpenAI/HTTP failure; ``stage`` is stt | llm | tts for telemetry."""
+
+    def __init__(self, stage: str) -> None:
+        self.stage = stage
+        super().__init__(f"openai_unavailable:{stage}")
+
+
+@dataclass(frozen=True)
+class PipelineTimings:
+    duration_check_ms: int
+    whisper_ms: int
+    chat_ms: int
+    tts_ms: int
+    headword_ms: int
+    concat_ms: int
+
+
+@dataclass(frozen=True)
+class ExplainPipelineResult:
+    mp3: bytes
+    response_log_text: str
+    latency_ms: int
+    raw_transcript: str
+    word_or_phrase: str
+    timings: PipelineTimings
 
 
 def _with_retries(fn: Any, *, attempts: int = 3) -> Any:
@@ -127,21 +156,24 @@ def run_explain_for_profile(
     age_profile: Any,
     audio: bytes,
     content_type: str | None,
-) -> tuple[bytes, str, int, str, str]:
-    """Returns (mp3, response_log_text, latency_ms, raw_transcript, word_or_phrase)."""
+) -> ExplainPipelineResult:
+    """Run Whisper → chat JSON → TTS; return audio, log text, timings (WX-020)."""
     t0 = time.perf_counter()
     try:
         dur = get_audio_duration_seconds(audio, content_type)
     except Exception:  # noqa: BLE001 — ffmpeg/pydub: treat as unprocessable
-        raise ValueError("unintelligible_audio")
+        raise ValueError("unintelligible_audio") from None
+    duration_check_ms = int((time.perf_counter() - t0) * 1000)
     if dur < 0.4:
         raise ValueError("audio_too_short")
     if dur > 30.0:
         raise ValueError("audio_too_long")
+    t_ws = time.perf_counter()
     try:
         raw = (_transcribe_open(client, settings, audio, content_type) or "").strip()
-    except (APIStatusError, RateLimitError, httpx.RequestError):
-        raise RuntimeError("openai_unavailable")
+    except (APIStatusError, RateLimitError, httpx.RequestError) as e:
+        raise OpenAIUnavailable("stt") from e
+    whisper_ms = int((time.perf_counter() - t_ws) * 1000)
     if not raw:
         raise ValueError("transcription_empty")
     need_head = settings.headword_tts
@@ -151,12 +183,14 @@ def run_explain_for_profile(
         age_profile.reading_level,
         age_profile.explanation_style,
     )
+    t_chat = time.perf_counter()
     try:
         j = _chat_json(client, settings, sm, raw, need_headword=need_head)
     except ValueError:
         raise
-    except (APIStatusError, RateLimitError, httpx.RequestError):
-        raise RuntimeError("openai_unavailable")
+    except (APIStatusError, RateLimitError, httpx.RequestError) as e:
+        raise OpenAIUnavailable("llm") from e
+    chat_ms = int((time.perf_counter() - t_chat) * 1000)
 
     explanation_text = (j.get("explanation_text") or "").strip()
     if not explanation_text:
@@ -175,16 +209,42 @@ def run_explain_for_profile(
         )
     wop = _trunc_transcript(raw, 200)
 
+    headword_ms = 0
+    concat_ms = 0
+    t_tts = time.perf_counter()
     try:
         mp3 = _tts_bytes(client, settings, explanation_text)
+    except (APIStatusError, RateLimitError, httpx.RequestError) as e:
+        raise OpenAIUnavailable("tts") from e
+    tts_ms = int((time.perf_counter() - t_tts) * 1000)
+    try:
         if need_head and (j.get("headword") or "").strip():
+            t_hw = time.perf_counter()
             mp3 = _concat_mp3(
                 mp3, _tts_bytes(client, settings, (j.get("headword") or "").strip())
             )
-    except (APIStatusError, RateLimitError, httpx.RequestError):
-        raise RuntimeError("openai_unavailable")
-    except Exception:  # noqa: BLE001
-        raise RuntimeError("openai_unavailable")
+            headword_ms = int((time.perf_counter() - t_hw) * 1000)
+            # _concat_mp3 includes second TTS; split not exact — store combined as headword_ms
+            concat_ms = 0
+    except (APIStatusError, RateLimitError, httpx.RequestError) as e:
+        raise OpenAIUnavailable("tts") from e
+    except Exception as e:  # noqa: BLE001
+        raise OpenAIUnavailable("tts") from e
 
     elapsed = int((time.perf_counter() - t0) * 1000)
-    return mp3, text_for_log, elapsed, raw, wop
+    timings = PipelineTimings(
+        duration_check_ms=duration_check_ms,
+        whisper_ms=whisper_ms,
+        chat_ms=chat_ms,
+        tts_ms=tts_ms,
+        headword_ms=headword_ms,
+        concat_ms=concat_ms,
+    )
+    return ExplainPipelineResult(
+        mp3=mp3,
+        response_log_text=text_for_log,
+        latency_ms=elapsed,
+        raw_transcript=raw,
+        word_or_phrase=wop,
+        timings=timings,
+    )

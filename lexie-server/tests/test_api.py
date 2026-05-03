@@ -9,6 +9,12 @@ def _count_explain_request_rows(db_path: Path) -> int:
         return int(conn.execute(text("select count(*) from explain_request")).scalar_one())
 
 
+def _count_explain_telemetry_rows(db_path: Path) -> int:
+    eng = create_engine(f"sqlite:///{db_path}")
+    with eng.connect() as conn:
+        return int(conn.execute(text("select count(*) from explain_telemetry")).scalar_one())
+
+
 def test_health(test_client) -> None:
     r = test_client.get("/health")
     assert r.status_code == 200
@@ -54,9 +60,17 @@ def test_explain_401_no_device_key(test_client) -> None:
 
 def test_explain_200_with_pipeline_mock(test_client, monkeypatch) -> None:
     from lexie_server.routers import explain as explain_router
+    from lexie_server.services.pipeline import ExplainPipelineResult, PipelineTimings
 
     def _fake_run(*_a, **_k):
-        return b"\xff" * 8, "Explained", 99, "raw t", "word"
+        return ExplainPipelineResult(
+            mp3=b"\xff" * 8,
+            response_log_text="Explained",
+            latency_ms=99,
+            raw_transcript="raw t",
+            word_or_phrase="word",
+            timings=PipelineTimings(1, 2, 3, 4, 0, 0),
+        )
 
     monkeypatch.setattr(
         explain_router.pipeline, "run_explain_for_profile", _fake_run
@@ -97,9 +111,17 @@ def test_explain_no_explain_request_row_when_log_off(
     test_client_and_db, monkeypatch
 ) -> None:
     from lexie_server.routers import explain as explain_router
+    from lexie_server.services.pipeline import ExplainPipelineResult, PipelineTimings
 
     def _fake_run(*_a, **_k):
-        return b"\xff" * 8, "{}", 10, "raw", "w"
+        return ExplainPipelineResult(
+            mp3=b"\xff" * 8,
+            response_log_text="{}",
+            latency_ms=10,
+            raw_transcript="raw",
+            word_or_phrase="w",
+            timings=PipelineTimings(1, 1, 1, 1, 0, 0),
+        )
 
     monkeypatch.setattr(
         explain_router.pipeline, "run_explain_for_profile", _fake_run
@@ -112,15 +134,69 @@ def test_explain_no_explain_request_row_when_log_off(
     )
     assert r.status_code == 200
     assert _count_explain_request_rows(db_path) == 0
+    assert _count_explain_telemetry_rows(db_path) == 0
+
+
+def test_explain_inserts_telemetry_when_store_on(
+    test_client_telemetry_on, monkeypatch
+) -> None:
+    """WX-020: LEXIE_STORE_TELEMETRY=1 inserts explain_telemetry (no PII columns)."""
+    from lexie_server.routers import explain as explain_router
+    from lexie_server.services.pipeline import ExplainPipelineResult, PipelineTimings
+
+    def _fake_run(*_a, **_k):
+        return ExplainPipelineResult(
+            mp3=b"\xff" * 8,
+            response_log_text="{}",
+            latency_ms=42,
+            raw_transcript="raw",
+            word_or_phrase="w",
+            timings=PipelineTimings(5, 10, 15, 12, 0, 0),
+        )
+
+    monkeypatch.setattr(
+        explain_router.pipeline, "run_explain_for_profile", _fake_run
+    )
+    client, db_path = test_client_telemetry_on
+    r = client.post(
+        "/explain",
+        files={"audio": ("a.webm", b"\x00" * 16, "audio/webm")},
+        headers={"Authorization": "Bearer devdev"},
+    )
+    assert r.status_code == 200
+    assert _count_explain_telemetry_rows(db_path) == 1
+    eng = create_engine(f"sqlite:///{db_path}")
+    with eng.connect() as conn:
+        row = conn.execute(
+            text(
+                "select outcome, http_status, total_ms, duration_check_ms, "
+                "whisper_ms, chat_ms, tts_ms from explain_telemetry limit 1"
+            )
+        ).one()
+    assert row.outcome == "ok"
+    assert row.http_status == 200
+    assert row.total_ms == 42
+    assert row.duration_check_ms == 5
+    assert row.whisper_ms == 10
+    assert row.chat_ms == 15
+    assert row.tts_ms == 12
 
 
 def test_explain_inserts_explain_request_when_log_on(
     test_client_log_requests_on, monkeypatch
 ) -> None:
     from lexie_server.routers import explain as explain_router
+    from lexie_server.services.pipeline import ExplainPipelineResult, PipelineTimings
 
     def _fake_run(*_a, **_k):
-        return b"\xff" * 8, '{"explanation_text":"x"}', 10, "raw", "w"
+        return ExplainPipelineResult(
+            mp3=b"\xff" * 8,
+            response_log_text='{"explanation_text":"x"}',
+            latency_ms=10,
+            raw_transcript="raw",
+            word_or_phrase="w",
+            timings=PipelineTimings(1, 1, 1, 1, 0, 0),
+        )
 
     monkeypatch.setattr(
         explain_router.pipeline, "run_explain_for_profile", _fake_run
@@ -140,9 +216,17 @@ def test_explain_does_not_persist_upload_as_audio_files_under_data_dir(
 ) -> None:
     """WX-018 / C6: default path keeps uploads in memory; no raw audio files on disk."""
     from lexie_server.routers import explain as explain_router
+    from lexie_server.services.pipeline import ExplainPipelineResult, PipelineTimings
 
     def _fake_run(*_a, **_k):
-        return b"\xff" * 8, "{}", 1, "raw", "w"
+        return ExplainPipelineResult(
+            mp3=b"\xff" * 8,
+            response_log_text="{}",
+            latency_ms=1,
+            raw_transcript="raw",
+            word_or_phrase="w",
+            timings=PipelineTimings(0, 0, 0, 0, 0, 0),
+        )
 
     monkeypatch.setattr(
         explain_router.pipeline, "run_explain_for_profile", _fake_run

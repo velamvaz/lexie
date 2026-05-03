@@ -28,6 +28,7 @@ class Settings(BaseSettings):
 
     log_requests: bool = Field(default=False, alias="LEXIE_LOG_REQUESTS")
     headword_tts: bool = Field(default=False, alias="LEXIE_HEADWORD_TTS")
+    store_telemetry: bool = Field(default=False, alias="LEXIE_STORE_TELEMETRY")
 
     cors_origins: str = Field(
         default="http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000",

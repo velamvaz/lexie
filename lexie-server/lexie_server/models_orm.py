@@ -38,3 +38,31 @@ class ExplainRequest(Base):
     response_text: Mapped[str] = mapped_column(Text, nullable=False)
     latency_ms: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[str] = mapped_column(String(64), nullable=False)
+
+
+class ExplainTelemetry(Base):
+    """Privacy-safe per-/explain timings and outcomes (WX-020). No transcript or response text."""
+
+    __tablename__ = "explain_telemetry"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    profile_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("age_profile.id", ondelete="CASCADE"), nullable=False
+    )
+    request_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[str] = mapped_column(String(64), nullable=False)
+
+    http_status: Mapped[int] = mapped_column(Integer, nullable=False)
+    outcome: Mapped[str] = mapped_column(String(64), nullable=False)
+    failed_stage: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
+    total_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    duration_check_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    whisper_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    chat_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    tts_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    headword_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    concat_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    upload_bytes_bucket: Mapped[str] = mapped_column(String(24), nullable=False)
+    audio_content_class: Mapped[str] = mapped_column(String(24), nullable=False)
