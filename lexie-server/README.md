@@ -156,6 +156,27 @@ Then **`curl -s http://127.0.0.1:8000/health`**.
 
 **CORS:** set **`LEXIE_CORS_ORIGINS`** to the exact origin(s) that will call the API in the browser (comma-separated), e.g. your prototype or static site URL. For same-host **`/prototype`**, include your public **`https://<BASE_URL>`** if browsers treat it as a distinct origin in your setup.
 
+### Fly.io
+
+1. Install the CLI: [Fly.io install](https://fly.io/docs/hands-on/install-flyctl/), then **`fly auth login`**.
+2. **`cd lexie-server`**. Edit **`fly.toml`**: set **`app`** to a name that is not already taken on Fly (or run **`fly launch`** once from this directory; it can create the app and align **`fly.toml`**).
+3. **`fly deploy`** — the **`[mounts]`** block uses **`initial_size = "1gb"`** so the first deploy can create a volume named **`lexie_data`** in **`primary_region`** if none exists. SQLite then lives under **`/data`** (see **`LEXIE_DATA_DIR`** in the **`Dockerfile`**). If you prefer to create the volume yourself: **`fly volumes create lexie_data --region iad --size 1`** (region must match **`primary_region`**), then deploy.
+4. **Secrets** (replace values; do not commit them):
+
+   ```bash
+   fly secrets set \
+     OPENAI_API_KEY="…" \
+     LEXIE_DEVICE_KEY="…" \
+     LEXIE_ADMIN_TOKEN="…" \
+     LEXIE_CORS_ORIGINS="https://<your-app>.fly.dev"
+   ```
+
+   Add any other vars from **`.env.example`** you need (e.g. **`LEXIE_LOG_REQUESTS`**, model overrides). **`PORT`** and **`LEXIE_DATA_DIR`** are already set in the image / **`fly.toml`**; you normally do not override them.
+
+5. **URL:** **`https://<app>.fly.dev`** (or a custom domain after **`fly certs add`**). Verify **`curl -sS https://<app>.fly.dev/health`**.
+
+To save cost at very low traffic, you can later switch **`auto_stop_machines`** / **`min_machines_running`** in **`fly.toml`** at the price of cold starts before **`POST /explain`**.
+
 ### After deploy (manual checks)
 
 1. **`curl -sS https://<BASE_URL>/health`** — JSON with **`"ok": true`**.  
