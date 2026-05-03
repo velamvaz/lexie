@@ -4,7 +4,7 @@ Single table for **current** work items. IDs are **`WX-*`** (execution). For pro
 
 **Elaborated narrative** (objectives, steps, acceptance, full milestone tables): **[`work-inventory.md`](work-inventory.md)**. Use this file for **status** and quick scanning; use `work-inventory.md` for detail.
 
-**M0 (Part C):** **WX-014**–**WX-018** **done**. **M1 Part D:** [**WX-006**](registry.md) **done** (**D2** `https://lexie-server.fly.dev/health` **200**). **WX-021** **done** (admin telemetry APIs + `/admin` UI + README Fly runbook). **Active:** [**WX-007**](registry.md) — M2 child browser path (**Part E**). **WX-013** preflight: **22** tests on **`lexie-server`**.
+**M0 (Part C):** **WX-014**–**WX-018** **done**. **M1 Part D:** [**WX-006**](registry.md) **done** (**D2** `https://lexie-server.fly.dev/health` **200**). **WX-021** **done** (admin telemetry APIs + `/admin` UI + README Fly runbook). **WX-007** **done** (M2 Part E — prototype on Fly). **Active:** [**WX-008**](registry.md) — M3 parent **`/admin`** on production (**Part F**). **WX-013** preflight: **22** tests on **`lexie-server`**.
 
 | ID | Title | Status | Feature | Area | Updated | Notes |
 |----|-------|--------|---------|------|---------|-------|
@@ -14,8 +14,8 @@ Single table for **current** work items. IDs are **`WX-*`** (execution). For pro
 | WX-004 | Monorepo PM folder: schema, registry, work-log | done | — | meta | 2026-04-22 | [§ Completed — WX-004](work-inventory.md#wx-004--project-management-folder); commit `c93390f` |
 | WX-005 | Phase 1 FastAPI server in repo + checklist Part B | done | LX-1 | lexie-server | 2026-04-22 | [§ Completed — WX-005](work-inventory.md#wx-005--phase-1-fastapi-server-part-b); commit `b1d6a85` |
 | WX-006 | Part D (M1) — public HTTPS deploy and reachability | **done** | LX-1 | release | 2026-05-04 | [§ Part D — WX-006](work-inventory.md#part-d-m1--public-https-and-reachability-wx-006); **Live:** **`https://lexie-server.fly.dev`**. **D2** verified (`GET /health` → **200**, `"ok": true`). **Remainder (manual):** **D3** cellular `/health`, **D5** save `BASE_URL` in 1Password. |
-| WX-007 | Part E (M2) — child browser path (CORS, mic, device key, journeys) | **in_progress** | LX-1 | release | 2026-05-04 | [§ Part E — WX-007](work-inventory.md#part-e-m2--child-browser-path-wx-007); prototype [`/prototype/`](../lexie-server/lexie_server/static_prototype/index.html); Fly **`…/prototype/`** same-origin. **Done when:** checklist **E1–E6** verified manually. |
-| WX-008 | Part F (M3) — parent admin on production host | backlog | LX-1 | release | 2026-04-22 | [§ Future — Part F](work-inventory.md#part-f-m3--parent-admin-on-real-host-wx-008) |
+| WX-007 | Part E (M2) — child browser path (CORS, mic, device key, journeys) | **done** | LX-1 | release | 2026-05-04 | [§ Part E — WX-007](work-inventory.md#part-e-m2--child-browser-path-wx-007); Fly **`/prototype/`** + README. **E4–E6** (journeys / runbook) can continue during **WX-009**. |
+| WX-008 | Part F (M3) — parent admin on production host | **in_progress** | LX-1 | release | 2026-05-04 | [§ Part F — WX-008](work-inventory.md#part-f-m3--parent-admin-on-real-host-wx-008); **`https://lexie-server.fly.dev/admin`**. **Done when:** **F1–F4** checklist verified on prod. |
 | WX-009 | Part G (M4) — E2E shakedown / manual eval set | backlog | LX-1 | release | 2026-04-22 | [§ Future — Part G](work-inventory.md#part-g-m4--e2e-shakedown-wx-009) |
 | WX-010 | Part H (M5) — steady operation and cost | backlog | LX-1 | ops | 2026-04-22 | [§ Future — Part H](work-inventory.md#part-h-m5--steady-operation-wx-010) |
 | WX-011 | Part I — lexie-ops optional local monitor | backlog | LX-1 | ops | 2026-04-22 | [§ Future — Part I](work-inventory.md#part-i--lexie-ops-optional-wx-011) |

@@ -168,6 +168,21 @@ Hosted at **`GET /prototype/`** (same app as the API). **[`static_prototype/inde
 
 See **[Part E in `work-inventory.md`](../project-management/work-inventory.md#part-e-m2--child-browser-path-wx-007)** for the full milestone table.
 
+## Parent admin on production (M3 / WX-008)
+
+**URL:** **`https://<BASE_URL>/admin`** — e.g. **`https://lexie-server.fly.dev/admin`**. Token is entered in the page only (**`sessionStorage`**); do **not** put **`LEXIE_ADMIN_TOKEN`** in query strings or bookmarks.
+
+**Checklist (Part F):**
+
+| Step | What |
+|------|------|
+| **F1** | Page loads over HTTPS (**200** HTML). |
+| **F2** | Paste admin token → **Load profile** → fields fill from **`GET /profile`**. |
+| **F3** | Change **age** / **reading level** (and optionally **child name**) → **Save** → reload page, paste token again, **Load profile** → values persisted (SQLite on **`/data`** on Fly). |
+| **F4** | **`POST /explain`** from **`/prototype/`** uses updated profile (prompt path reads **`age_profile`** on each explain — hear difference or enable **`LEXIE_LOG_REQUESTS=1`** only for short local debugging). |
+
+See **[Part F in `work-inventory.md`](../project-management/work-inventory.md#part-f-m3--parent-admin-on-real-host-wx-008)** for the full milestone table.
+
 ## Deploy (M1 / WX-006)
 
 Goal: **`https://<BASE_URL>/health` → 200** with TLS (checklist **D2**). Use your host’s **secret UI** for **`OPENAI_API_KEY`**, **`LEXIE_DEVICE_KEY`**, **`LEXIE_ADMIN_TOKEN`** — not only a laptop **`.env`**.

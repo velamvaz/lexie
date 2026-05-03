@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-04 (WX-021 observability UI + APIs; WX-006 live on Fly)  
+**Last updated:** 2026-05-04 (WX-008 M3 Part F active; WX-007 done)  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -56,9 +56,9 @@
 
 **M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Active:** [**WX-007**](registry.md) — M2 **Part E** (browser PTT on prod). See [**§ Part E**](work-inventory.md#part-e-m2--child-browser-path-wx-007) and [README — Child browser prototype (M2 / WX-007)](../lexie-server/README.md#child-browser-prototype-m2--wx-007).
+**Active:** [**WX-008**](registry.md) — M3 **Part F** (parent **`/admin`** on **`lexie-server.fly.dev`** — load/save profile; verify explain uses profile). See [**§ Part F**](work-inventory.md#part-f-m3--parent-admin-on-real-host-wx-008) and [README — Parent admin on production (M3 / WX-008)](../lexie-server/README.md#parent-admin-on-production-m3--wx-008).
 
-**Done recently:** [**WX-021**](registry.md) — **`GET /admin/telemetry/summary|recent|count`**, **`/admin`** telemetry panel, README § Observability + Fly metrics runbook. [**WX-006**](registry.md) — **`https://lexie-server.fly.dev`** (**D2**). **WX-020** / **WX-019** — telemetry table + PM. **WX-018** — C6 closed.
+**Done recently:** [**WX-007**](registry.md) — M2 prototype deployed / documented. [**WX-021**](registry.md) — telemetry APIs + `/admin` telemetry panel. [**WX-006**](registry.md) — Fly live. **WX-018** — C6 closed.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
@@ -228,9 +228,9 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 | **D4** | *(Optional)* External uptime ping to `/health`. | Operations visibility. | **D2**, **A5** |
 | **D5** | Store **BASE_URL** in 1Password for firmware/bookmarks. | Stable reference for clients. | **D2** |
 
-### Part E (M2) — Child browser path (WX-007) *(registry: in_progress)*
+### Part E (M2) — Child browser path (WX-007) *(registry: done, 2026-05-04)*
 
-**Execution:** Open **`https://<BASE_URL>/prototype/`** on Fly (e.g. **`https://lexie-server.fly.dev/prototype/`**); paste **`LEXIE_DEVICE_KEY`**; hold-to-talk. Same-origin requests avoid CORS configuration for that URL. Full steps: [README — Child browser prototype (M2 / WX-007)](../lexie-server/README.md#child-browser-prototype-m2--wx-007).
+**Execution:** Open **`https://<BASE_URL>/prototype/`** on Fly (e.g. **`https://lexie-server.fly.dev/prototype/`**); paste **`LEXIE_DEVICE_KEY`**; hold-to-talk. Same-origin requests avoid CORS configuration for that URL. Full steps: [README — Child browser prototype (M2 / WX-007)](../lexie-server/README.md#child-browser-prototype-m2--wx-007). **E4–E6** (latency journeys, runbook) remain manual and overlap **WX-009**.
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
@@ -241,7 +241,9 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 | **E5** | J2 word+context, J3 “What is Hogwarts?” — redirect tone acceptable. | PRD journeys. | **E4** |
 | **E6** | On failure, follow [**RUNBOOK**](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.RUNBOOK.md) §1 A→E. | Consistent triage. | Any E# failure |
 
-### Part F (M3) — Parent admin on real host (WX-008)
+### Part F (M3) — Parent admin on real host (WX-008) *(registry: in_progress)*
+
+**Execution:** **`https://lexie-server.fly.dev/admin`** — paste **`LEXIE_ADMIN_TOKEN`** from 1Password / Fly secrets (never in URL); **Load profile** → edit → **Save** → refresh and reload to confirm SQLite on **`/data`**. Then **`POST /explain`** from **`/prototype/`** should reflect **`age_profile`** (hear tone/content change or use **`LEXIE_LOG_REQUESTS=1`** briefly only for debugging). Checklist: [README — Parent admin on production (M3 / WX-008)](../lexie-server/README.md#parent-admin-on-production-m3--wx-008).
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
@@ -340,8 +342,8 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-004 | PM folder *(done)* |
 | WX-005 | `lexie-server` Part B *(done)* |
 | WX-006 | Part D M1 public deploy *(done — `https://lexie-server.fly.dev`)* |
-| WX-007 | Part E M2 browser/CORS/mic *(in progress)* |
-| WX-008 | Part F M3 admin on host |
+| WX-007 | Part E M2 browser/CORS/mic *(done)* |
+| WX-008 | Part F M3 admin on host *(in progress)* |
 | WX-009 | Part G M4 manual eval |
 | WX-010 | Part H M5 ops |
 | WX-011 | Part I lexie-ops optional |
