@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-04 (WX-008 M3 Part F active; WX-007 done)  
+**Last updated:** 2026-05-04 (WX-008 done; **WX-009** M4 Part G active)  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -56,9 +56,9 @@
 
 **M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
 
-**Active:** [**WX-008**](registry.md) — M3 **Part F** (parent **`/admin`** on **`lexie-server.fly.dev`** — load/save profile; verify explain uses profile). See [**§ Part F**](work-inventory.md#part-f-m3--parent-admin-on-real-host-wx-008) and [README — Parent admin on production (M3 / WX-008)](../lexie-server/README.md#parent-admin-on-production-m3--wx-008).
+**Active:** [**WX-009**](registry.md) — M4 **Part G** (manual E2E / validation-matrix shakedown on **`lexie-server.fly.dev`**). See [**§ Part G**](work-inventory.md#part-g-m4--e2e-shakedown-wx-009) and [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.validation-matrix.md).
 
-**Done recently:** [**WX-007**](registry.md) — M2 prototype deployed / documented. [**WX-021**](registry.md) — telemetry APIs + `/admin` telemetry panel. [**WX-006**](registry.md) — Fly live. **WX-018** — C6 closed.
+**Done recently:** [**WX-008**](registry.md) — **F1–F4** parent **`/admin`** verified on prod. [**WX-007**](registry.md) — M2 prototype. [**WX-021**](registry.md) — telemetry. [**WX-006**](registry.md) — Fly. **WX-018** — C6 closed.
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
@@ -241,9 +241,9 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 | **E5** | J2 word+context, J3 “What is Hogwarts?” — redirect tone acceptable. | PRD journeys. | **E4** |
 | **E6** | On failure, follow [**RUNBOOK**](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.RUNBOOK.md) §1 A→E. | Consistent triage. | Any E# failure |
 
-### Part F (M3) — Parent admin on real host (WX-008) *(registry: in_progress)*
+### Part F (M3) — Parent admin on real host (WX-008) *(registry: done, 2026-05-04)*
 
-**Execution:** **`https://lexie-server.fly.dev/admin`** — paste **`LEXIE_ADMIN_TOKEN`** from 1Password / Fly secrets (never in URL); **Load profile** → edit → **Save** → refresh and reload to confirm SQLite on **`/data`**. Then **`POST /explain`** from **`/prototype/`** should reflect **`age_profile`** (hear tone/content change or use **`LEXIE_LOG_REQUESTS=1`** briefly only for debugging). Checklist: [README — Parent admin on production (M3 / WX-008)](../lexie-server/README.md#parent-admin-on-production-m3--wx-008).
+**Done:** **`https://lexie-server.fly.dev/admin`** — **F1–F4** verified (token in page only, load/save/refresh, explain reflects profile). Checklist: [README — Parent admin on production (M3 / WX-008)](../lexie-server/README.md#parent-admin-on-production-m3--wx-008).
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
@@ -252,7 +252,9 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 | **F3** | Change `age_years` / `reading_level`; save; persist after refresh. | Profile storage on host. | **F2** |
 | **F4** | Next explain reflects new profile (hear or inspect with logging). | End-to-end profile → prompt. | **F3**, **C5** on host |
 
-### Part G (M4) — E2E shakedown (WX-009)
+### Part G (M4) — E2E shakedown (WX-009) *(registry: in_progress)*
+
+**Execution:** Run Part **G** rows against **`https://lexie-server.fly.dev`** (**`/prototype/`**, **`/admin`** as needed). Map scenarios to [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.validation-matrix.md). [**RUNBOOK**](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.RUNBOOK.md) for failures.
 
 | Item | What | Why it matters | Typical dependency |
 |------|------|----------------|---------------------|
@@ -343,8 +345,8 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-005 | `lexie-server` Part B *(done)* |
 | WX-006 | Part D M1 public deploy *(done — `https://lexie-server.fly.dev`)* |
 | WX-007 | Part E M2 browser/CORS/mic *(done)* |
-| WX-008 | Part F M3 admin on host *(in progress)* |
-| WX-009 | Part G M4 manual eval |
+| WX-008 | Part F M3 admin on host *(done)* |
+| WX-009 | Part G M4 manual eval *(in progress)* |
 | WX-010 | Part H M5 ops |
 | WX-011 | Part I lexie-ops optional |
 | WX-012 | Part J final sign-off |
