@@ -143,6 +143,21 @@ def _concat_mp3(a: bytes, b: bytes) -> bytes:
     return buf.getvalue()
 
 
+def _resample_mp3_for_device(mp3: bytes, target_hz: int) -> bytes:
+    """Match device I2S rate (shared TX/RX); OpenAI TTS MP3 is 24 kHz mono."""
+    if target_hz <= 0:
+        return mp3
+    from pydub import AudioSegment
+
+    seg = AudioSegment.from_file(BytesIO(mp3), format="mp3")
+    if seg.frame_rate == target_hz and seg.channels == 1:
+        return mp3
+    seg = seg.set_frame_rate(target_hz).set_channels(1)
+    buf = BytesIO()
+    seg.export(buf, format="mp3", bitrate="128k")
+    return buf.getvalue()
+
+
 def _trunc_transcript(s: str, n: int) -> str:
     if len(s) <= n:
         return s
@@ -230,6 +245,8 @@ def run_explain_for_profile(
         raise OpenAIUnavailable("tts") from e
     except Exception as e:  # noqa: BLE001
         raise OpenAIUnavailable("tts") from e
+
+    mp3 = _resample_mp3_for_device(mp3, settings.playback_sample_rate)
 
     elapsed = int((time.perf_counter() - t0) * 1000)
     timings = PipelineTimings(

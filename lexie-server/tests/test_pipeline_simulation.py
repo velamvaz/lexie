@@ -38,6 +38,9 @@ def test_run_explain_happy_path_whisper_chat_tts_order(monkeypatch: pytest.Monke
     monkeypatch.setattr(pipeline_mod, "_transcribe_open", _transcribe)
     monkeypatch.setattr(pipeline_mod, "_chat_json", _chat)
     monkeypatch.setattr(pipeline_mod, "_tts_bytes", _tts)
+    monkeypatch.setattr(
+        pipeline_mod, "_resample_mp3_for_device", lambda mp3, _hz: mp3
+    )
 
     settings = MagicMock()
     settings.headword_tts = False
@@ -92,6 +95,9 @@ def test_run_explain_headword_two_tts_and_concat(monkeypatch: pytest.MonkeyPatch
 
     monkeypatch.setattr(pipeline_mod, "_tts_bytes", _tts)
     monkeypatch.setattr(pipeline_mod, "_concat_mp3", _concat)
+    monkeypatch.setattr(
+        pipeline_mod, "_resample_mp3_for_device", lambda mp3, _hz: mp3
+    )
 
     settings = MagicMock()
     settings.headword_tts = True

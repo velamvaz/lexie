@@ -19,7 +19,9 @@ class Settings(BaseSettings):
     openai_api_key: str = Field(default="", alias="OPENAI_API_KEY")
     openai_chat_model: str = Field(default="gpt-4o-mini", alias="LEXIE_CHAT_MODEL")
     openai_tts_model: str = Field(default="tts-1", alias="LEXIE_TTS_MODEL")
-    openai_tts_voice: str = Field(default="nova", alias="LEXIE_TTS_VOICE")
+    openai_tts_voice: str = Field(default="shimmer", alias="LEXIE_TTS_VOICE")
+    # ESP32 Waveshare bench shares I2S TX/RX at one rate; OpenAI TTS is 24 kHz — resample for playback.
+    playback_sample_rate: int = Field(default=16000, alias="LEXIE_PLAYBACK_SAMPLE_RATE")
     whisper_model: str = Field(default="whisper-1", alias="LEXIE_WHISPER_MODEL")
 
     # Required in production: when set, device must send this on /explain
