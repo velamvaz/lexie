@@ -1,6 +1,6 @@
 # Lexie work inventory (elaborated)
 
-**Last updated:** 2026-05-03 (**WX-011** Part I lexie-ops **done**; optional **WX-006** D3/D5 remain)  
+**Last updated:** 2026-06-09 — **Phase 1 complete; Phase 2 (LX-4) active** — **WX-032** **done**; **WX-034** **done**; **Waveshare board delivered**; **WX-035** **done**  
 
 **Canonical status** for each `WX-*` row lives in [`registry.md`](registry.md). This document is the **elaborated narrative**: objectives, steps, acceptance, and roadmap context. When they disagree, **registry wins** for current status; refresh this file when scope changes.
 
@@ -52,19 +52,19 @@
 
 ---
 
-## Section B — In progress
+## Section B — Phase status
 
-**M0 (Part C) complete:** [**WX-014**](registry.md)–[**WX-018**](registry.md) **done** (local `.env` + health, profile auth, `/admin`, real **`POST /explain`**, privacy C6).
+**Phase 1 complete (2026-05-03).** LX-1 server shipped and signed off: SPEC §11 done, 32 tests green, Fly live, ops settled, lexie-ops verified. Full history in [Section A](#section-a--completed) and [work-log](work-log/).
 
-**Active:** none — optional manual follow-ups: [**WX-006**](registry.md) **D3** / **D5** only.
+**Phase 2 active — LX-4 hardware track.** Bridge (**WX-022**–**WX-025**) **done**; **WX-034** Path B pivot **done**; **WX-026** **done**; active bench [**WX-035** → **WX-028** → **WX-036** → **WX-029** → **WX-033** → **WX-032**](registry.md) ([Section D3](#section-d3--lx-4-bench-execution-path-b-waveshare)). Path A archive: [Section D2](#section-d2--lx-4-bench-execution-path-a--archive). See [Section D](#section-d--phase-2-hardware-track-lx-4).
 
-**Done recently:** [**WX-011**](registry.md) — Part I lexie-ops (**2026-05-03**). [**WX-012**](registry.md) — Part J SPEC §11 (**2026-05-01**). [**WX-010**](registry.md) — M5 **Part H**. [**WX-009**](registry.md) — M4 **Part G**. [**WX-008**](registry.md) — **`/admin`**. [**WX-007**](registry.md) — M2 prototype. [**WX-021**](registry.md) — telemetry. [**WX-006**](registry.md) — Fly. **WX-018** — C6 closed.
+**Parallel non-blocking software polish** (no gate on hardware): latency SLO, validation G2–G7, Phase 1b Journey 5. See [Section E](#section-e--parallel-software-polish).
 
 **How to move work:** Edit [`registry.md`](registry.md) (**Status**, **Updated**), append a line to [`work-log/`](work-log/).
 
 ---
 
-## Section C — Planned next (M0 **done**; follow-on WX-006+)
+## Section C — Phase 1 planned items (archive)
 
 **Superseded (see registry):** **WX-001** and **WX-003** were broad umbrellas; execution is now **WX-013** (pytest) and **WX-014–WX-018** (checklist C1–C6 steps). Do **not** reopen WX-001 / WX-003.
 
@@ -226,7 +226,7 @@ The following restates [**lexie-word-explainer.MASTER-CHECKLIST.md**](../lexie-d
 | **D2** | `https://<BASE_URL>/health` → **200**. | Confirms TLS and routing. | **D1** |
 | **D3** | Hit `/health` from **phone on cellular**. | Rules out home-only networking issues. | **D2** |
 | **D4** | *(Optional)* External uptime ping to `/health`. | Operations visibility. | **D2**, **A5** |
-| **D5** | Store **BASE_URL** in 1Password for firmware/bookmarks. | Stable reference for clients. | **D2** |
+| **D5** | Store **BASE_URL** in 1Password for Lexie Card firmware / provisioning. | Stable reference for clients. | **D2** |
 
 ### Part E (M2) — Child browser path (WX-007) *(registry: done, 2026-05-04)*
 
@@ -340,6 +340,334 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 
 ---
 
+---
+
+## Section D — Phase 2: Hardware track (LX-4)
+
+### WX-022 — Connectivity de-risk: D3 + hotspot + D5 *(registry: done, 2026-05-03)*
+
+**Objective:** Prove the server is reachable from **beyond home Wi-Fi** — the network path the future device will actually use (SPEC §1.2, PRD connectivity section).
+
+**Steps:**
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **D3** | Phone, Wi-Fi off, cellular on — open `https://lexie-server.fly.dev/health` | **200** JSON `{"ok":true}` |
+| **Hotspot stretch** | Phone hotspot on; laptop joins that Wi-Fi; open `/health` and optionally `/prototype/` for one explain | **200** health; explain plays audio |
+| **D5** | Save exact `BASE_URL` in 1Password (Secure Note: "Lexie — production URL") | Note saved |
+
+**Why hotspot matters:** the device is a Wi-Fi client that routes through the parent's phone hotspot when away from home — not a cellular device itself. Testing from a laptop on hotspot is a closer simulation than cellular browser alone.
+
+**Recorded (2026-05-03):** D3 cellular `/health` → **200** ✓. Hotspot (laptop on phone hotspot) `/health` → **200** ✓. D5 `BASE_URL` saved in 1Password. WX-006 tail closed. LX-4 device connectivity de-risked.
+
+---
+
+### WX-023 — Firmware handoff doc
+
+**Objective:** A concise, normative API reference for **LX-4 firmware implementers** — so hardware work can begin without needing to read the full SPEC.
+
+**File:** [`lexie-docs/lexie/committed-to-build/lexie-word-explainer.DEVICE-INTEGRATION.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.DEVICE-INTEGRATION.md)
+
+**Sections:** `BASE_URL` (from 1Password D5); `GET /health` liveness; `POST /explain` shape, auth header, response; limits (2 MiB, 30 s, 0.4 s); TLS requirements; `LEXIE_DEVICE_KEY` sourcing and flash-at-provisioning note; what is **not** for the device (`/profile`, `/admin`, `/admin/telemetry/*`); SPEC §5.1 error codes for LED/audio mapping; OpenAI note (server calls OpenAI; device never does).
+
+**Done when:** file exists and is linked from [SPEC](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.SPEC.md) header or [README](../lexie-server/README.md).
+
+---
+
+### WX-024 — LX-4 platform decision and bringup scaffold *(registry: done, 2026-05-03)*
+
+**Objective:** Decide hardware platform, audio transport, and create a minimal scaffold so firmware development can begin.
+
+**Decided (2026-05-03):**
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Platform** | **Seeed XIAO ESP32-S3** (~$8) | 21×17.5 mm — smallest ESP32-S3 board; USB-C LiPo charging built-in; JST battery connector; I2S pins native; fits inside **Lexie Card** ID-1 shell (see [`hardware/lexie-plaud-form-factor.html`](../hardware/lexie-plaud-form-factor.html)); ~2 s boot vs ~30 s for Pi Zero |
+| **Audio (mic)** | **INMP441** I2S MEMS mic | Tiny (4×3 mm); I2S native; no USB audio hat needed |
+| **Audio (amp + speaker)** | **MAX98357A** I2S amp + slim 8Ω 0.5W speaker (~30×20 mm) | Wires directly to XIAO I2S pins; no extra hat |
+| **Battery** | **503040** thin LiPo ~400 mAh | 5 mm thick, 30×40 mm — fits **Lexie Card** ≤ ~8 mm stack; charges via USB-C on XIAO |
+| **Firmware language** | **MicroPython** | Sufficient for button → record → HTTP POST → play; avoids C++ for Phase 2 |
+| **Audio transport** | **WAV/PCM** to start | Simplest; evaluate Opus compression if latency is a concern after real-device testing |
+
+**Pi Zero 2W rejected** primarily on **boot time** (~30 s Linux boot is a product-level problem for Lexie Card — a child picks it up and expects immediate PTT).
+
+**Amended (2026-05-22, WX-034):** Active bench platform is **Waveshare ESP32-S3-AUDIO-Board** (Path B). Table above is **historical Path A lock**; parts remain spare. See [lx-4-platform-pivot-waveshare.md](lx-4-platform-pivot-waveshare.md) and [lx-4-waveshare-device.PRD.md](../lexie-docs/lexie/prds/lx-4-waveshare-device.PRD.md).
+
+---
+
+### WX-025 — WiFi provisioning design for LX-4 device *(registry: done, 2026-05-03)*
+
+**Objective:** Define how home + hotspot SSIDs and `BASE_URL` are stored on the device (PRD open question 7).
+
+**Decided (2026-05-03):**
+
+**Mechanism: USB serial, one-time setup.** Parent connects XIAO to laptop via USB-C (same cable used for charging), runs a short Python provisioning script that writes a JSON config file to the XIAO's onboard flash (8 MB filesystem). Re-run only if credentials change.
+
+**Config shape stored in flash (`config.json`):**
+
+```json
+{
+  "networks": [
+    {"ssid": "HomeWiFi",       "password": "..."},
+    {"ssid": "Parent1Hotspot", "password": "..."},
+    {"ssid": "Parent2Hotspot", "password": "..."}
+  ],
+  "base_url": "https://lexie-server.fly.dev",
+  "device_key": "..."
+}
+```
+
+**3 network profiles:** home AP + 2 parent hotspots (two parents with separate phones). Firmware tries SSIDs in order on boot until one connects — device auto-switches between home and whichever hotspot is available; no child interaction required.
+
+**`BASE_URL` and `device_key`** sourced from 1Password at provisioning time; never hardcoded in firmware source.
+
+**Phase 3 upgrade path:** SoftAP provisioning (device becomes a temporary AP; parent fills a browser form) for a more polished out-of-box setup experience — does not need to be built for Phase 2.
+
+---
+
+## Section D2 — LX-4 bench execution (Path A — archive)
+
+**Status:** **Superseded 2026-05-22** by [Section D3](#section-d3--lx-4-bench-execution-path-b-waveshare) (**WX-034**). Docs retained for history and spare parts.
+
+**Assumption:** BOM parts received (XIAO ESP32-S3, LiPo, MAX98357, INMP441, speaker, breadboard, dupont, soldering kit). **Normative API:** [`lexie-word-explainer.DEVICE-INTEGRATION.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.DEVICE-INTEGRATION.md). **Depends on:** [Seeed XIAO ESP32S3 wiki](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/) for pinout and LiPo polarity.
+
+**Original order:** **WX-026** → **WX-027** → **WX-028** → **WX-029** → (**WX-030** and **WX-031** in either order) → **WX-033** → **WX-032**.
+
+**Scaffold:** There is no `firmware/` tree yet; **WX-028** acceptance should introduce a minimal MicroPython layout (e.g. `firmware/` + README); **WX-033** may add a host script under e.g. `tools/` (document in the same README).
+
+### WX-026 — Unbox + inventory + verify ordered SKUs *(registry: done, 2026-05-05)*
+
+**Objective:** Confirm the shipment matches the intended Lexie M1 bench BOM before soldering or powering from LiPo.
+
+**Evidence:** [`items/WX-026.md`](items/WX-026.md).
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Inventory** | Lay out boards, cell, speaker, breadboard kit, dupont, iron | Nothing missing for first wiring pass |
+| **XIAO** | Visual + silkscreen / listing | **Plain XIAO ESP32-S3** — **not** “Sense” (no camera module) |
+| **Polarity prep** | Do **not** plug LiPo into XIAO until **WX-027** | — |
+
+**Done when:** Checklist ticked; optional photo or one-line note in [work-log](work-log/2026-05.md).
+
+---
+
+### WX-027 — Solder prep + safe power documentation *(registry: superseded, 2026-05-22)*
+
+**Status:** **Superseded** — partial work done (XIAO headers, MAX98357 + terminal); round INMP441 not finished. Path B active.
+
+**Objective:** Make breakouts breadboard-ready and eliminate LiPo polarity ambiguity.
+**Normative parts context:** [lx-4-path-a-component-kit.md](lx-4-path-a-component-kit.md) (Path A fixed kit, header type, jig wording).  
+**Bench layout (machine-readable):** [lx-4-path-a-bench-layout.md](lx-4-path-a-bench-layout.md).
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Solder** | Male headers on **MAX98357** and **INMP441**; speaker wires to amp **±** (strip pigtail, not LiPo JST) | Joints solid; no bridged pins |
+| **XIAO** | Optional: solder pin headers for breadboard / dupont | Matches your wiring plan |
+| **LiPo** | Multimeter **DC V** (red lead in **VΩ** jack); compare leads to [Seeed LiPo guidance](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/) | Table or photo: which wire is **+** / **−** vs JST orientation **before** first battery plug |
+
+**Done when:** Amp and mic usable on breadboard; polarity documented; first LiPo plug only after sign-off.
+
+---
+
+### WX-028 — Flash MicroPython + USB REPL + WiFi smoke *(registry: backlog)*
+
+**Objective:** Prove the XIAO is a programmable Wi-Fi device over a **data-capable** USB-C cable.
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Firmware** | Flash MicroPython build appropriate for **XIAO ESP32-S3** (Seeed / generic ESP32-S3 port per current docs) | REPL responds over USB |
+| **Tooling** | `mpremote` or serial terminal | Can run a one-liner (e.g. `print`, WiFi scan) |
+| **WiFi** | Join **one** known AP (SSID/password hardcoded for this milestone is OK) | `wlan.isconnected()` true or equivalent |
+
+**Done when:** REPL + WiFi smoke documented; repo contains initial **`firmware/`** (or agreed path) + **README** with flash steps and versions.
+
+---
+
+### WX-029 — Freeze I2S / GPIO pin map + breadboard wire table *(registry: backlog)*
+
+**Objective:** One committed source of truth for wiring — avoids rework when two I2S peripherals share the MCU.
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Research** | Map **BCLK / WS (LRCLK) / data** for **MAX98357** (DIN) and **INMP441** (SD/DOUT) to XIAO GPIOs per ESP32-S3 I2S capabilities | Table drafted |
+| **Document** | Add file under e.g. [`lexie-docs/lexie/committed-to-build/`](../lexie-docs/lexie/committed-to-build/) (**`lexie-word-explainer.PINMAP-XIAO-ESP32S3.md`**) or `firmware/README.md` | Merged to `main`; linked from DEVICE-INTEGRATION or firmware README |
+| **Extras** | Note **3V3 / GND**, INMP441 **L/R** if applicable, **MAX98357 GAIN / SD** | Clear for implementer |
+
+**Done when:** Pin map merged; **WX-030** / **WX-031** wiring follows it.
+
+---
+
+### WX-030 — I2S out: MAX98357 + speaker playback *(registry: backlog)*
+
+**Objective:** Validate the output chain (digital → amp → speaker) per **WX-024** transport (WAV/PCM first).
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Wire** | Per **WX-029** | Power and I2S to amp |
+| **Software** | MicroPython: I2S TX + buffer to amp | Audible **test tone** or short WAV |
+| **Level** | Avoid clipping / overheating on **0.5 W** speaker | Sane volume |
+
+**Done when:** Reliable sound from the physical speaker on command.
+
+---
+
+### WX-031 — I2S in: INMP441 capture *(registry: backlog)*
+
+**Objective:** Validate microphone path before HTTP upload.
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Wire** | Per **WX-029** | Mic clocks and data in |
+| **Software** | MicroPython: I2S RX; record short sample | File or buffer with non-silent audio when speaking |
+| **Levels** | Inspect peak / RMS roughly | No permanent clipping on normal speech |
+
+**Done when:** Repeatable capture; ready to wrap as **`audio`** for **`POST /explain`**.
+
+---
+
+### WX-033 — USB provisioning: write `config.json` to flash (WX-025 shape) *(registry: backlog)*
+
+**Objective:** Replace hardcoded Wi-Fi and secrets in source with flash-backed config as designed in **WX-025**.
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Shape** | JSON: `networks[]`, `base_url`, `device_key` | Matches **WX-025** example |
+| **Host** | Script (e.g. Python + `mpremote` copy or VFS write) writes **`config.json`** | Parent can run from laptop; values from 1Password, not committed |
+| **Device** | Boot code loads JSON, connects using stored SSIDs order | Connects without embedding passwords in `.py` source |
+
+**Done when:** One documented provisioning run; firmware reads config at boot.
+
+---
+
+### WX-032 — Device TLS: GET /health + POST /explain + play MP3 *(registry: done)*
+
+**Objective:** End-to-end Lexie path on hardware per [`DEVICE-INTEGRATION.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.DEVICE-INTEGRATION.md).
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **TLS** | `GET {base_url}/health` | **200** `{"ok": true}` |
+| **Explain** | `POST {base_url}/explain` multipart **`audio`**, `Authorization: Bearer` or `X-Device-Key` | **200** `audio/mpeg`; play on device |
+| **Auth** | Wrong or missing key | **401** / `unauthorized` handled per §8 |
+| **Config** | `base_url` and `device_key` from **WX-033** | No production secrets in git |
+| **Stress** | `./tools/wx032-reliability.sh` | `LEXIE_E2E: SUMMARY pass=10 fail=0` ✓ (2026-06-09) |
+
+**Done when:** Automated 10× stress pass ✓ (2026-06-09) + manual PTT smoke ✓ (2026-06-09).
+
+---
+
+## Section D3 — LX-4 bench execution (Path B — Waveshare)
+
+**Platform:** [Waveshare ESP32-S3-AUDIO-Board](https://www.waveshare.com/esp32-s3-audio-board.htm)  
+**Decision:** [lx-4-platform-pivot-waveshare.md](lx-4-platform-pivot-waveshare.md) · **WX-034**  
+**PRDs:** [lx-4-waveshare-device.PRD.md](../lexie-docs/lexie/prds/lx-4-waveshare-device.PRD.md) · [lx-4-device-firmware.PRD.md](../lexie-docs/lexie/prds/lx-4-device-firmware.PRD.md) · [lx-4-device-ux-sla.PRD.md](../lexie-docs/lexie/prds/lx-4-device-ux-sla.PRD.md)  
+**Kit / order:** [lx-4-path-b-waveshare-kit.md](lx-4-path-b-waveshare-kit.md)  
+**Testing phases:** [lx-4-path-b-bench-testing.md](lx-4-path-b-bench-testing.md)  
+**Network policy:** [lx-4-network-policy.md](lx-4-network-policy.md)
+
+**Suggested order:** **WX-035** → **WX-028** → **WX-036** → **WX-029** → **WX-033** → **WX-032**.
+
+**Scaffold:** No `firmware/` tree yet; **WX-028** introduces minimal layout + README (ESP-IDF or MicroPython per feasibility); **WX-033** host script under e.g. `tools/`.
+
+### WX-035 — Path B unbox + erase vendor firmware *(registry: in_progress, 2026-05-22 — board delivered)*
+
+**Objective:** Receive Waveshare board safely; **never** run stock Xiaozhi/demo firmware on home Wi‑Fi.
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Unbox** | Visual inspect; note variant (with/without bundled LiPo) | Photo optional in [work-log](work-log/2026-05.md) |
+| **Erase** | **Full flash erase** before network join | Vendor demo image gone |
+| **Polarity** | If using external LiPo: multimeter **DC V** on MX1.25 connector | **+ / −** documented before first battery plug |
+| **Policy** | Read [lx-4-network-policy.md](lx-4-network-policy.md) | Understand allowlist before Wi‑Fi test |
+
+**Done when:** Board ready for Lexie firmware only; no vendor cloud traffic.
+
+---
+
+### WX-028 — Flash toolchain + USB REPL + WiFi smoke *(Path B)* *(registry: backlog)*
+
+**Objective:** Prove Waveshare is a programmable Wi‑Fi device over **data-capable** USB-C.
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Prereq** | **WX-035** complete | Vendor FW erased |
+| **Toolchain** | ESP-IDF (Waveshare examples as **reference**) or MicroPython if port exists | Serial monitor / REPL responds |
+| **Flash** | Lexie smoke image (not vendor demo) | Boot log shows Lexie or test app |
+| **WiFi** | Join **one** known AP (hardcoded OK for milestone) | Connected |
+
+**Done when:** REPL/monitor + WiFi smoke documented; initial **`firmware/`** + README with flash steps.
+
+---
+
+### WX-036 — Path B codec audio smoke (ES8311/ES7210) *(registry: backlog)*
+
+**Objective:** Validate integrated audio path before HTTP upload — replaces Path A **WX-030** + **WX-031**.
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Init** | I2C config ES8311 + ES7210 per Waveshare wiki | Codecs respond |
+| **Record** | ES7210: short clip to buffer/file | Non-silent when speaking |
+| **Play** | ES8311: tone or loopback | Audible on speaker header |
+| **Levels** | No clipping on normal speech | Sane RMS/peak |
+
+**Done when:** Repeatable record + playback; ready for **`POST /explain`** wrap.
+
+---
+
+### WX-029 — Freeze codec / I2S / GPIO pin map *(Path B)* *(registry: backlog)*
+
+**Objective:** One committed pin map for Waveshare — ES8311, ES7210, I2S, PTT/LED (future).
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Research** | Waveshare wiki + schematic: I2C **GPIO10/11**, I2S **MCLK/BCLK/LRCLK/DIN/DOUT** | Table drafted |
+| **Document** | [`lexie-word-explainer.PINMAP-WAVESHARE-AUDIO.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.PINMAP-WAVESHARE-AUDIO.md) (draft — verify on board) | Merged; linked from firmware README |
+| **Verify** | Cross-check against physical board silkscreen | Matches receipt |
+
+**Done when:** Pin map merged; **WX-036** / **WX-032** follow it.
+
+---
+
+### WX-033 — USB provisioning: write `config.json` to flash (WX-025 shape) *(registry: backlog)*
+
+**Unchanged from Path A** — same JSON shape; flash path may use ESP-IDF partition or MicroPython VFS.
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **Shape** | JSON: `networks[]`, `base_url`, `device_key` | Matches **WX-025** |
+| **Host** | Script writes **`config.json`** | Values from 1Password |
+| **Device** | Boot loads JSON, tries SSIDs in order | No passwords in source |
+
+**Done when:** One documented provisioning run on Waveshare.
+
+---
+
+### WX-032 — Device TLS: GET /health + POST /explain + play MP3 *(registry: done)*
+
+**Unchanged objective** — end-to-end Lexie on hardware per [`DEVICE-INTEGRATION.md`](../lexie-docs/lexie/committed-to-build/lexie-word-explainer.DEVICE-INTEGRATION.md).
+
+| Step | What | Passes when |
+|------|------|-------------|
+| **TLS** | `GET {base_url}/health` | **200** |
+| **Explain** | `POST {base_url}/explain` multipart **`audio`** | **200** `audio/mpeg`; play via ES8311 |
+| **Network** | Router log or capture | Only Lexie host (+ optional NTP) per [network policy](lx-4-network-policy.md) |
+| **Config** | From **WX-033** | No secrets in git |
+
+**Done when:** `./tools/wx032-reliability.sh` reports `LEXIE_E2E: SUMMARY pass=10 fail=0` ✓; manual PTT smoke ✓ (2026-06-09).
+
+---
+
+## Section E — Parallel software polish (non-blocking)
+
+These do **not** gate hardware work. Open a WX item only if a real device test produces a concrete reproducible failure.
+
+| Item | What | When |
+|------|------|------|
+| **Latency SLO** | Chase SPEC §8.2 p95 &lt; 5 s (region, VM tier, model, prompt) | After real device reveals what latency feels like in use |
+| **Validation G2–G7** | Full validation matrix (phrasal, Hogwarts, short clip, long clip, wrong key) | Any time; no gate |
+| **Phase 1b / Journey 5** | Multi-turn + recovery cap (SPEC §15); defined but not yet built | After hardware validated and in-use |
+
+---
+
 ## Quick index: `WX-*` → milestone
 
 | WX | Focus |
@@ -365,5 +693,20 @@ Validation detail: [`lexie-word-explainer.validation-matrix.md`](../lexie-docs/l
 | WX-019 | M1 ops — Fly + capacity recorded in PM *(done)* |
 | WX-020 | DB `explain_telemetry` *(done)* |
 | WX-021 | Admin telemetry UI + Fly runbook *(done)* |
+| WX-022 | Phase 2 connectivity de-risk D3 + hotspot + D5 *(done)* |
+| WX-023 | Firmware handoff doc DEVICE-INTEGRATION.md *(done)* |
+| WX-024 | LX-4 platform decision + bringup scaffold *(done)* |
+| WX-025 | WiFi provisioning design *(done)* |
+| WX-026 | Unbox + inventory + verify SKUs *(done)* |
+| WX-027 | Solder prep *(Path A — superseded)* |
+| **WX-034** | **Platform pivot — Waveshare Path B + PRD set** *(done)* |
+| **WX-035** | **Path B unbox + erase vendor firmware** *(in progress — board delivered)* |
+| **WX-028** | **Flash toolchain + USB REPL + WiFi smoke (Path B)** *(backlog)* |
+| **WX-036** | **Path B codec smoke ES8311/ES7210** *(backlog)* |
+| **WX-029** | **Waveshare pin map (Path B)** *(backlog)* |
+| WX-030 | I2S out MAX98357 *(Path A — cancelled)* |
+| WX-031 | I2S in INMP441 *(Path A — cancelled)* |
+| **WX-033** | **USB provisioning `config.json` (WX-025 shape)** *(backlog)* |
+| **WX-032** | **Device TLS `/health` + `/explain` + play MP3** *(backlog)* |
 
 See [`registry.md`](registry.md) for status and dates.

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WX-035 — Waveshare BOOT &amp; RESET buttons</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4d;
+      --text: #e8eef7;
+      --muted: #9fb0c8;
+      --accent: #5b9cff;
+      --warn: #ffb020;
+      --ok: #4cd964;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .wrap { max-width: 52rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+    .meta { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.15rem; color: var(--accent); margin: 2rem 0 0.75rem; }
+    figure {
+      margin: 1rem 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 0.75rem; }
+    img.photo { max-width: 100%; border-radius: 8px; display: block; margin: 0 auto; }
+    .callout {
+      border-left: 4px solid var(--warn);
+      background: rgba(255, 176, 32, 0.08);
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    ol.steps { padding-left: 1.25rem; }
+    ol.steps li { margin: 0.5rem 0; }
+    code { background: #0a0e14; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9em; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>WX-035 — Find BOOT &amp; RESET on the Waveshare board</h1>
+    <p class="meta">ESP32-S3-AUDIO-Board · for flash erase / download mode</p>
+
+    <h2>1. Official board photo</h2>
+    <figure>
+      <img class="photo" src="https://www.waveshare.com/media/catalog/product/cache/1/image/800x800/9df78eab33525d08d6e5fb8d27136e95/e/s/esp32-s3-audio-board-1.jpg" alt="Waveshare ESP32-S3-AUDIO-Board top view" width="800" height="800" />
+      <figcaption>Top view — USB-C is on one short edge. BOOT and RESET are <strong>small square tactile buttons</strong> on the PCB, labeled in tiny white silkscreen text.</figcaption>
+    </figure>
+
+    <h2>2. Close-up — what to look for</h2>
+    <figure>
+      <svg viewBox="0 0 520 340" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of USB edge with BOOT and RESET buttons">
+        <defs>
+          <pattern id="pcb" width="8" height="8" patternUnits="userSpaceOnUse">
+            <rect width="8" height="8" fill="#1e3a2f"/>
+            <rect width="4" height="4" fill="#234a38"/>
+          </pattern>
+        </defs>
+        <!-- board edge -->
+        <rect x="20" y="40" width="480" height="260" rx="12" fill="url(#pcb)" stroke="#4a6a5a" stroke-width="2"/>
+        <!-- USB-C -->
+        <rect x="200" y="20" width="120" height="36" rx="6" fill="#333" stroke="#888" stroke-width="2"/>
+        <text x="260" y="43" text-anchor="middle" fill="#ccc" font-size="13" font-family="system-ui,sans-serif">USB Type-C</text>
+        <line x1="260" y1="56" x2="260" y2="80" stroke="#888" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- button cluster near USB -->
+        <g transform="translate(130, 110)">
+          <rect x="0" y="0" width="56" height="56" rx="4" fill="#2a2a2a" stroke="#666" stroke-width="2"/>
+          <rect x="14" y="14" width="28" height="28" rx="3" fill="#444" stroke="#aaa" stroke-width="1.5"/>
+          <text x="28" y="78" text-anchor="middle" fill="#ffb020" font-size="14" font-weight="bold" font-family="system-ui,sans-serif">BOOT</text>
+          <text x="28" y="96" text-anchor="middle" fill="#9fb0c8" font-size="11" font-family="system-ui,sans-serif">small square button</text>
+        </g>
+        <g transform="translate(330, 110)">
+          <rect x="0" y="0" width="56" height="56" rx="4" fill="#2a2a2a" stroke="#666" stroke-width="2"/>
+          <rect x="14" y="14" width="28" height="28" rx="3" fill="#444" stroke="#aaa" stroke-width="1.5"/>
+          <text x="28" y="78" text-anchor="middle" fill="#5b9cff" font-size="14" font-weight="bold" font-family="system-ui,sans-serif">RESET</text>
+          <text x="28" y="96" text-anchor="middle" fill="#9fb0c8" font-size="11" font-family="system-ui,sans-serif">small square button</text>
+        </g>
+        <!-- labels on silkscreen -->
+        <text x="158" y="102" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace" opacity="0.7">BOOT</text>
+        <text x="358" y="102" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace" opacity="0.7">RESET</text>
+        <!-- other buttons hint -->
+        <g transform="translate(220, 200)" opacity="0.5">
+          <rect x="0" y="0" width="40" height="40" rx="3" fill="#333" stroke="#555"/>
+          <rect x="60" y="0" width="40" height="40" rx="3" fill="#333" stroke="#555"/>
+          <text x="40" y="58" text-anchor="middle" fill="#9fb0c8" font-size="10" font-family="system-ui,sans-serif">KEY1 KEY2 KEY3 (ignore for erase)</text>
+        </g>
+        <!-- finger hint -->
+        <ellipse cx="158" cy="138" rx="22" ry="28" fill="none" stroke="#ffb020" stroke-width="2" stroke-dasharray="4 3"/>
+        <text x="158" y="175" text-anchor="middle" fill="#ffb020" font-size="11" font-family="system-ui,sans-serif">hold here first</text>
+      </svg>
+      <figcaption>Not to scale — positions vary slightly by revision. Look for <strong>white silkscreen text</strong> next to each tiny button. There are also <strong>KEY1 / KEY2 / KEY3</strong> user buttons — those are <em>not</em> BOOT/RESET.</figcaption>
+    </figure>
+
+    <h2>3. What they look like in your hand</h2>
+    <ul>
+      <li><strong>Shape:</strong> tiny <strong>square</strong> plastic button, about 4–6 mm, sitting flush or slightly above the green PCB.</li>
+      <li><strong>Feel:</strong> a soft <strong>click</strong> when pressed (tactile switch).</li>
+      <li><strong>Labels:</strong> printed on the board in small letters: <code>BOOT</code> and <code>RESET</code> (or <code>EN</code> on some boards — yours should say RESET).</li>
+      <li><strong>Location:</strong> on the same side of the board as the <strong>USB-C port</strong>, not on the speaker/mic end.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Download mode for erase:</strong>
+      <ol class="steps">
+        <li>Hold <strong>BOOT</strong> down.</li>
+        <li>Tap <strong>RESET</strong> once (press and release).</li>
+        <li>Release <strong>BOOT</strong>.</li>
+        <li>Within 3 seconds, run <code>python3 -m esptool ... erase_flash</code> in Terminal.</li>
+      </ol>
+    </div>
+
+    <h2>4. Command (your port)</h2>
+    <pre style="background:#0a0e14;padding:1rem;border-radius:8px;overflow-x:auto;font-size:0.85rem;"><code>cd "/Users/1597home/Documents/Coding Projects/Lexie"
+python3 -m esptool --chip esp32s3 -p /dev/cu.usbmodem1101 erase_flash</code></pre>
+
+    <p class="meta">See also <a href="../firmware/README.md">firmware/README.md</a> · <a href="https://www.waveshare.com/wiki/ESP32-S3-AUDIO-Board">Waveshare wiki</a></p>
+  </div>
+</body>
+</html>

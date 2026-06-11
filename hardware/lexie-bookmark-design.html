@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lexie Bookmark — Hardware Design Reference</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      background: #f5f4f0;
+      color: #1c1c1e;
+      padding: 48px 56px;
+      line-height: 1.5;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid #1c1c1e;
+      padding-bottom: 18px;
+      margin-bottom: 44px;
+    }
+    header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    header p  { font-size: 12px; color: #636366; margin-top: 5px; }
+    .header-meta { font-size: 11px; color: #636366; text-align: right; line-height: 1.7; }
+
+    .views-row {
+      display: flex;
+      gap: 52px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .view-block { display: flex; flex-direction: column; gap: 10px; }
+
+    .view-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: #636366;
+    }
+
+    .scale-note { font-size: 10px; color: #8e8e93; font-style: italic; margin-top: 2px; }
+
+    /* ── NOTES SECTION ── */
+    .notes-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-top: 52px;
+      padding-top: 28px;
+      border-top: 1px solid #d1d1d6;
+    }
+
+    .notes-section h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 16px;
+    }
+
+    /* Legend */
+    .legend { display: flex; flex-direction: column; gap: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+    .swatch { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; }
+    .legend-name { font-weight: 600; min-width: 130px; }
+    .legend-dim { color: #636366; }
+
+    /* Table */
+    table { border-collapse: collapse; font-size: 12px; width: 100%; }
+    th {
+      text-align: left; padding: 5px 16px 5px 0;
+      font-size: 10px; letter-spacing: 0.8px;
+      text-transform: uppercase; color: #636366;
+      border-bottom: 1px solid #d1d1d6;
+    }
+    td { padding: 7px 16px 7px 0; border-bottom: 1px solid #e5e5ea; vertical-align: top; }
+    td:first-child { font-weight: 600; white-space: nowrap; }
+
+    .tip-box {
+      margin-top: 18px;
+      padding: 12px 16px;
+      background: #deedfb;
+      border-left: 3px solid #0a84ff;
+      font-size: 12px;
+      line-height: 1.65;
+      border-radius: 0 4px 4px 0;
+    }
+
+    footer {
+      margin-top: 36px;
+      font-size: 11px;
+      color: #8e8e93;
+      border-top: 1px solid #e5e5ea;
+      padding-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div role="note" style="background:#7f1d1d;color:#fef2f2;padding:14px 20px;font:14px/1.45 -apple-system,sans-serif;margin:-48px -56px 28px -56px;border-bottom:3px solid #450a0a;">
+    <strong>Superseded — not v1 hardware.</strong> Phase 2 product is <strong>Lexie Card</strong> (credit-card footprint, beside the book, no clip). See <a href="lexie-plaud-form-factor.html" style="color:#93c5fd;">lexie-plaud-form-factor.html</a> and <a href="README.md" style="color:#93c5fd;">hardware/README.md</a>.
+  </div>
+
+<header>
+  <div>
+    <h1>Lexie Bookmark — Hardware Design Reference</h1>
+    <p>Physical enclosure &amp; component layout · Phase 2 bringup · XIAO ESP32-S3</p>
+  </div>
+  <div class="header-meta">
+    Scale: 3 px = 1 mm (face views)<br>
+    Enclosure target: 55 × 165 × 12 mm<br>
+    Document: 2026-05-03 · WX-024
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     THREE SVG VIEWS
+     ══════════════════════════════════════════════════════════ -->
+<div class="views-row">
+
+  <!-- ══ VIEW A — FRONT FACE ══ -->
+  <div class="view-block">
+    <div class="view-label">A — Front face (child view)</div>
+    <!-- Bookmark body: x=55,y=50, w=165,h=495 → 3px/mm, 55×165mm -->
+    <svg width="270" height="585" style="display:block;overflow:visible">
+
+      <!-- Width dimension arrow -->
+      <line x1="55" y1="32" x2="220" y2="32" stroke="#8e8e93" stroke-width="1"/>
+      <line x1="55" y1="28" x2="55" y2="36" stroke="#8e8e93" stroke-width="1"/>
+      <line x1="220" y1="28" x2="220" y2="36" stroke="#8e8e93" stroke-width="1"/>
+      <text x="137" y="25" text-anchor="middle" font-size="9" fill="#636366">55 mm</text>
+
+      <!-- Height dimension arrow -->
+      <line x1="36" y1="50" x2="36" y2="545" stroke="#8e8e93" stroke-width="1"/>
+      <line x1="32" y1="50"  x2="40" y2="50"  stroke="#8e8e93" stroke-width="1"/>
+      <line x1="32" y1="545" x2="40" y2="545" stroke="#8e8e93" stroke-width="1"/>
+      <text x="26" y="300" text-anchor="middle" font-size="9" fill="#636366"
+            transform="rotate(-90,26,300)">165 mm</text>
+
+      <!-- ── BOOKMARK BODY ── -->
+      <rect x="55" y="50" width="165" height="495" rx="14" fill="#1a1a1e"/>
+
+      <!-- Clip cutout at top (16mm wide = 48px, 12mm deep = 36px) -->
+      <rect x="114" y="50" width="48" height="36" rx="0" fill="#f5f4f0"/>
+      <!-- Clip grip arms -->
+      <rect x="110" y="43" width="9"  height="14" rx="2" fill="#3a3a3c"/>
+      <rect x="157" y="43" width="9"  height="14" rx="2" fill="#3a3a3c"/>
+      <!-- Clip grip pads (rubber) -->
+      <rect x="110" y="50" width="9"  height="5" rx="1" fill="#555558"/>
+      <rect x="157" y="50" width="9"  height="5" rx="1" fill="#555558"/>
+
+      <!-- Subtle top status bar -->
+      <line x1="66" y1="100" x2="209" y2="100" stroke="#2c2c2e" stroke-width="0.8"/>
+
+      <!-- ── BUTTON (press-and-hold, child's thumb zone) ──
+           12×12mm = 36×36px, centered-left to leave room for LED -->
+      <rect x="91" y="113" width="38" height="38" rx="10" fill="#0a84ff"/>
+      <!-- Button face highlight -->
+      <rect x="95" y="117" width="30" height="30" rx="7" fill="#1d8ff5" opacity="0.45"/>
+      <!-- Button label -->
+      <text x="110" y="135" text-anchor="middle" font-size="7" fill="white" font-weight="700">PRESS</text>
+      <text x="110" y="145" text-anchor="middle" font-size="7" fill="white" font-weight="700">&amp; HOLD</text>
+
+      <!-- ── LED RING (NeoPixel, 14mm ⌀ = r21px) ──
+           centered right of button, same vertical center -->
+      <!-- Outer ambient glow -->
+      <circle cx="168" cy="132" r="24" fill="#ffd60a" opacity="0.07"/>
+      <!-- Ring track -->
+      <circle cx="168" cy="132" r="18" fill="none" stroke="#ffd60a" stroke-width="2.5" opacity="0.35"/>
+      <circle cx="168" cy="132" r="18" fill="none" stroke="#ffd60a" stroke-width="1.2"/>
+      <!-- 7 individual LEDs on ring (resting = dim) -->
+      <circle cx="168" cy="114" r="2.8" fill="#ffd60a" opacity="0.55"/>
+      <circle cx="183" cy="119" r="2.8" fill="#ffd60a" opacity="0.55"/>
+      <circle cx="186" cy="132" r="2.8" fill="#ffd60a" opacity="0.55"/>
+      <circle cx="183" cy="145" r="2.8" fill="#ffd60a" opacity="0.55"/>
+      <circle cx="168" cy="150" r="2.8" fill="#ffd60a" opacity="0.55"/>
+      <circle cx="153" cy="145" r="2.8" fill="#ffd60a" opacity="0.55"/>
+      <circle cx="150" cy="132" r="2.8" fill="#ffd60a" opacity="0.55"/>
+      <circle cx="153" cy="119" r="2.8" fill="#ffd60a" opacity="0.55"/>
+      <!-- LED center label -->
+      <text x="168" y="136" text-anchor="middle" font-size="6" fill="#b28900" font-weight="600">LED</text>
+
+      <!-- ── MIC PORT (3mm hole on face, top-left zone) ── -->
+      <!-- Port recess -->
+      <circle cx="70" cy="120" r="6" fill="#0d0d11"/>
+      <!-- Port hole -->
+      <circle cx="70" cy="120" r="3.5" fill="#252528"/>
+      <!-- Port label callout -->
+      <line x1="70" y1="113" x2="70" y2="104" stroke="#48484a" stroke-width="0.7"/>
+      <text x="70" y="100" text-anchor="middle" font-size="7" fill="#636366">MIC</text>
+
+      <!-- Separator line -->
+      <line x1="66" y1="170" x2="209" y2="170" stroke="#2c2c2e" stroke-width="0.8"/>
+
+      <!-- ── SPEAKER GRILLE (30×20mm = 90×60px centered, middle of bookmark) ── -->
+      <!-- Grille recess -->
+      <rect x="93" y="288" width="90" height="63" rx="6" fill="#111113"/>
+      <!-- Speaker mesh — 7 cols × 5 rows of holes -->
+      <g fill="#2a2a2d">
+        <!-- row 1 -->
+        <circle cx="105" cy="299" r="2.8"/> <circle cx="118" cy="299" r="2.8"/>
+        <circle cx="131" cy="299" r="2.8"/> <circle cx="144" cy="299" r="2.8"/>
+        <circle cx="157" cy="299" r="2.8"/> <circle cx="170" cy="299" r="2.8"/>
+        <circle cx="183" cy="299" r="2.8"/>
+        <!-- row 2 -->
+        <circle cx="105" cy="312" r="2.8"/> <circle cx="118" cy="312" r="2.8"/>
+        <circle cx="131" cy="312" r="2.8"/> <circle cx="144" cy="312" r="2.8"/>
+        <circle cx="157" cy="312" r="2.8"/> <circle cx="170" cy="312" r="2.8"/>
+        <circle cx="183" cy="312" r="2.8"/>
+        <!-- row 3 -->
+        <circle cx="105" cy="325" r="2.8"/> <circle cx="118" cy="325" r="2.8"/>
+        <circle cx="131" cy="325" r="2.8"/> <circle cx="144" cy="325" r="2.8"/>
+        <circle cx="157" cy="325" r="2.8"/> <circle cx="170" cy="325" r="2.8"/>
+        <circle cx="183" cy="325" r="2.8"/>
+        <!-- row 4 -->
+        <circle cx="105" cy="338" r="2.8"/> <circle cx="118" cy="338" r="2.8"/>
+        <circle cx="131" cy="338" r="2.8"/> <circle cx="144" cy="338" r="2.8"/>
+        <circle cx="157" cy="338" r="2.8"/> <circle cx="170" cy="338" r="2.8"/>
+        <circle cx="183" cy="338" r="2.8"/>
+        <!-- row 5 -->
+        <circle cx="105" cy="351" r="2.8"/> <circle cx="118" cy="351" r="2.8"/>
+        <circle cx="131" cy="351" r="2.8"/> <circle cx="144" cy="351" r="2.8"/>
+        <circle cx="157" cy="351" r="2.8"/> <circle cx="170" cy="351" r="2.8"/>
+        <circle cx="183" cy="351" r="2.8"/>
+      </g>
+
+      <!-- LEXIE wordmark near bottom -->
+      <text x="137" y="503" text-anchor="middle"
+            font-size="8" fill="#3a3a3c" letter-spacing="4" font-weight="600">LEXIE</text>
+
+      <!-- USB-C slot at bottom edge (centered, 9mm=27px wide, 3.5mm=10.5px tall) -->
+      <rect x="124" y="541" width="28" height="4" rx="2" fill="#f5f4f0"/>
+      <text x="138" y="558" text-anchor="middle" font-size="7" fill="#8e8e93">USB-C</text>
+
+    </svg>
+    <p class="scale-note">Scale 3 px = 1 mm · Print at 100% for 1:1 template</p>
+  </div>
+
+  <!-- ══ VIEW B — INTERNAL X-RAY ══ -->
+  <div class="view-block">
+    <div class="view-label">B — Internal layout (X-ray)</div>
+    <svg width="270" height="585" style="display:block;overflow:visible">
+
+      <!-- Ghost bookmark outline -->
+      <rect x="55" y="50" width="165" height="495" rx="14"
+            fill="#eae9e5" fill-opacity="0.6" stroke="#1a1a1e" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <!-- Ghost clip -->
+      <rect x="114" y="50" width="48" height="36"
+            fill="none" stroke="#1a1a1e" stroke-width="1" stroke-dasharray="4 3"/>
+
+      <!-- ── ZONE LABELS ── -->
+      <text x="60" y="106" font-size="7" fill="#8e8e93" letter-spacing="0.5">INPUT ZONE</text>
+      <text x="60" y="180" font-size="7" fill="#8e8e93" letter-spacing="0.5">ELECTRONICS ZONE</text>
+      <text x="60" y="255" font-size="7" fill="#8e8e93" letter-spacing="0.5">AUDIO ZONE</text>
+      <text x="60" y="335" font-size="7" fill="#8e8e93" letter-spacing="0.5">BATTERY ZONE</text>
+
+      <!-- Zone dividers -->
+      <line x1="60" y1="109" x2="209" y2="109" stroke="#d1d1d6" stroke-width="0.7" stroke-dasharray="3 3"/>
+      <line x1="60" y1="183" x2="209" y2="183" stroke="#d1d1d6" stroke-width="0.7" stroke-dasharray="3 3"/>
+      <line x1="60" y1="258" x2="209" y2="258" stroke="#d1d1d6" stroke-width="0.7" stroke-dasharray="3 3"/>
+      <line x1="60" y1="338" x2="209" y2="338" stroke="#d1d1d6" stroke-width="0.7" stroke-dasharray="3 3"/>
+
+      <!-- ── INMP441 MIC PCB (13×18mm = 39×54px, top-left, behind mic port) ── -->
+      <rect x="60" y="112" width="39" height="54" rx="4" fill="#30d158" opacity="0.88"/>
+      <!-- PCB detail lines -->
+      <rect x="63" y="115" width="33" height="2" rx="1" fill="white" opacity="0.3"/>
+      <rect x="63" y="159" width="33" height="2" rx="1" fill="white" opacity="0.3"/>
+      <text x="79" y="135" text-anchor="middle" font-size="7" fill="white" font-weight="700">MIC</text>
+      <text x="79" y="146" text-anchor="middle" font-size="6" fill="white">INMP441</text>
+      <text x="79" y="157" text-anchor="middle" font-size="6" fill="white">13×18 mm</text>
+
+      <!-- ── BUTTON PCB (behind button) ── -->
+      <rect x="91" y="113" width="38" height="38" rx="8" fill="#bf5af2" opacity="0.88"/>
+      <text x="110" y="130" text-anchor="middle" font-size="7" fill="white" font-weight="700">BTN</text>
+      <text x="110" y="141" text-anchor="middle" font-size="6" fill="white">12×12 mm</text>
+
+      <!-- ── LED RING ── -->
+      <circle cx="168" cy="132" r="21" fill="#ffd60a" opacity="0.22"/>
+      <circle cx="168" cy="132" r="21" fill="none" stroke="#ffd60a" stroke-width="2.5"/>
+      <text x="168" y="130" text-anchor="middle" font-size="7" fill="#7a6200" font-weight="700">LED</text>
+      <text x="168" y="141" text-anchor="middle" font-size="6" fill="#7a6200">NeoPixel 14mm</text>
+
+      <!-- ── XIAO ESP32-S3 (21×17.5mm = 63×52px) ── -->
+      <rect x="60" y="187" width="63" height="52" rx="4" fill="#0a84ff" opacity="0.88"/>
+      <!-- Chip detail -->
+      <rect x="68" y="196" width="30" height="20" rx="2" fill="#0060bb" opacity="0.6"/>
+      <!-- USB-C on right edge of XIAO -->
+      <rect x="120" y="207" width="5" height="9" rx="1.5" fill="#004fa3"/>
+      <text x="91" y="208" text-anchor="middle" font-size="7" fill="white" font-weight="700">XIAO</text>
+      <text x="91" y="219" text-anchor="middle" font-size="6" fill="white">ESP32-S3</text>
+      <text x="91" y="230" text-anchor="middle" font-size="6" fill="white">21×17.5 mm</text>
+
+      <!-- ── MAX98357A AMP (23×18mm = 69×54px) ── -->
+      <rect x="131" y="187" width="69" height="54" rx="4" fill="#ff9f0a" opacity="0.88"/>
+      <rect x="138" y="195" width="28" height="16" rx="2" fill="#c47500" opacity="0.5"/>
+      <text x="165" y="208" text-anchor="middle" font-size="7" fill="white" font-weight="700">AMP</text>
+      <text x="165" y="219" text-anchor="middle" font-size="6" fill="white">MAX98357A</text>
+      <text x="165" y="230" text-anchor="middle" font-size="6" fill="white">23×18 mm</text>
+
+      <!-- Wire connections (I2S bus) -->
+      <line x1="91" y1="239" x2="91"  y2="260" stroke="#0a84ff" stroke-width="1" stroke-dasharray="2 2" opacity="0.7"/>
+      <line x1="165" y1="241" x2="165" y2="260" stroke="#ff9f0a" stroke-width="1" stroke-dasharray="2 2" opacity="0.7"/>
+      <line x1="79"  y1="166" x2="79"  y2="187" stroke="#30d158" stroke-width="1" stroke-dasharray="2 2" opacity="0.7"/>
+
+      <!-- ── SPEAKER (30×20mm = 90×60px, centered) ── -->
+      <rect x="93" y="262" width="90" height="60" rx="5" fill="#636366" opacity="0.88"/>
+      <!-- Speaker cone visual -->
+      <ellipse cx="138" cy="292" rx="30" ry="22" fill="#4a4a4c" opacity="0.7"/>
+      <ellipse cx="138" cy="292" rx="16" ry="12" fill="#3a3a3c" opacity="0.8"/>
+      <circle  cx="138" cy="292" r="4"            fill="#2c2c2e"/>
+      <!-- Spider lines -->
+      <line x1="138" y1="270" x2="138" y2="314" stroke="#555" stroke-width="0.6" opacity="0.4"/>
+      <line x1="108" y1="292" x2="168" y2="292" stroke="#555" stroke-width="0.6" opacity="0.4"/>
+      <text x="138" y="308" text-anchor="middle" font-size="7" fill="white" font-weight="700">SPEAKER</text>
+      <text x="138" y="318" text-anchor="middle" font-size="6" fill="#d1d1d6">30×20 mm · 8Ω · 0.5W</text>
+
+      <!-- ── LiPo BATTERY (30×40mm = 90×120px, centered) ── -->
+      <rect x="93" y="342" width="90" height="120" rx="5" fill="#ff453a" opacity="0.82"/>
+      <!-- Battery cell stripes -->
+      <rect x="93" y="358" width="90" height="2" fill="white" opacity="0.12"/>
+      <rect x="93" y="374" width="90" height="2" fill="white" opacity="0.12"/>
+      <rect x="93" y="390" width="90" height="2" fill="white" opacity="0.12"/>
+      <!-- Terminals -->
+      <rect x="117" y="338" width="14" height="8" rx="2" fill="#d43429"/>
+      <rect x="138" y="338" width="14" height="8" rx="2" fill="#d43429"/>
+      <!-- Labels -->
+      <text x="138" y="385" text-anchor="middle" font-size="8" fill="white" font-weight="700">LiPo</text>
+      <text x="138" y="397" text-anchor="middle" font-size="7" fill="white">503040 · ~400 mAh</text>
+      <text x="138" y="409" text-anchor="middle" font-size="6" fill="white">30×40 mm · 5 mm thin</text>
+      <text x="138" y="421" text-anchor="middle" font-size="6" fill="white">charges via USB-C on XIAO</text>
+
+      <!-- JST wire from battery to XIAO -->
+      <line x1="120" y1="338" x2="85" y2="239" stroke="#ff453a" stroke-width="1"
+            stroke-dasharray="2 2" opacity="0.5"/>
+
+    </svg>
+    <p class="scale-note">X-ray view — dashed outline = enclosure wall · components to scale</p>
+  </div>
+
+  <!-- ══ VIEW C — CROSS-SECTION ══ -->
+  <div class="view-block">
+    <div class="view-label">C — Cross-section (depth, right side)</div>
+    <!--
+      Depth: 12mm total
+        Front wall: 1.5mm = 12px  (x=14 to x=26)
+        Inner:      9.0mm = 72px  (x=26 to x=98)
+        Back wall:  1.5mm = 12px  (x=98 to x=110)
+      Scale: depth = 8px/mm  |  height = 3px/mm
+    -->
+    <svg width="210" height="585" style="display:block;overflow:visible">
+
+      <!-- Depth dimension at top -->
+      <line x1="14" y1="32" x2="110" y2="32" stroke="#8e8e93" stroke-width="1"/>
+      <line x1="14" y1="28" x2="14" y2="36" stroke="#8e8e93" stroke-width="1"/>
+      <line x1="110" y1="28" x2="110" y2="36" stroke="#8e8e93" stroke-width="1"/>
+      <text x="62" y="25" text-anchor="middle" font-size="9" fill="#636366">12 mm depth</text>
+      <text x="20" y="44" text-anchor="middle" font-size="8" fill="#8e8e93">FRONT</text>
+      <text x="104" y="44" text-anchor="middle" font-size="8" fill="#8e8e93">BACK</text>
+
+      <!-- ── ENCLOSURE WALLS (full height) ── -->
+      <!-- Front wall -->
+      <rect x="14" y="50" width="12" height="495" fill="#1a1a1e"/>
+      <!-- Back wall -->
+      <rect x="98" y="50" width="12" height="495" fill="#2c2c2e"/>
+
+      <!-- ── INPUT ZONE (y=50 → y=175, 125px ≈ 42mm) ── -->
+      <!-- Mic PCB (behind front wall, upper zone) -->
+      <rect x="26" y="112" width="20" height="54" fill="#30d158" opacity="0.85"/>
+      <!-- Button (pokes through front wall slightly) -->
+      <rect x="18" y="120" width="28" height="30" fill="#bf5af2" opacity="0.85"/>
+      <!-- LED ring (thin) -->
+      <rect x="46" y="117" width="22" height="36" fill="#ffd60a" opacity="0.65"/>
+      <!-- Zone fill -->
+      <rect x="26" y="50" width="72" height="62" fill="#1a1a1e" opacity="0.3"/>
+
+      <!-- ── ELECTRONICS ZONE (y=183 → y=241, 58px ≈ 19mm) ── -->
+      <!-- XIAO -->
+      <rect x="26" y="187" width="40" height="52" fill="#0a84ff" opacity="0.85"/>
+      <!-- USB-C tab (pokes out right edge of XIAO, toward back) -->
+      <rect x="66" y="205" width="10" height="9" rx="1.5" fill="#004fa3"/>
+      <!-- AMP -->
+      <rect x="60" y="187" width="38" height="54" fill="#ff9f0a" opacity="0.85"/>
+
+      <!-- ── SPEAKER ZONE (y=262 → y=322, 60px = 20mm) ── -->
+      <rect x="26" y="262" width="72" height="60" fill="#636366" opacity="0.85"/>
+      <!-- Speaker cone (seen from side = flat profile) -->
+      <ellipse cx="62" cy="292" rx="7" ry="26" fill="#4a4a4c" opacity="0.8"/>
+
+      <!-- ── BATTERY ZONE (y=342 → y=462, 120px = 40mm) ── -->
+      <rect x="26" y="342" width="72" height="120" fill="#ff453a" opacity="0.78"/>
+
+      <!-- ── ZONE DIMENSION LABELS (right side) ── -->
+      <!-- Input zone -->
+      <line x1="112" y1="50"  x2="125" y2="50"  stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="112" y1="183" x2="125" y2="183" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="118" y1="50"  x2="118" y2="183" stroke="#d1d1d6" stroke-width="0.8"/>
+      <text x="128" y="110" font-size="8" fill="#636366">Input</text>
+      <text x="128" y="121" font-size="7" fill="#8e8e93">~42 mm</text>
+
+      <!-- Electronics zone -->
+      <line x1="112" y1="187" x2="125" y2="187" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="112" y1="245" x2="125" y2="245" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="118" y1="187" x2="118" y2="245" stroke="#d1d1d6" stroke-width="0.8"/>
+      <text x="128" y="213" font-size="8" fill="#636366">PCBs</text>
+      <text x="128" y="224" font-size="7" fill="#8e8e93">~19 mm</text>
+
+      <!-- Speaker zone -->
+      <line x1="112" y1="262" x2="125" y2="262" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="112" y1="322" x2="125" y2="322" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="118" y1="262" x2="118" y2="322" stroke="#d1d1d6" stroke-width="0.8"/>
+      <text x="128" y="288" font-size="8" fill="#636366">Speaker</text>
+      <text x="128" y="299" font-size="7" fill="#8e8e93">~20 mm</text>
+
+      <!-- Battery zone -->
+      <line x1="112" y1="342" x2="125" y2="342" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="112" y1="462" x2="125" y2="462" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="118" y1="342" x2="118" y2="462" stroke="#d1d1d6" stroke-width="0.8"/>
+      <text x="128" y="394" font-size="8" fill="#636366">Battery</text>
+      <text x="128" y="405" font-size="7" fill="#8e8e93">~40 mm</text>
+
+      <!-- Bottom gap (USB-C, clip area) -->
+      <line x1="112" y1="462" x2="125" y2="462" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="112" y1="545" x2="125" y2="545" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="118" y1="462" x2="118" y2="545" stroke="#d1d1d6" stroke-width="0.8"/>
+      <text x="128" y="499" font-size="8" fill="#636366">USB-C</text>
+      <text x="128" y="510" font-size="7" fill="#8e8e93">~28 mm</text>
+
+      <!-- ── DEPTH BREAKDOWN (bottom) ── -->
+      <text x="20" y="563" text-anchor="middle" font-size="7" fill="#636366">1.5</text>
+      <text x="62" y="563" text-anchor="middle" font-size="7" fill="#636366">9 mm (inner)</text>
+      <text x="104" y="563" text-anchor="middle" font-size="7" fill="#636366">1.5</text>
+      <line x1="14" y1="556" x2="110" y2="556" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="26" y1="553" x2="26" y2="560" stroke="#d1d1d6" stroke-width="0.8"/>
+      <line x1="98" y1="553" x2="98" y2="560" stroke="#d1d1d6" stroke-width="0.8"/>
+
+    </svg>
+    <p class="scale-note">Depth: 8 px/mm · Height: 3 px/mm</p>
+  </div>
+
+</div><!-- end views-row -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     NOTES + LEGEND + SPECS
+     ══════════════════════════════════════════════════════════ -->
+<div class="notes-section">
+
+  <!-- LEGEND -->
+  <div>
+    <h2>Component Legend</h2>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="swatch" style="background:#0a84ff"></div>
+        <span class="legend-name">Seeed XIAO ESP32-S3</span>
+        <span class="legend-dim">21 × 17.5 mm · 6 mm tall (with headers)</span>
+      </div>
+      <div class="legend-item">
+        <div class="swatch" style="background:#30d158"></div>
+        <span class="legend-name">INMP441 Mic PCB</span>
+        <span class="legend-dim">13 × 18 mm · 2 mm thin · I2S</span>
+      </div>
+      <div class="legend-item">
+        <div class="swatch" style="background:#ff9f0a"></div>
+        <span class="legend-name">MAX98357A Amp PCB</span>
+        <span class="legend-dim">23 × 18 mm · 3 mm · I2S amplifier</span>
+      </div>
+      <div class="legend-item">
+        <div class="swatch" style="background:#636366"></div>
+        <span class="legend-name">Oval Speaker</span>
+        <span class="legend-dim">30 × 20 mm · 8Ω · 0.5W</span>
+      </div>
+      <div class="legend-item">
+        <div class="swatch" style="background:#ff453a"></div>
+        <span class="legend-name">503040 LiPo Battery</span>
+        <span class="legend-dim">30 × 40 mm · 5 mm thin · ~400 mAh</span>
+      </div>
+      <div class="legend-item">
+        <div class="swatch" style="background:#bf5af2"></div>
+        <span class="legend-name">Tactile Button</span>
+        <span class="legend-dim">12 × 12 mm · press-and-hold</span>
+      </div>
+      <div class="legend-item">
+        <div class="swatch" style="background:#ffd60a"></div>
+        <span class="legend-name">NeoPixel LED Ring</span>
+        <span class="legend-dim">14 mm ⌀ · 7 LEDs · blue / teal / green</span>
+      </div>
+
+      <div style="margin-top:16px; padding-top:16px; border-top: 1px solid #d1d1d6; width:100%">
+        <p style="font-size:12px; font-weight:700; margin-bottom:10px;">LED states (PRD)</p>
+        <div class="legend-item" style="gap:8px">
+          <div class="swatch" style="background:#0a84ff; border-radius:50%"></div>
+          <span style="font-size:12px"><strong>Pulsing blue</strong> — listening (button held)</span>
+        </div>
+        <div class="legend-item" style="gap:8px; margin-top:6px">
+          <div class="swatch" style="background:#5ac8fa; border-radius:50%"></div>
+          <span style="font-size:12px"><strong>Spinning teal</strong> — thinking (server processing)</span>
+        </div>
+        <div class="legend-item" style="gap:8px; margin-top:6px">
+          <div class="swatch" style="background:#30d158; border-radius:50%"></div>
+          <span style="font-size:12px"><strong>Solid teal-green</strong> — speaking (audio playing)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPECS + NOTES -->
+  <div>
+    <h2>Enclosure Specification</h2>
+    <table>
+      <thead>
+        <tr><th>Property</th><th>Target</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Width</td><td>55 mm</td><td>XIAO (21) + AMP (23) + margins fit side by side</td></tr>
+        <tr><td>Height</td><td>165 mm</td><td>Standard bookmark; fits most books</td></tr>
+        <tr><td>Depth</td><td>~12 mm</td><td>1.5mm face + 9mm inner + 1.5mm back. Thicker than paper but slim as a pencil.</td></tr>
+        <tr><td>Clip</td><td>Top, center</td><td>16mm cutout; two rubber grip pads on arms. Slides between pages.</td></tr>
+        <tr><td>Button</td><td>Top zone</td><td>Large (12×12mm), recessed 1mm; child presses with thumb while holding bookmark</td></tr>
+        <tr><td>LED ring</td><td>Top zone, right of button</td><td>Visible to child with thumb on button</td></tr>
+        <tr><td>Mic port</td><td>Top zone, left face</td><td>3mm hole; INMP441 PCB directly behind it</td></tr>
+        <tr><td>Speaker grille</td><td>Middle of face</td><td>7×5 dot mesh; oval recess 30×20mm</td></tr>
+        <tr><td>USB-C</td><td>Bottom edge, center</td><td>Charges battery via XIAO; same cable programs firmware</td></tr>
+        <tr><td>Material (v1)</td><td>PETG</td><td>More durable than PLA; slight flex means it won't snap if dropped</td></tr>
+        <tr><td>CAD tool</td><td>TinkerCAD</td><td>Browser, free, zero install — a bookmark shell is simple enough</td></tr>
+        <tr><td>Print service</td><td>JLC3DP or Craftcloud</td><td>Upload STL → mailed back in ~7 days. ~$10–20. No printer needed for v1.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tip-box">
+      <strong>Paper template first:</strong> print View A (front face) at 100% scale — it prints at exactly 55×165mm.
+      Cut it out and hold it like a bookmark. Check the button is where a child's thumb lands naturally.
+      Cut View B to cardboard and tape inside to verify component fit before opening TinkerCAD.
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     VIEW D — BOOK ATTACHMENT
+     ══════════════════════════════════════════════════════════ -->
+<div style="margin-top:52px; padding-top:28px; border-top:2px solid #1c1c1e;">
+  <p class="view-label" style="font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#636366;margin-bottom:20px;">D — How it attaches to a book during reading</p>
+
+  <div style="display:flex; gap:60px; align-items:flex-start; flex-wrap:wrap;">
+
+    <!-- D1: Top-edge spring clip (recommended) -->
+    <div class="view-block">
+      <div class="view-label" style="font-size:9px;color:#30d158;">RECOMMENDED — Top-edge spring jaw</div>
+      <!-- Book open + device clipped to top-right -->
+      <svg width="380" height="320" style="display:block;overflow:visible">
+
+        <!-- ── OPEN BOOK ── -->
+        <!-- Book spine (center) -->
+        <rect x="186" y="60" width="8" height="220" rx="2" fill="#8e7b5c"/>
+        <!-- Left page -->
+        <rect x="50"  y="60" width="136" height="220" rx="3 0 0 3" fill="#faf9f6" stroke="#d1c9b8" stroke-width="1"/>
+        <!-- Right page -->
+        <rect x="194" y="60" width="136" height="220" rx="0 3 3 0" fill="#faf9f6" stroke="#d1c9b8" stroke-width="1"/>
+        <!-- Book cover top/bottom edge visible -->
+        <rect x="48"  y="56"  width="276" height="6"  rx="2" fill="#6b5c42"/>
+        <rect x="48"  y="278" width="276" height="6"  rx="2" fill="#6b5c42"/>
+
+        <!-- Text lines on left page (simulated) -->
+        <g fill="#c5bfb0">
+          <rect x="62" y="80"  width="108" height="4" rx="1"/>
+          <rect x="62" y="90"  width="98"  height="4" rx="1"/>
+          <rect x="62" y="100" width="112" height="4" rx="1"/>
+          <rect x="62" y="110" width="90"  height="4" rx="1"/>
+          <rect x="62" y="120" width="108" height="4" rx="1"/>
+          <rect x="62" y="140" width="102" height="4" rx="1"/>
+          <rect x="62" y="150" width="95"  height="4" rx="1"/>
+          <rect x="62" y="160" width="108" height="4" rx="1"/>
+        </g>
+        <!-- Text lines on right page -->
+        <g fill="#c5bfb0">
+          <rect x="206" y="80"  width="108" height="4" rx="1"/>
+          <rect x="206" y="90"  width="95"  height="4" rx="1"/>
+          <rect x="206" y="100" width="112" height="4" rx="1"/>
+          <!-- highlighted word -->
+          <rect x="206" y="110" width="52"  height="4" rx="1" fill="#ffd60a" opacity="0.6"/>
+          <rect x="262" y="110" width="42"  height="4" rx="1"/>
+          <rect x="206" y="120" width="100" height="4" rx="1"/>
+          <rect x="206" y="140" width="108" height="4" rx="1"/>
+          <rect x="206" y="150" width="90"  height="4" rx="1"/>
+        </g>
+        <!-- Highlighted word label -->
+        <text x="232" y="108" font-size="7" fill="#b28900" font-weight="600">unfamiliar word</text>
+
+        <!-- ── SPRING JAW CLIP gripping top edge of book ── -->
+        <!-- Upper jaw (grips front cover + pages from above) -->
+        <rect x="288" y="42" width="55" height="16" rx="4" fill="#1a1a1e"/>
+        <!-- Lower jaw (inside book, pressed against pages from below) -->
+        <rect x="290" y="58" width="51" height="10" rx="2" fill="#2c2c2e"/>
+        <!-- Spring connection at back -->
+        <rect x="337" y="44" width="8"  height="22" rx="3" fill="#3a3a3c"/>
+        <!-- PETG spring flex indicator -->
+        <path d="M 341 44 Q 348 55 341 66" stroke="#636366" stroke-width="1" fill="none" stroke-dasharray="2 2"/>
+        <text x="350" y="58" font-size="7" fill="#636366">PETG spring</text>
+
+        <!-- ── LEXIE DEVICE BODY hanging from clip ── -->
+        <!-- Device body (scaled down to fit, ~1.5px/mm) -->
+        <!-- 55mm × 120mm visible portion = 82px × 180px -->
+        <rect x="288" y="68" width="55" height="170" rx="8" fill="#1a1a1e"/>
+        <!-- Button -->
+        <rect x="299" y="90" width="20" height="20" rx="5" fill="#0a84ff"/>
+        <text x="309" y="103" text-anchor="middle" font-size="6" fill="white" font-weight="700">BTN</text>
+        <!-- LED ring -->
+        <circle cx="330" cy="100" r="11" fill="none" stroke="#ffd60a" stroke-width="2"/>
+        <circle cx="330" cy="100" r="2" fill="#ffd60a" opacity="0.7"/>
+        <!-- Speaker grille -->
+        <rect x="296" y="130" width="47" height="32" rx="4" fill="#111113"/>
+        <g fill="#2a2a2d">
+          <circle cx="304" cy="139" r="1.8"/> <circle cx="313" cy="139" r="1.8"/>
+          <circle cx="322" cy="139" r="1.8"/> <circle cx="331" cy="139" r="1.8"/>
+          <circle cx="304" cy="148" r="1.8"/> <circle cx="313" cy="148" r="1.8"/>
+          <circle cx="322" cy="148" r="1.8"/> <circle cx="331" cy="148" r="1.8"/>
+          <circle cx="304" cy="157" r="1.8"/> <circle cx="313" cy="157" r="1.8"/>
+          <circle cx="322" cy="157" r="1.8"/> <circle cx="331" cy="157" r="1.8"/>
+        </g>
+        <!-- Lexie text on device -->
+        <text x="315" y="225" text-anchor="middle" font-size="5" fill="#3a3a3c" letter-spacing="2">LEXIE</text>
+        <!-- USB-C -->
+        <rect x="308" y="234" width="16" height="3" rx="1.5" fill="#f5f4f0"/>
+
+        <!-- ── CHILD'S THUMB approaching button ── -->
+        <!-- Thumb silhouette (simple) -->
+        <ellipse cx="278" cy="100" rx="14" ry="10" fill="#f5d5b8" opacity="0.9"/>
+        <ellipse cx="274" cy="100" rx="10" ry="8"  fill="#eba882" opacity="0.7"/>
+        <!-- Thumb fingernail -->
+        <ellipse cx="268" cy="99" rx="5" ry="4" fill="#f0c8a0"/>
+        <!-- Reach arrow -->
+        <line x1="285" y1="100" x2="297" y2="100" stroke="#0a84ff" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <text x="278" y="118" text-anchor="middle" font-size="7" fill="#0a84ff">thumb reaches button</text>
+
+        <!-- Labels -->
+        <text x="315" y="38" text-anchor="middle" font-size="8" fill="#1a1a1e" font-weight="600">Spring jaw clips top-right of book</text>
+        <text x="315" y="50" text-anchor="middle" font-size="7" fill="#636366">device hangs on front · always accessible</text>
+
+        <!-- D1 child's line of sight annotation -->
+        <text x="232" y="175" text-anchor="middle" font-size="9" fill="#1a1a1e" font-weight="600">child reads here</text>
+        <line x1="232" y1="130" x2="232" y2="168" stroke="#636366" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <text x="140" y="290" text-anchor="middle" font-size="7" fill="#636366">Left page</text>
+        <text x="262" y="290" text-anchor="middle" font-size="7" fill="#636366">Right page (currently reading)</text>
+      </svg>
+    </div>
+
+    <!-- D2: Right-edge clip (alternative) -->
+    <div class="view-block">
+      <div class="view-label" style="font-size:9px;color:#636366;">ALTERNATIVE — Right-edge jaw</div>
+      <svg width="260" height="320" style="display:block;overflow:visible">
+
+        <!-- Book (closed, seen from front-right 3/4 angle via skew) -->
+        <!-- Front cover -->
+        <rect x="40" y="60" width="160" height="220" rx="4" fill="#6b5c42"/>
+        <!-- Page block (right side) -->
+        <rect x="200" y="64" width="14" height="212" fill="#f0ebe3"/>
+        <!-- Page lines (page block edge) -->
+        <line x1="200" y1="80"  x2="214" y2="80"  stroke="#d8d0c4" stroke-width="0.5"/>
+        <line x1="200" y1="96"  x2="214" y2="96"  stroke="#d8d0c4" stroke-width="0.5"/>
+        <line x1="200" y1="112" x2="214" y2="112" stroke="#d8d0c4" stroke-width="0.5"/>
+        <line x1="200" y1="128" x2="214" y2="128" stroke="#d8d0c4" stroke-width="0.5"/>
+        <line x1="200" y1="144" x2="214" y2="144" stroke="#d8d0c4" stroke-width="0.5"/>
+        <!-- Back cover edge -->
+        <rect x="40" y="60" width="4" height="220" rx="2 0 0 2" fill="#5a4d38"/>
+
+        <!-- ── DEVICE clipped to RIGHT EDGE ── -->
+        <!-- Jaw behind page block -->
+        <rect x="213" y="120" width="10" height="60" rx="3" fill="#2c2c2e"/>
+        <!-- Device body (portrait, on right side of book) -->
+        <rect x="223" y="90" width="32" height="100" rx="6" fill="#1a1a1e"/>
+        <!-- Button -->
+        <rect x="229" y="105" width="20" height="20" rx="5" fill="#0a84ff"/>
+        <text x="239" y="118" text-anchor="middle" font-size="5.5" fill="white" font-weight="700">BTN</text>
+        <!-- LED -->
+        <circle cx="239" cy="145" r="8" fill="none" stroke="#ffd60a" stroke-width="1.8"/>
+        <!-- Speaker -->
+        <rect x="229" y="160" width="20" height="20" rx="3" fill="#111113"/>
+        <circle cx="234" cy="165" r="1.5" fill="#2a2a2d"/>
+        <circle cx="239" cy="165" r="1.5" fill="#2a2a2d"/>
+        <circle cx="244" cy="165" r="1.5" fill="#2a2a2d"/>
+        <circle cx="234" cy="171" r="1.5" fill="#2a2a2d"/>
+        <circle cx="239" cy="171" r="1.5" fill="#2a2a2d"/>
+        <circle cx="244" cy="171" r="1.5" fill="#2a2a2d"/>
+        <!-- Jaw front clamping pages -->
+        <rect x="213" y="120" width="10" height="60" rx="3" fill="none" stroke="#3a3a3c" stroke-width="1"/>
+
+        <!-- Thumb from right -->
+        <ellipse cx="260" cy="115" rx="8" ry="12" fill="#f5d5b8" opacity="0.9"/>
+        <ellipse cx="258" cy="115" rx="6" ry="9"  fill="#eba882" opacity="0.7"/>
+        <!-- Arrow -->
+        <line x1="254" y1="115" x2="247" y2="115" stroke="#0a84ff" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <text x="252" y="135" text-anchor="middle" font-size="7" fill="#0a84ff">thumb</text>
+
+        <text x="139" y="295" text-anchor="middle" font-size="8" fill="#1a1a1e" font-weight="600">Device on right edge</text>
+        <text x="139" y="308" text-anchor="middle" font-size="7" fill="#636366">clips all pages at right margin</text>
+      </svg>
+    </div>
+
+    <!-- D3: Comparison + verdict -->
+    <div style="max-width:280px">
+      <h2 style="font-size:13px;font-weight:700;margin-bottom:16px;">Clip mechanism comparison</h2>
+      <table>
+        <thead><tr><th>Property</th><th>Top-edge jaw</th><th>Right-edge jaw</th></tr></thead>
+        <tbody>
+          <tr><td>Clip mechanism</td><td>Spring jaw, top of book cover</td><td>Spring jaw, right page margin</td></tr>
+          <tr><td>Device orientation</td><td>Hanging front-center (like a reading light)</td><td>Standing upright on right edge</td></tr>
+          <tr><td>Button access</td><td>Right thumb while holding book</td><td>Right thumb naturally</td></tr>
+          <tr><td>Text coverage</td><td>None — hangs below top margin</td><td>None — sits outside page</td></tr>
+          <tr><td>Book thickness range</td><td>2–12 mm (spring jaw)</td><td>2–15 mm (all pages)</td></tr>
+          <tr><td>Works when book flat on desk</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td>3D print difficulty</td><td>PETG C-spring, simple</td><td>Same</td></tr>
+          <tr><td>Verdict</td><td style="color:#30d158;font-weight:700;">Recommended — familiar reading light motion</td><td>Good alternative — very natural thumb reach</td></tr>
+        </tbody>
+      </table>
+
+      <div class="tip-box" style="margin-top:18px">
+        <strong>Revised clip design:</strong> Replace the slot cutout (between-pages) with a
+        <strong>PETG C-spring jaw</strong> at the top of the device body. The jaw gap at rest is ~4mm;
+        PETG's natural flex lets it grip book covers 2–12mm thick without any metal spring.
+        The lower jaw is a flat tab that goes behind the front cover; the upper jaw is the back of the device.
+        The child simply hooks it onto the top-right corner of the book — same motion as clipping a reading light.
+      </div>
+
+      <div style="margin-top:16px; padding:12px 16px; background:#f0f0ea; border-left:3px solid #636366; font-size:12px; line-height:1.65; border-radius:0 4px 4px 0;">
+        <strong>What changes in the enclosure design:</strong><br>
+        Remove the slot cutout at the top. Replace with a solid <strong>C-shaped overhang</strong> that extends 8–10mm behind the device body, creating a spring jaw. The jaw mouth faces downward so the child clips it onto the book from above. Print in PETG at 1.0mm wall thickness for jaw arms — this gives enough flex without being floppy.
+      </div>
+    </div>
+
+  </div>
+</div><!-- end View D -->
+
+<footer>
+  Lexie Bookmark Hardware Design Reference &nbsp;·&nbsp; WX-024 &nbsp;·&nbsp; 2026-05-03
+  &nbsp;·&nbsp; Print at 100% scale — View A is 1:1 (55×165 mm)
+</footer>
+
+</body>
+</html>

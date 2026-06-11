@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WX-027 — Beginner solder + MS8332C multimeter guide</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4d;
+      --text: #e8eef7;
+      --muted: #9fb0c8;
+      --accent: #5b9cff;
+      --warn: #ffb020;
+      --danger: #ff6b6b;
+      --ok: #4cd964;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 1rem;
+    }
+    .wrap {
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    .meta { color: var(--muted); font-size: 0.95rem; }
+    h2 {
+      font-size: 1.2rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--accent);
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
+    h2:first-of-type { border-top: none; padding-top: 0; }
+    h3 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; color: var(--text); }
+    p, li { color: var(--text); }
+    ul { padding-left: 1.25rem; }
+    li { margin: 0.35rem 0; }
+    a { color: var(--accent); }
+    .callout {
+      border-left: 4px solid var(--warn);
+      background: rgba(255, 176, 32, 0.08);
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .callout.danger {
+      border-left-color: var(--danger);
+      background: rgba(255, 107, 107, 0.08);
+    }
+    .callout.ok {
+      border-left-color: var(--ok);
+      background: rgba(76, 217, 100, 0.08);
+    }
+    figure {
+      margin: 1.25rem 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    figcaption {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      margin: 0.75rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.65rem;
+      text-align: left;
+    }
+    th { background: rgba(91, 156, 255, 0.12); color: var(--text); }
+    code {
+      background: rgba(255,255,255,0.06);
+      padding: 0.12em 0.35em;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .checklist { list-style: none; padding-left: 0; }
+    .checklist li::before { content: "[ ] "; color: var(--muted); }
+    svg { display: block; max-width: 100%; height: auto; }
+    .step-num {
+      display: inline-block;
+      min-width: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Lexie WX-027 — Beginner bench guide</h1>
+      <p class="meta">
+        <strong>Work item:</strong> WX-027 (Solder prep + safe power documentation)<br />
+        <strong>Multimeter:</strong> MS8332C (Commercial Electric) — written for someone who has <strong>never used a multimeter</strong> before.
+      </p>
+    </header>
+
+    <div class="callout danger">
+      <strong>Critical:</strong> Do <strong>not</strong> plug the LiPo into the XIAO until you finish the multimeter polarity steps and they match Seeed’s battery guidance. Wrong polarity can damage the board.
+    </div>
+
+    <h2>What you will accomplish</h2>
+    <ol>
+      <li>Solder headers on <strong>MAX98357</strong> and <strong>INMP441</strong> (and optionally <strong>XIAO</strong>).</li>
+      <li>Solder the speaker terminal block on the amp and connect the speaker wires <strong>only to the amp</strong>.</li>
+      <li>Use the MS8332C to <strong>measure which battery wire is + and which is −</strong>, write it down, then plug JST only when it matches the XIAO.</li>
+    </ol>
+
+    <p>
+      <strong>Seeed reference:</strong>
+      <a href="https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/" rel="noopener">XIAO ESP32S3 Getting Started</a>
+      (find the LiPo / battery polarity section on the board).
+    </p>
+    <p><strong>Parts + header type source:</strong> <a href="lx-4-path-a-component-kit.md">lx-4-path-a-component-kit.md</a>.  
+    <strong>Row/column layout (machine-readable):</strong> <a href="lx-4-path-a-bench-layout.md">lx-4-path-a-bench-layout.md</a>.</p>
+
+    <h2>Why solder if you have a breadboard?</h2>
+    <ul>
+      <li>Breadboards need <strong>rigid male pins</strong> for a reliable connection.</li>
+      <li>Breakouts usually ship with <strong>loose header strips</strong> — you solder them into the PCB holes.</li>
+      <li>The MAX98357 board typically needs a <strong>speaker terminal block</strong> soldered on.</li>
+    </ul>
+    <p>This soldering is <strong>assembly</strong>, not “designing a custom PCB.”</p>
+
+    <h2>Tools and parts checklist</h2>
+    <ul class="checklist">
+      <li>Soldering iron + stand + sponge or brass wool</li>
+      <li>Rosin-core solder</li>
+      <li>MAX98357 + header pins + speaker terminal block</li>
+      <li>INMP441 + header pins</li>
+      <li>Optional: XIAO male headers</li>
+      <li>MS8332C + red and black probes (test leads)</li>
+      <li>LiPo — keep away from the hot iron until polarity is verified</li>
+    </ul>
+
+    <h2>Figure 1 — Breadboard as a soldering jig</h2>
+    <figure aria-label="Diagram: breadboard holds header straight while PCB sits on pins">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" role="img">
+        <title>Breadboard jig: pins vertical, PCB on top, then solder</title>
+        <rect x="0" y="0" width="720" height="220" fill="#121a26" rx="8"/>
+        <text x="360" y="28" fill="#9fb0c8" font-size="14" text-anchor="middle" font-family="Segoe UI, sans-serif">Soldering flow (side view concept)</text>
+        <rect x="40" y="120" width="200" height="70" fill="#2d3a4d" stroke="#5b9cff" stroke-width="2" rx="4"/>
+        <text x="140" y="108" fill="#e8eef7" font-size="13" text-anchor="middle" font-family="Segoe UI, sans-serif">Breadboard</text>
+        <g fill="#c8d4e6">
+          <rect x="55" y="125" width="6" height="55"/><rect x="70" y="125" width="6" height="55"/>
+          <rect x="85" y="125" width="6" height="55"/><rect x="100" y="125" width="6" height="55"/>
+          <rect x="115" y="125" width="6" height="55"/><rect x="130" y="125" width="6" height="55"/>
+          <rect x="145" y="125" width="6" height="55"/><rect x="160" y="125" width="6" height="55"/>
+          <rect x="175" y="125" width="6" height="55"/><rect x="190" y="125" width="6" height="55"/>
+          <rect x="205" y="125" width="6" height="55"/><rect x="220" y="125" width="6" height="55"/>
+        </g>
+        <rect x="50" y="55" width="210" height="18" fill="#3d5a3d" stroke="#4cd964" stroke-width="2" rx="2"/>
+        <text x="155" y="68" fill="#e8eef7" font-size="12" text-anchor="middle" font-family="Segoe UI, sans-serif">Module PCB (MAX98357 / INMP441)</text>
+        <g stroke="#e8eef7" stroke-width="2">
+          <line x1="58" y1="73" x2="58" y2="125"/><line x1="73" y1="73" x2="73" y2="125"/>
+          <line x1="88" y1="73" x2="88" y2="125"/><line x1="103" y1="73" x2="103" y2="125"/>
+          <line x1="118" y1="73" x2="118" y2="125"/><line x1="133" y1="73" x2="133" y2="125"/>
+        </g>
+        <text x="155" y="205" fill="#9fb0c8" font-size="11" text-anchor="middle" font-family="Segoe UI, sans-serif">Header pressed into breadboard keeps pins vertical</text>
+        <path d="M 280 95 L 340 95" stroke="#5b9cff" stroke-width="3" fill="none" marker-end="url(#arr)"/>
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#5b9cff"/>
+          </marker>
+        </defs>
+        <text x="380" y="88" fill="#e8eef7" font-size="13" font-family="Segoe UI, sans-serif">1) Tack one corner pin</text>
+        <text x="380" y="108" fill="#e8eef7" font-size="13" font-family="Segoe UI, sans-serif">2) Check PCB is not tilted</text>
+        <text x="380" y="128" fill="#e8eef7" font-size="13" font-family="Segoe UI, sans-serif">3) Solder every pin</text>
+        <text x="380" y="148" fill="#9fb0c8" font-size="12" font-family="Segoe UI, sans-serif">Inspect: no solder bridges</text>
+      </svg>
+      <figcaption>
+        <strong>Method:</strong> Press <strong>male header pins</strong> into the breadboard so pins are straight. Seat the PCB fully on the pins.
+        <strong>Tack</strong> one pin, re-check the board is parallel to the breadboard, then solder the rest.
+      </figcaption>
+    </figure>
+
+    <h2>Figure 2 — Bench layout (top view, Path A kit)</h2>
+    <figure aria-label="Top view: 830 and 400 tie-point breadboards with module placement">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340" role="img">
+        <title>Suggested layout on full and half breadboards from the kit</title>
+        <rect width="780" height="340" fill="#121a26" rx="8"/>
+        <text x="390" y="26" fill="#9fb0c8" font-size="14" text-anchor="middle" font-family="Segoe UI, sans-serif">Top view (not to scale) — BOJACK-style kit: 830 + 400 tie-point boards</text>
+
+        <defs>
+          <marker id="arrBenchLayout" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#ffb020"/>
+          </marker>
+        </defs>
+
+        <!-- 830 full board -->
+        <g transform="translate(24, 44)">
+          <text x="210" y="-8" fill="#5b9cff" font-size="13" text-anchor="middle" font-family="Segoe UI, sans-serif">830 tie-point — use this as the main board</text>
+          <rect x="0" y="0" width="420" height="230" fill="#1e2636" stroke="#5b9cff" stroke-width="2" rx="6"/>
+          <!-- power rails -->
+          <rect x="8" y="6" width="404" height="14" fill="#3d2525" stroke="#ff6b6b" stroke-width="1" rx="2"/>
+          <text x="210" y="17" fill="#ffb020" font-size="9" text-anchor="middle" font-family="Segoe UI, sans-serif">+ rail (red)</text>
+          <rect x="8" y="210" width="404" height="14" fill="#252d3d" stroke="#5b9cff" stroke-width="1" rx="2"/>
+          <text x="210" y="221" fill="#9fb0c8" font-size="9" text-anchor="middle" font-family="Segoe UI, sans-serif">− rail (blue)</text>
+          <!-- inner prototyping zone -->
+          <rect x="24" y="34" width="372" height="162" fill="#252b38" stroke="#3d4d66" stroke-width="1" stroke-dasharray="6 4" rx="4"/>
+          <!-- dotted grid hint -->
+          <g fill="#4a5568" opacity="0.35">
+            <circle cx="44" cy="54" r="1.2"/><circle cx="64" cy="54" r="1.2"/><circle cx="84" cy="54" r="1.2"/><circle cx="104" cy="54" r="1.2"/>
+            <circle cx="44" cy="74" r="1.2"/><circle cx="64" cy="74" r="1.2"/><circle cx="84" cy="74" r="1.2"/><circle cx="104" cy="74" r="1.2"/>
+          </g>
+          <!-- XIAO -->
+          <rect x="52" y="78" width="72" height="44" fill="#2d4a3d" stroke="#4cd964" stroke-width="2" rx="4"/>
+          <text x="88" y="104" fill="#e8eef7" font-size="11" text-anchor="middle" font-family="Segoe UI, sans-serif">XIAO</text>
+          <!-- MAX98357 -->
+          <rect x="152" y="76" width="62" height="48" fill="#3d3d5a" stroke="#a78bfa" stroke-width="2" rx="4"/>
+          <text x="183" y="98" fill="#e8eef7" font-size="9" text-anchor="middle" font-family="Segoe UI, sans-serif">MAX98357</text>
+          <text x="183" y="112" fill="#9fb0c8" font-size="8" text-anchor="middle" font-family="Segoe UI, sans-serif">amp</text>
+          <!-- INMP441 -->
+          <rect x="238" y="76" width="62" height="48" fill="#3d455a" stroke="#5b9cff" stroke-width="2" rx="4"/>
+          <text x="269" y="98" fill="#e8eef7" font-size="9" text-anchor="middle" font-family="Segoe UI, sans-serif">INMP441</text>
+          <text x="269" y="112" fill="#9fb0c8" font-size="8" text-anchor="middle" font-family="Segoe UI, sans-serif">mic</text>
+          <!-- Speaker -->
+          <circle cx="340" cy="118" r="26" fill="#3d3530" stroke="#ffb020" stroke-width="2"/>
+          <text x="340" y="114" fill="#e8eef7" font-size="9" text-anchor="middle" font-family="Segoe UI, sans-serif">8Ω</text>
+          <text x="340" y="126" fill="#9fb0c8" font-size="8" text-anchor="middle" font-family="Segoe UI, sans-serif">speaker</text>
+          <path d="M 286 100 L 314 108" stroke="#ffb020" stroke-width="1.5" fill="none" marker-end="url(#arrBenchLayout)"/>
+          <text x="250" y="96" fill="#ffb020" font-size="9" font-family="Segoe UI, sans-serif">→ SPK±</text>
+        </g>
+
+        <!-- 400 half board -->
+        <g transform="translate(462, 44)">
+          <text x="145" y="-8" fill="#5b9cff" font-size="13" text-anchor="middle" font-family="Segoe UI, sans-serif">400 tie-point — extra space or jig</text>
+          <rect x="0" y="0" width="290" height="230" fill="#1e2636" stroke="#9fb0c8" stroke-width="2" rx="6"/>
+          <rect x="8" y="6" width="274" height="12" fill="#3d2525" stroke="#ff6b6b" stroke-width="1" rx="2"/>
+          <rect x="8" y="212" width="274" height="12" fill="#252d3d" stroke="#5b9cff" stroke-width="1" rx="2"/>
+          <rect x="32" y="34" width="226" height="162" fill="#252b38" stroke="#3d4d66" stroke-width="1" stroke-dasharray="6 4" rx="4"/>
+          <text x="145" y="118" fill="#9fb0c8" font-size="12" text-anchor="middle" font-family="Segoe UI, sans-serif"> spare tie points,</text>
+          <text x="145" y="138" fill="#9fb0c8" font-size="12" text-anchor="middle" font-family="Segoe UI, sans-serif">power routing,</text>
+          <text x="145" y="158" fill="#9fb0c8" font-size="12" text-anchor="middle" font-family="Segoe UI, sans-serif">or soldering jig</text>
+        </g>
+
+        <!-- LiPo callout -->
+        <rect x="520" y="292" width="220" height="38" fill="#2a2230" stroke="#ff6b6b" stroke-width="1" rx="6"/>
+        <text x="630" y="308" fill="#e8eef7" font-size="11" text-anchor="middle" font-family="Segoe UI, sans-serif">LiPo — keep on bench only</text>
+        <text x="630" y="324" fill="#9fb0c8" font-size="10" text-anchor="middle" font-family="Segoe UI, sans-serif">until polarity check (later steps)</text>
+
+      </svg>
+      <figcaption>
+        Your Path A kit lists a <strong>full 830</strong> board and a <strong>half 400</strong> board—see <a href="hardware-shopping-cart.md">hardware-shopping-cart.md</a> (Seq 6).
+        Put <strong>XIAO</strong>, <strong>MAX98357</strong>, and <strong>INMP441</strong> on the <strong>large board</strong> first.
+        Use the <strong>small board</strong> for extra wiring room or as a second jig while soldering headers.
+        Speaker wires go only to the amp block—never to the XIAO battery connector.
+        Exact pin placement waits for <strong>WX-029</strong>; this picture only shows <strong>which board is which</strong>.
+      </figcaption>
+    </figure>
+
+    <h2>Soldering steps</h2>
+
+    <h3><span class="step-num">1</span> Bench safety</h3>
+    <ul>
+      <li>Clear workspace; use a non-flammable surface.</li>
+      <li>Turn on the iron; wait until it is fully hot.</li>
+      <li>Keep the <strong>LiPo away</strong> from the soldering area (heat and stray solder).</li>
+      <li>Have the multimeter ready for later — you will use it <strong>before</strong> first battery plug-in.</li>
+    </ul>
+
+    <h3><span class="step-num">2</span> MAX98357: solder the pin header</h3>
+    <ol>
+      <li>Break or cut a male header strip to match the number of holes on the amp board.</li>
+      <li>Press the header <strong>into the breadboard</strong> so the long pins point down into the breadboard and the short side sticks up.</li>
+      <li>Place the MAX98357 PCB on the pins so every hole seats fully.</li>
+      <li><strong>Tack one corner pin</strong> with a small amount of solder.</li>
+      <li>Re-check the board is not twisted — it should sit flat and parallel to the breadboard.</li>
+      <li>Solder <strong>every</strong> remaining pin with shiny, cone-shaped joints.</li>
+      <li>Visually inspect: <strong>no solder bridges</strong> between adjacent pins (no blob connecting two pins).</li>
+    </ol>
+
+    <h3><span class="step-num">3</span> MAX98357: solder the speaker terminal block</h3>
+    <ol>
+      <li>Insert the terminal block into its footprint (usually two larger holes).</li>
+      <li>Tack one pin; ensure the block sits <strong>flush</strong> against the PCB.</li>
+      <li>Solder the remaining pin(s).</li>
+      <li>Gentle tug: the block should not move.</li>
+    </ol>
+
+    <h3><span class="step-num">4</span> INMP441: solder the pin header</h3>
+    <p>Same method as Step 2: breadboard jig → tack one pin → align → solder all → check for bridges.</p>
+
+    <h3><span class="step-num">5</span> (Optional) XIAO: solder headers</h3>
+    <p>If you want easy breadboard use, solder a <strong>male</strong> header row on the XIAO. Keep pins straight.</p>
+
+    <h3><span class="step-num">6</span> Speaker to amp only</h3>
+    <div class="callout danger">
+      <strong>Never</strong> connect speaker wires to the <strong>XIAO LiPo JST</strong>. Speaker goes to the <strong>MAX98357</strong> terminal block only.
+    </div>
+    <ol>
+      <li>Strip the ends of the speaker pigtail.</li>
+      <li><strong>Tin</strong> the bare wire (a thin coat of solder on the strands).</li>
+      <li>Insert into <strong>SPK+</strong> / <strong>SPK−</strong> (or the silkscreen labels on your board) on the MAX98357 terminal block.</li>
+      <li>Tighten the screws; do a light pull test — wires should stay put.</li>
+    </ol>
+
+    <h2>Your multimeter (MS8332C) — parts and safety</h2>
+    <p>
+      The MS8332C is a handheld digital multimeter. Before measuring the battery, learn these parts:
+    </p>
+    <ul>
+      <li><strong>Display</strong> — shows numbers and sometimes a minus sign, units (V, mV), or symbols.</li>
+      <li><strong>Rotary dial</strong> — selects what you are measuring. For WX-027 you need <strong>DC voltage</strong> only.</li>
+      <li><strong>Jacks</strong> (holes at the bottom) — where probe plugs insert. <strong>Color matters:</strong> black lead almost always goes in <strong>COM</strong>.</li>
+      <li><strong>Probes</strong> — red and black; the metal tips touch the circuit. Only touch insulated handles when measuring live battery wires.</li>
+    </ul>
+    <div class="callout">
+      <strong>Probe insertion:</strong> Push the banana plug on each lead fully into the jack until it feels seated. A loose plug causes wild or zero readings.
+    </div>
+
+    <h2>Figure 3 — Where to plug the probes (typical MS8332C layout)</h2>
+    <figure aria-label="Diagram: COM, VΩmA, and 10A jacks">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" role="img">
+        <title>MS8332C style three jacks: COM black, VΩmA red for voltage</title>
+        <rect width="720" height="260" fill="#121a26" rx="8"/>
+        <text x="360" y="28" fill="#9fb0c8" font-size="14" text-anchor="middle" font-family="Segoe UI, sans-serif">Bottom of meter (conceptual — labels match common Commercial Electric meters)</text>
+        <rect x="120" y="45" width="480" height="120" fill="#1a2332" stroke="#2d3a4d" stroke-width="2" rx="8"/>
+        <text x="360" y="78" fill="#e8eef7" font-size="16" text-anchor="middle" font-family="Segoe UI, sans-serif">MS8332C — jack panel</text>
+        <g transform="translate(0,0)">
+          <circle cx="200" cy="130" r="18" fill="#2d3a4d" stroke="#e8eef7" stroke-width="2"/>
+          <text x="200" y="135" fill="#e8eef7" font-size="11" text-anchor="middle" font-family="Segoe UI, sans-serif">COM</text>
+          <text x="200" y="168" fill="#5b9cff" font-size="13" text-anchor="middle" font-family="Segoe UI, sans-serif">BLACK probe</text>
+          <text x="200" y="186" fill="#9fb0c8" font-size="11" text-anchor="middle" font-family="Segoe UI, sans-serif">Always</text>
+        </g>
+        <g>
+          <circle cx="360" cy="130" r="18" fill="#2d3a4d" stroke="#4cd964" stroke-width="2"/>
+          <text x="360" y="128" fill="#e8eef7" font-size="10" text-anchor="middle" font-family="Segoe UI, sans-serif">VΩmA</text>
+          <text x="360" y="142" fill="#e8eef7" font-size="9" text-anchor="middle" font-family="Segoe UI, sans-serif">(or VΩ)</text>
+          <text x="360" y="168" fill="#ff6b6b" font-size="13" text-anchor="middle" font-family="Segoe UI, sans-serif">RED probe</text>
+          <text x="360" y="186" fill="#9fb0c8" font-size="11" text-anchor="middle" font-family="Segoe UI, sans-serif">DC volts for WX-027</text>
+        </g>
+        <g>
+          <circle cx="520" cy="130" r="18" fill="#2d3a4d" stroke="#ffb020" stroke-width="2"/>
+          <text x="520" y="135" fill="#e8eef7" font-size="11" text-anchor="middle" font-family="Segoe UI, sans-serif">10A</text>
+          <text x="520" y="168" fill="#ffb020" font-size="13" text-anchor="middle" font-family="Segoe UI, sans-serif">Do NOT use</text>
+          <text x="520" y="186" fill="#9fb0c8" font-size="11" text-anchor="middle" font-family="Segoe UI, sans-serif">for battery test</text>
+        </g>
+        <text x="360" y="235" fill="#ff6b6b" font-size="12" text-anchor="middle" font-family="Segoe UI, sans-serif">Wrong jack (10A) + wrong dial (amps) can damage the meter or battery — follow steps exactly.</text>
+      </svg>
+      <figcaption>
+        For LiPo polarity: <strong>black → COM</strong>, <strong>red → VΩmA</strong> (the jack used for voltage and resistance — <strong>not</strong> 10A).
+        If your printed labels differ slightly, COM is always common/ground reference; the middle jack is for V and Ω on this class of meter.
+      </figcaption>
+    </figure>
+
+    <h2>Figure 4 — DC voltage symbol on the dial</h2>
+    <figure>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" role="img">
+        <rect width="400" height="120" fill="#121a26" rx="8"/>
+        <text x="200" y="28" fill="#9fb0c8" font-size="13" text-anchor="middle" font-family="Segoe UI, sans-serif">Look for DC Volts on the dial</text>
+        <g transform="translate(200,75)">
+          <text x="0" y="8" fill="#e8eef7" font-size="28" text-anchor="middle" font-family="Segoe UI, sans-serif">V</text>
+          <line x1="-22" y1="-18" x2="-22" y2="-8" stroke="#5b9cff" stroke-width="3"/>
+          <line x1="-22" y1="-8" x2="-12" y2="-8" stroke="#5b9cff" stroke-width="3" stroke-dasharray="4 3"/>
+          <text x="45" y="8" fill="#9fb0c8" font-size="14" font-family="Segoe UI, sans-serif">solid + dashed line = DC</text>
+        </g>
+      </svg>
+      <figcaption>
+        <strong>DC voltage</strong> is usually labeled <code>V</code> with a solid line above a dashed line, or “DCV”.
+        <strong>Do not</strong> select a position with <code>A</code> (amps) or the continuity beep symbol for this battery test.
+      </figcaption>
+    </figure>
+
+    <h2>Multimeter steps — from zero to polarity reading</h2>
+
+    <h3><span class="step-num">7</span> Insert probes correctly</h3>
+    <ol>
+      <li><strong>Power off</strong> the meter if it has a separate power button (optional on some models).</li>
+      <li>Plug the <strong>black</strong> probe into the jack labeled <strong>COM</strong>.</li>
+      <li>Plug the <strong>red</strong> probe into <strong>VΩmA</strong> or <strong>VΩ</strong> — the jack for voltage and resistance. <strong>Never</strong> use the <strong>10A</strong> jack for this test.</li>
+      <li>Push until each plug seats fully.</li>
+    </ol>
+
+    <h3><span class="step-num">8</span> Select DC voltage on the dial</h3>
+    <ol>
+      <li>Rotate the dial to <strong>DC voltage</strong> (see Figure 4).</li>
+      <li>If your meter has manual ranges, pick a range <strong>above</strong> 5 V (for example <strong>20 V DC</strong>). A 3.7–4.2 V battery should read clearly.</li>
+      <li>If the meter is auto-ranging, any <strong>DC V</strong> position is usually enough.</li>
+    </ol>
+    <div class="callout danger">
+      <strong>Common beginner mistake:</strong> leaving the dial in <strong>current (A)</strong> or plugging red into <strong>10A</strong> and probing both battery wires can act like a <strong>short circuit</strong>. For polarity, <strong>always</strong> use <strong>DC volts</strong> and <strong>VΩmA</strong>.
+    </div>
+
+    <h3><span class="step-num">9</span> Measure the battery (not plugged into XIAO)</h3>
+    <p>The battery must still be <strong>unplugged</strong> from the XIAO. You only touch the <strong>two</strong> battery conductors (bare wire, exposed pin, or JST metal if you can reach only the metal safely).</p>
+    <ol>
+      <li>Hold one probe in each hand by the <strong>insulated handles</strong>.</li>
+      <li>Touch <strong>black</strong> to one conductor; touch <strong>red</strong> to the other.</li>
+      <li>Read the display (steady hands help):</li>
+    </ol>
+    <table>
+      <thead>
+        <tr><th>Reading</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Positive</strong> number (about 3.7–4.2)</td>
+          <td>Red probe is on <strong>+</strong>, black on <strong>−</strong> for that orientation.</td>
+        </tr>
+        <tr>
+          <td><strong>Negative</strong> number (e.g. −3.9)</td>
+          <td>Same battery, opposite assignment: red is on <strong>−</strong>, black on <strong>+</strong>.</td>
+        </tr>
+        <tr>
+          <td><strong>0.00</strong> or unstable</td>
+          <td>Bad contact, wrong mode, weak probe tip, or dead cell — fix before continuing.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Write down:</strong> “Wire color ___ = + / −” and “Wire color ___ = + / −” (or label your JST with tape after you know).</p>
+
+    <h3><span class="step-num">10</span> Match the XIAO JST, then plug once</h3>
+    <ol>
+      <li>Open Seeed’s XIAO ESP32S3 page and confirm which JST pin or pad is <strong>+</strong> on the <strong>board</strong>.</li>
+      <li>Compare to your written table from Step 9.</li>
+      <li><strong>Only if they agree</strong>, plug the JST into the XIAO once. If anything disagrees, <strong>stop</strong> — fix orientation or wiring before applying power.</li>
+    </ol>
+
+    <h2>WX-027 evidence (for your log)</h2>
+    <ul class="checklist">
+      <li>MAX98357 headers soldered</li>
+      <li>MAX98357 speaker block soldered</li>
+      <li>INMP441 headers soldered</li>
+      <li>Speaker wired to amp ± only</li>
+      <li>LiPo polarity documented before first plug</li>
+    </ul>
+
+    <h2>Stop — do not power the LiPo if</h2>
+    <ul>
+      <li>Red probe was in the <strong>10A</strong> jack.</li>
+      <li>Dial was in <strong>amps</strong> or <strong>resistance</strong> by mistake.</li>
+      <li>Polarity does not match the XIAO JST expectation.</li>
+      <li>Any <strong>solder bridge</strong> remains on headers.</li>
+    </ul>
+
+    <div class="callout ok">
+      <strong>Next work item after WX-027:</strong> WX-028 — flash MicroPython, USB REPL, Wi-Fi smoke.
+    </div>
+
+    <footer>
+      Markdown companion: <code>wx-027-beginner-bench-guide.md</code> — same steps; this page adds diagrams and expanded meter help.
+    </footer>
+  </div>
+</body>
+</html>

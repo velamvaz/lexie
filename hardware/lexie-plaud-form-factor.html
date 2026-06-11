@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lexie Card — v1 specification</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f4f0;
+      color: #1c1c1e;
+      padding: 48px 56px;
+      line-height: 1.55;
+    }
+    header {
+      border-bottom: 2px solid #1c1c1e;
+      padding-bottom: 16px;
+      margin-bottom: 36px;
+    }
+    header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    header p { font-size: 12px; color: #636366; margin-top: 6px; max-width: 720px; }
+
+    .section { margin-bottom: 48px; }
+    .label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.4px;
+      text-transform: uppercase; color: #636366; margin-bottom: 14px;
+    }
+    .row { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; }
+
+    h2 { font-size: 15px; font-weight: 700; margin: 28px 0 12px; }
+    p, li { font-size: 13px; color: #333; max-width: 720px; }
+    ul { margin: 10px 0 10px 22px; }
+    li { margin: 6px 0; }
+
+    table { border-collapse: collapse; font-size: 12px; margin-top: 12px; max-width: 800px; }
+    th { text-align: left; padding: 6px 18px 6px 0; font-size: 10px; text-transform: uppercase;
+         letter-spacing: 0.8px; color: #636366; border-bottom: 1px solid #d1d1d6; }
+    td { padding: 8px 18px 8px 0; border-bottom: 1px solid #e5e5ea; vertical-align: top; }
+    td:first-child { font-weight: 600; white-space: nowrap; }
+
+    .callout {
+      margin-top: 18px; padding: 14px 18px; background: #deedfb;
+      border-left: 3px solid #0a84ff; border-radius: 0 4px 4px 0;
+      font-size: 12px; max-width: 720px; line-height: 1.65;
+    }
+    .warn {
+      margin-top: 14px; padding: 12px 16px; background: #fff3cd;
+      border-left: 3px solid #b8860b; border-radius: 0 4px 4px 0;
+      font-size: 12px; max-width: 720px; line-height: 1.65;
+    }
+
+    footer { margin-top: 40px; font-size: 11px; color: #8e8e93;
+             border-top: 1px solid #e5e5ea; padding-top: 14px; }
+
+    .fit-ok { background: #e8f5e9; border-left-color: #2e7d32; }
+    .fit-risk { background: #fff3e0; border-left-color: #e65100; }
+    .mono { font-family: ui-monospace, monospace; font-size: 11px; }
+    caption { caption-side: bottom; font-size: 11px; color: #636366; text-align: left; padding-top: 8px; max-width: 820px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Lexie Card — v1 specification <span style="font-size:11px;font-weight:600;color:#0a84ff;vertical-align:super;margin-left:6px">CANONICAL · LX-4</span></h1>
+  <p>
+    Reference: <a href="https://www.plaud.ai/products/plaud-note-ai-voice-recorder">Plaud Note</a> — credit-card footprint (~85 × 54 mm, very thin in the commercial product),
+    <strong>pocketable slab</strong>, one-button capture. Lexie adopts the <strong>same outline</strong> but sits <strong>flat beside the book</strong> (no magnets, no steel pads, no snap-to-phone required for v1).
+    Thickness envelope: <strong>≤ 8 mm</strong>. Same server contract: WiFi, <code>POST /explain</code>, PTT, speaker — <strong>no book clip</strong>.
+  </p>
+</header>
+
+<!-- ═══ LEXIE CARD — SINGLE SOURCE OF TRUTH FOR V1 ═══ -->
+<div class="section" style="margin-top:-8px">
+  <div class="label">Lexie Card — v1 (zeroed in)</div>
+  <p style="margin-bottom:14px;max-width:820px">
+    One object name: <strong>Lexie Card</strong>. One job: press-and-hold → hear a word explanation. Everything below is the <strong>default v1 mechanical target</strong> unless a prototype proves otherwise.
+  </p>
+  <table>
+    <thead><tr><th>Parameter</th><th>Value</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>Footprint</td><td><strong>85.60 × 53.98 mm</strong></td><td>ISO / IEC 7810 ID-1 (same as credit card). CAD: 85.6 × 54.0 mm is fine.</td></tr>
+      <tr><td>Corner radius</td><td><strong>3.18 mm</strong> (or 3 mm)</td><td>ISO ID-1; 3 mm OK for FDM.</td></tr>
+      <tr><td>Thickness (depth)</td><td><strong>≤ 8.0 mm</strong></td><td>Total stack: shells + PCB + battery + speaker.</td></tr>
+      <tr><td>Mass target</td><td><strong>≤ 45 g</strong></td><td>Light in pocket and small hand; validate with scale.</td></tr>
+      <tr><td>PTT control</td><td><strong>1</strong> only</td><td>Press-and-hold to talk, release to send. No mode dial for v1.</td></tr>
+      <tr><td>PTT active area</td><td><strong>≥ 18 mm</strong> circle or side</td><td>Target <strong>20 mm</strong> for a 6-year-old pad; rubber dome optional.</td></tr>
+      <tr><td>PTT position</td><td>Upper half, <strong>left of center</strong></td><td>Right thumb reaches when card is horizontal; reversible if you mirror for left-handed dominant.</td></tr>
+      <tr><td>Status LED</td><td><strong>Top edge</strong> arc or 7-dot ring</td><td>PRD colors: pulse blue / spin teal / solid green-teal when speaking.</td></tr>
+      <tr><td>Mic</td><td><strong>3–5 × ∅1 mm</strong> holes or mesh slot</td><td>INMP441 or digital MEMS behind acoustic port; keep away from speaker cavity.</td></tr>
+      <tr><td>Speaker</td><td><strong>Full width</strong> slot, <strong>10–12 mm</strong> tall zone</td><td>Lower half; grille flush; aim slightly upward in CAD if shell allows.</td></tr>
+      <tr><td>USB-C</td><td><strong>Bottom short edge</strong>, centered</td><td>Charging + provisioning; cable exits toward child / desk, not into book.</td></tr>
+      <tr><td>Back face</td><td><strong>Flat matte plastic</strong></td><td>Optional: 2× small <strong>silicone bump</strong> feet (adhesive) for anti-slip on desk — no magnets in v1.</td></tr>
+      <tr><td>Wireless</td><td>WiFi 2.4 GHz</td><td>Antenna keep-out on top half of PCB; keep large metal masses away from antenna zone.</td></tr>
+      <tr><td>Placement</td><td><strong>Beside the book</strong> on table or lap board</td><td>Same “reading corner” every time; optional 3D-printed <strong>shallow tray</strong> so the card does not slide — purely mechanical, no magnet.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <div class="label">What “Plaud-like” means for Lexie</div>
+  <ul>
+    <li><strong>Shape:</strong> rounded rectangle “card” — fits a small pocket or pencil case.</li>
+    <li><strong>Placement:</strong> lives <strong>beside the open book</strong> on a stable surface (table, lap desk, or board). Optional silicone feet or a printed <strong>shallow tray</strong> so it does not skate — <strong>no magnets</strong> in the v1 story.</li>
+    <li><strong>Interaction:</strong> one obvious <strong>press-and-hold</strong>; <strong>LED</strong> on top edge; <strong>speaker</strong> on front; <strong>mic</strong> in its own band — same server pipeline as today.</li>
+    <li><strong>Companion feel:</strong> pocket → same spot next to the book every reading session — ritual without attaching anything to the pages.</li>
+  </ul>
+
+  <div class="warn">
+    <strong>Thickness (card depth) — v1 envelope:</strong> Lexie v1 targets <strong>≤ 8 mm</strong> total thickness (builder-approved). The <strong>WX-024 dev BOM</strong> (breakout boards + <strong>503040</strong> 5 mm cell) often lands <strong>~9–11 mm</strong> until you move to a <strong>thinner LiPo</strong>, <strong>single rigid PCB</strong> (SMD mic / amp), and <strong>minimal shell</strong> — see <strong>§1b</strong> below. “Plaud-like” means <strong>credit-card footprint + pocket + table placement</strong>, not matching Plaud’s ~3 mm custom stack.
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">1b — Internal layout &amp; fit (WX-024 BOM vs ID-1)</div>
+  <p style="max-width:820px;margin-bottom:12px">
+    <strong>XY (plan):</strong> Interior usable area ≈ <strong>83 × 52 mm</strong> after ~1 mm shell wall and corner relief (from 85.6 × 54 ID-1). Below, rectangles use <strong>nominal catalog sizes</strong>; real breakouts vary — re-measure before CAD lock.
+  </p>
+  <p style="max-width:820px;margin-bottom:12px;font-size:12px;color:#444">
+    <strong>Part envelopes (plan, mm):</strong> Seeed XIAO ESP32-S3 <span class="mono">21.0 × 17.5</span> · 503040 LiPo <span class="mono">30 × 40 × 5.0</span> (Z) · slim speaker (target) <span class="mono">30 × 20</span> · INMP441 breakout (generic) <span class="mono">~16 × 12</span> · MAX98357A breakout (e.g. Adafruit) <span class="mono">~20 × 15</span>
+  </p>
+
+  <div class="row" style="align-items:flex-start">
+    <div>
+      <p style="font-size:11px;color:#636366;margin-bottom:6px"><strong>Plan</strong> — viewBox in <strong>mm</strong> (85.6 × 54 ID-1). Green = battery; blue = speaker; purple = XIAO. Orange hatched = RF keep-out.</p>
+      <svg width="428" height="270" viewBox="0 0 85.6 54" style="display:block;background:#faf9f6;border:1px solid #d1d1d6;border-radius:8px" aria-label="Lexie Card internal plan in millimeters">
+        <defs>
+          <pattern id="rfhatch" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="3" stroke="#e6c200" stroke-width="0.4"/>
+          </pattern>
+          <marker id="arrusb" markerWidth="2.5" markerHeight="2.5" refX="1.2" refY="1.2" orient="auto"><path d="M0,0 L2.5,1.2 L0,2.5 Z" fill="#5e35b1"/></marker>
+        </defs>
+        <!-- ID-1 plate -->
+        <rect x="0" y="0" width="85.6" height="54" rx="3.18" fill="#eceae4" stroke="#1c1c1e" stroke-width="0.15"/>
+        <!-- RF keep-out: top ~14 mm -->
+        <rect x="0.2" y="0.2" width="85.2" height="14" fill="url(#rfhatch)" stroke="#c9a000" stroke-width="0.12" opacity="0.85"/>
+        <text x="42.8" y="9" text-anchor="middle" font-size="2.8" fill="#5d4b00">RF keep-out</text>
+        <!-- Battery 30×40 port column (no overlap with speaker on right) -->
+        <rect x="2" y="8" width="30" height="40" fill="#c8e6c9" stroke="#2e7d32" stroke-width="0.12"/>
+        <text x="17" y="30" text-anchor="middle" font-size="2.6" fill="#1b5e20">503040</text>
+        <text x="17" y="34" text-anchor="middle" font-size="2.2" fill="#33691e">30×40</text>
+        <!-- Speaker 30×20 bottom-right -->
+        <rect x="48" y="34" width="30" height="20" fill="#bbdefb" stroke="#1565c0" stroke-width="0.12"/>
+        <text x="63" y="46" text-anchor="middle" font-size="2.5" fill="#0d47a1">Speaker</text>
+        <!-- XIAO 21×17.5 upper right; USB faces bottom (clear of MAX) -->
+        <rect x="62.5" y="16" width="21" height="17.5" fill="#d1c4e9" stroke="#5e35b1" stroke-width="0.12"/>
+        <text x="73" y="25.5" text-anchor="middle" font-size="2.4" fill="#4527a0">XIAO</text>
+        <line x1="73" y1="33.5" x2="73" y2="40" stroke="#5e35b1" stroke-width="0.1" marker-end="url(#arrusb)"/>
+        <text x="78.5" y="38" font-size="2" fill="#5e35b1">USB↓</text>
+        <!-- MAX98357 narrow board in gap before XIAO (above speaker column) -->
+        <rect x="48" y="16" width="13.5" height="11" fill="#ffe0b2" stroke="#e65100" stroke-width="0.12"/>
+        <text x="54.75" y="22.5" text-anchor="middle" font-size="2.1" fill="#bf360c">MAX</text>
+        <!-- INMP441 upper-mid (clear PTT dome — keep acoustic port away from edge of battery) -->
+        <rect x="27" y="15.5" width="12" height="9.5" fill="#e1f5fe" stroke="#0277bd" stroke-width="0.12"/>
+        <text x="33" y="21" text-anchor="middle" font-size="1.9" fill="#01579b">Mic</text>
+        <!-- PTT upper half, right of battery column (PRD: left of card center for right thumb) -->
+        <circle cx="40" cy="22" r="10" fill="none" stroke="#0a84ff" stroke-width="0.12" stroke-dasharray="0.6 0.6"/>
+        <text x="40" y="22.5" text-anchor="middle" font-size="2" fill="#0a84ff">PTT</text>
+      </svg>
+      <p style="font-size:11px;color:#555;max-width:360px;margin-top:8px">
+        <strong>Non-overlap rule:</strong> With the <strong>503040</strong> pouch on the <strong>left</strong> (30 × 40 mm) and the <strong>30 × 20</strong> speaker <strong>bottom-right</strong>, the 40 mm battery dimension fits in height with a top RF band and clears the speaker in X. Place <strong>PTT</strong> just <strong>right of x = 32 mm</strong> so the dome is not over the cell stack; keep <strong>mic</strong> in the upper band with a route to the front face. <strong>Re-check</strong> every breakout with calipers — headers dominate thickness before XY.
+      </p>
+    </div>
+
+    <div style="max-width:420px">
+      <h2 style="margin-top:0">Z-height budget (card thickness)</h2>
+      <table style="max-width:420px">
+        <thead><tr><th>Build stage</th><th>Stack (mm)</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>A — Dev (WX-024 breakouts + 503040)</strong></td><td class="mono">~9–11</td><td>5 mm cell + 1.6 mm PCB + XIAO on headers (~8–12 mm tall) + 2× ~1 mm shells → expect over 8 mm. OK for <strong>bench / fat prototype</strong>.</td></tr>
+          <tr><td><strong>B — Target ≤ 8 mm</strong></td><td class="mono">≤ 8.0</td><td>Requires: <strong>LiPo ≤ ~3.5 mm</strong> (e.g. hunt <span class="mono">402535</span>, <span class="mono">303450</span> class — verify mAh), <strong>no pin headers</strong> (solder XIAO flat or migrate to <strong>module / custom PCB</strong>), SMD or low-profile mic/amp, shells <strong>≤ ~1 mm</strong> each or pocketed USB.</td></tr>
+        </tbody>
+        <caption>Numbers are planning bands, not guarantees. Measure USB-C plug height on your XIAO sample; some shells need a <strong>relief cut</strong> around the connector.</caption>
+      </table>
+
+      <div class="callout fit-risk" style="margin-top:16px">
+        <strong>503040 vs ≤ 8 mm:</strong> A <strong>5 mm</strong> cell alone + <strong>2 mm</strong> shells + <strong>1.6 mm</strong> PCB + <strong>~3 mm</strong> populated height already ≈ <strong>11+ mm</strong> if everything stacks naïvely. Treat <strong>503040</strong> as the <strong>bring-up</strong> cell; schedule a <strong>≤ 3.5 mm</strong> replacement (or shaped / stepped pocket) before calling the enclosure “v1 shipping.”
+      </div>
+      <div class="callout fit-ok" style="margin-top:12px">
+        <strong>XY fit:</strong> The <strong>ID-1</strong> plate easily holds XIAO + 503040 + 30×20 speaker + two small breakouts <strong>without overlapping</strong> if battery stays <strong>port-side</strong> and speaker <strong>opposite corner</strong> as in the diagram. Mic belongs in the <strong>upper</strong> half, <strong>away</strong> from the speaker cavity and amp.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">1 — Face layout (matches table above, notional mm zones)</div>
+  <div class="row">
+    <svg width="360" height="248" style="display:block;overflow:visible">
+      <!-- Card body 85.6 x 54 mm scaled 2.2 px/mm => 188.3 x 118.8 ~ 188 x 119 -->
+      <rect x="50" y="45" width="188" height="119" rx="14" fill="#1a1a1e" stroke="#333" stroke-width="1"/>
+      <!-- Zone dividers (dashed) — from top: ~8mm, ~24mm button, ~6mm mic, ~12mm spk, rest USB -->
+      <line x1="52" y1="63" x2="236" y2="63" stroke="#4a4a4a" stroke-width="0.8" stroke-dasharray="3 3"/>
+      <line x1="52" y1="116" x2="236" y2="116" stroke="#4a4a4a" stroke-width="0.8" stroke-dasharray="3 3"/>
+      <line x1="52" y1="129" x2="236" y2="129" stroke="#4a4a4a" stroke-width="0.8" stroke-dasharray="3 3"/>
+      <line x1="52" y1="156" x2="236" y2="156" stroke="#4a4a4a" stroke-width="0.8" stroke-dasharray="3 3"/>
+      <text x="245" y="56" font-size="7" fill="#8e8e93">~8 mm</text>
+      <text x="245" y="92" font-size="7" fill="#8e8e93">~24 mm</text>
+      <text x="245" y="124" font-size="7" fill="#8e8e93">~6 mm</text>
+      <text x="245" y="146" font-size="7" fill="#8e8e93">~12 mm</text>
+      <text x="245" y="172" font-size="7" fill="#8e8e93">USB +</text>
+      <text x="245" y="180" font-size="7" fill="#8e8e93">margin</text>
+      <!-- Button ~20mm => 44px -->
+      <rect x="68" y="72" width="44" height="44" rx="12" fill="#0a84ff"/>
+      <text x="90" y="98" text-anchor="middle" font-size="8" fill="white" font-weight="700">PTT</text>
+      <!-- LED arc -->
+      <path d="M 140 50 A 48 48 0 0 1 208 70" fill="none" stroke="#ffd60a" stroke-width="3" opacity="0.85"/>
+      <!-- Mic holes (mic band ~116–129) -->
+      <circle cx="178" cy="122" r="2" fill="#2a2a2d"/><circle cx="186" cy="122" r="2" fill="#2a2a2d"/>
+      <circle cx="194" cy="122" r="2" fill="#2a2a2d"/>
+      <text x="186" y="118" text-anchor="middle" font-size="6" fill="#8e8e93">mic</text>
+      <!-- Speaker grille (~129–156) -->
+      <rect x="58" y="129" width="172" height="27" rx="4" fill="#111113"/>
+      <g fill="#2a2a2d">
+        <circle cx="68" cy="138" r="2"/><circle cx="78" cy="138" r="2"/><circle cx="88" cy="138" r="2"/>
+        <circle cx="98" cy="138" r="2"/><circle cx="108" cy="138" r="2"/><circle cx="118" cy="138" r="2"/>
+        <circle cx="128" cy="138" r="2"/><circle cx="138" cy="138" r="2"/><circle cx="148" cy="138" r="2"/>
+        <circle cx="158" cy="138" r="2"/><circle cx="168" cy="138" r="2"/><circle cx="178" cy="138" r="2"/>
+        <circle cx="188" cy="138" r="2"/><circle cx="198" cy="138" r="2"/><circle cx="208" cy="138" r="2"/>
+        <circle cx="218" cy="138" r="2"/><circle cx="228" cy="138" r="2"/>
+        <circle cx="68" cy="148" r="2"/><circle cx="78" cy="148" r="2"/><circle cx="88" cy="148" r="2"/>
+        <circle cx="98" cy="148" r="2"/><circle cx="108" cy="148" r="2"/><circle cx="118" cy="148" r="2"/>
+        <circle cx="128" cy="148" r="2"/><circle cx="138" cy="148" r="2"/><circle cx="148" cy="148" r="2"/>
+      </g>
+      <!-- LEXIE -->
+      <text x="144" y="58" text-anchor="middle" font-size="7" fill="#4a4a4a" letter-spacing="3">LEXIE</text>
+      <!-- USB-C edge -->
+      <rect x="128" y="162" width="34" height="5" rx="2" fill="#2c2c2c"/>
+      <text x="145" y="180" text-anchor="middle" font-size="7" fill="#8e8e93">USB-C</text>
+      <!-- Overall dimensions -->
+      <line x1="50" y1="178" x2="238" y2="178" stroke="#636366" stroke-width="0.8"/>
+      <line x1="50" y1="175" x2="50" y2="181" stroke="#636366"/><line x1="238" y1="175" x2="238" y2="181" stroke="#636366"/>
+      <text x="144" y="192" text-anchor="middle" font-size="8" fill="#636366">85.6 mm (ID-1)</text>
+      <line x1="42" y1="45" x2="42" y2="164" stroke="#636366" stroke-width="0.8"/>
+      <line x1="39" y1="45" x2="45" y2="45" stroke="#636366"/><line x1="39" y1="164" x2="45" y2="164" stroke="#636366"/>
+      <text x="32" y="108" text-anchor="middle" font-size="8" fill="#636366" transform="rotate(-90,32,108)">54 mm</text>
+      <text x="144" y="218" text-anchor="middle" font-size="9" fill="#1c1c1e" font-weight="600">≤ 8 mm thick · one PTT · sits flat beside the book</text>
+    </svg>
+
+    <svg width="200" height="220" style="display:block">
+      <text x="100" y="18" text-anchor="middle" font-size="10" fill="#636366" font-weight="600">Edge profile</text>
+      <!-- Side view card on edge — width ≈ 8mm at ~2.2 px/mm -->
+      <rect x="70" y="50" width="18" height="119" rx="4" fill="#1a1a1e"/>
+      <rect x="70" y="50" width="18" height="8" fill="#2d5a27" opacity="0.5"/>
+      <!-- Optional silicone anti-slip dots (rear) — not to scale -->
+      <circle cx="88" cy="88" r="4" fill="#4a4a4a" opacity="0.6"/>
+      <circle cx="88" cy="132" r="4" fill="#4a4a4a" opacity="0.6"/>
+      <text x="108" y="95" font-size="8" fill="#636366">optional</text>
+      <text x="108" y="106" font-size="8" fill="#636366">silicone</text>
+      <text x="108" y="118" font-size="8" fill="#636366">dots</text>
+      <line x1="92" y1="88" x2="102" y2="88" stroke="#0a84ff" stroke-width="0.6" stroke-dasharray="2 2"/>
+      <line x1="92" y1="132" x2="102" y2="132" stroke="#0a84ff" stroke-width="0.6" stroke-dasharray="2 2"/>
+      <!-- Thickness arrow -->
+      <line x1="52" y1="50" x2="52" y2="169" stroke="#636366"/>
+      <line x1="49" y1="50" x2="55" y2="50" stroke="#636366"/>
+      <line x1="49" y1="169" x2="55" y2="169" stroke="#636366"/>
+      <text x="38" y="115" text-anchor="middle" font-size="8" fill="#636366" transform="rotate(-90,38,115)">≤8 mm v1</text>
+    </svg>
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">2 — Where it sits during reading (no clip, no magnets)</div>
+  <div class="row">
+
+    <svg width="300" height="200" style="display:block">
+      <text x="150" y="16" text-anchor="middle" font-size="10" font-weight="600" fill="#1c1c1e">A — Lap board / table</text>
+      <!-- Board -->
+      <rect x="20" y="35" width="260" height="150" rx="8" fill="#c4b8a8" stroke="#8b7d6b"/>
+      <!-- Book on left -->
+      <rect x="35" y="55" width="100" height="110" rx="3" fill="#faf9f6" stroke="#d1c9b8"/>
+      <g fill="#c5bfb0">
+        <rect x="42" y="68" width="86" height="3"/><rect x="42" y="78" width="80" height="3"/>
+        <rect x="42" y="88" width="90" height="3"/><rect x="42" y="98" width="72" height="3"/>
+      </g>
+      <!-- Lexie card flat on board beside book -->
+      <rect x="165" y="78" width="50" height="32" rx="5" fill="#1a1a1e"/>
+      <rect x="173" y="85" width="14" height="14" rx="3" fill="#0a84ff"/>
+      <text x="190" y="118" text-anchor="middle" font-size="7" fill="#555">same surface</text>
+      <text x="150" y="192" text-anchor="middle" font-size="8" fill="#636366">Card rests beside the book — text untouched</text>
+    </svg>
+
+    <svg width="300" height="200" style="display:block">
+      <text x="150" y="16" text-anchor="middle" font-size="10" font-weight="600" fill="#1c1c1e">B — Shallow printed tray (optional)</text>
+      <!-- Tray base -->
+      <rect x="40" y="120" width="220" height="55" rx="6" fill="#8b7d6b" stroke="#6b5c42"/>
+      <!-- Recess -->
+      <rect x="155" y="128" width="95" height="38" rx="4" fill="#5a4d3a"/>
+      <!-- Card in recess -->
+      <rect x="178" y="135" width="50" height="28" rx="4" fill="#1a1a1e"/>
+      <rect x="186" y="141" width="12" height="12" rx="2" fill="#0a84ff"/>
+      <!-- Book -->
+      <rect x="50" y="55" width="95" height="100" rx="3" fill="#faf9f6" stroke="#d1c9b8"/>
+      <text x="150" y="188" text-anchor="middle" font-size="8" fill="#636366">Mechanical pocket — no magnet, no glue on Lexie</text>
+    </svg>
+
+    <svg width="300" height="200" style="display:block">
+      <text x="150" y="16" text-anchor="middle" font-size="10" font-weight="600" fill="#1c1c1e">C — Nightstand between reads</text>
+      <!-- Table -->
+      <rect x="25" y="130" width="250" height="45" rx="4" fill="#d4c4b0"/>
+      <!-- Book closed stack -->
+      <rect x="50" y="75" width="90" height="55" rx="3" fill="#6b5015"/>
+      <rect x="55" y="70" width="90" height="8" rx="2" fill="#8b6914"/>
+      <!-- Lexie beside -->
+      <rect x="165" y="95" width="50" height="32" rx="5" fill="#1a1a1e"/>
+      <rect x="173" y="102" width="14" height="14" rx="3" fill="#0a84ff"/>
+      <text x="150" y="192" text-anchor="middle" font-size="8" fill="#636366">Same object, same ritual — just parked</text>
+    </svg>
+  </div>
+
+  <p style="margin-top:16px;font-size:12px;color:#555;max-width:800px">
+    <strong>Child workflow:</strong> book open → Lexie comes out of pocket → <strong>set down</strong> in the usual spot beside the spread (or in the tray) → press-and-hold → hear answer → leave there or put away.
+    No snap, no steel, no MagSafe — only **gravity + friction** (and optional tray / silicone bumps) keep it put.
+  </p>
+</div>
+
+<div class="section">
+  <div class="label">3 — Electronics vs Plaud thickness</div>
+  <table>
+    <thead><tr><th>Layer</th><th>Plaud ballpark</th><th>Lexie v1 (realistic)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Total thickness</strong></td><td>~3 mm</td><td><strong>≤ 8 mm</strong> (envelope — card depth)</td></tr>
+      <tr><td>Outer shells</td><td>Very thin injection / CNC</td><td>2× 1 mm PETG or PC</td></tr>
+      <tr><td>Compute</td><td>Custom / dense</td><td>ESP32-S3 <strong>module</strong> or trimmed carrier — avoid tall headers</td></tr>
+      <tr><td>Battery</td><td>Custom flat LiPo</td><td>~3–4 mm thick LiPo cut to card outline (vendor “shaped cell”)</td></tr>
+      <tr><td>Audio</td><td>MEMS in package</td><td>Low-profile digital mic + small speaker + mini amp IC</td></tr>
+      <tr><td>Antenna</td><td>Internal</td><td>Keep-out + FPC WiFi antenna in top half of card</td></tr>
+      <tr><td>Retention</td><td>N/A (held in hand)</td><td>v1: <strong>flat lay + optional tray / silicone feet</strong>. Add a fancier dock later if you want.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Dev path:</strong> Breadboard with XIAO dev board proves firmware first. Parallel track: CAD a <strong>≤ 8 mm</strong> thick card enclosure (flat back); swap in <strong>SMT module + shaped battery</strong> when the pipeline is stable — same UX, optional thinner stack later.
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">4 — Pros / cons vs clip-on bookmark</div>
+  <table>
+    <thead><tr><th></th><th>Plaud-style Lexie</th><th>Clip-on bookmark</th></tr></thead>
+    <tbody>
+      <tr><td>Text obstruction</td><td><strong>None</strong> (off book)</td><td>Strip or L-bar tradeoffs</td></tr>
+      <tr><td>Mic distance</td><td>Card on desk ~20–40 cm from mouth — OK</td><td>Often closer if on book edge</td></tr>
+      <tr><td>“With the book” feeling</td><td>Weaker unless dock is <strong>always</strong> the same ritual object</td><td>Stronger literal attachment</td></tr>
+      <tr><td>Travel / hotspot story</td><td>Card in pocket; WiFi via home or hotspot like any small gadget</td><td>Extra object</td></tr>
+      <tr><td>Manufacturing</td><td>Simple flat shell + optional tray print</td><td>Clip spring tuning</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <div class="label">5 — Safety (v1 — no magnets)</div>
+  <p style="max-width:720px">
+    Skipping magnets avoids <strong>swallowed-magnet</strong> hazards entirely. Still plan for: <strong>battery</strong> enclosure integrity (no pouch puncture),
+    <strong>no small loose parts</strong> after drops, rounded shell, and USB-C port strain relief. Any future magnet idea should be a separate design review.
+  </p>
+</div>
+
+<footer>
+  Lexie Card (Plaud-style footprint, no magnets) · hardware/lexie-plaud-form-factor.html · 2026-05-03 ·
+  API unchanged — see <a href="../lexie-docs/lexie/committed-to-build/lexie-word-explainer.DEVICE-INTEGRATION.md">DEVICE-INTEGRATION.md</a>
+</footer>
+
+</body>
+</html>

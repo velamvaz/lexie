@@ -1,6 +1,6 @@
 # Lexie — phased delivery (LX-1, documentation)
 
-**Date:** 2026-04-22  
+**Date:** 2026-04-22 · **Last aligned:** 2026-05-22 (Waveshare board delivered; WX-035 active)  
 **PRD:** [../prds/lexie-word-explainer.PRD.md](../prds/lexie-word-explainer.PRD.md)  
 **SPEC:** [lexie-word-explainer.SPEC.md](lexie-word-explainer.SPEC.md)
 
@@ -10,7 +10,7 @@ This file ties **phases** to **documentation** and the **suggested** implementat
 |-------|---------------------|---------------------------|---------------|
 | **Phase 1 (MVP)** | Single-PTT explain; **one** `age_profile`; public HTTPS; admin HTML; browser prototype; device key; **Journey 5 only at Level 0** | Child can ask words in one press; parent can edit profile | SPEC §1–11, §14–16; validation matrix; PRD J1–4, J5 L0 only |
 | **Phase 1b** | **Journey 5** full cascade (L1–L3) with **server-side session/turns** and recovery cap | Disambiguation across multiple PTTs | PRD J5, SPEC §12/§15 (future contract revision) |
-| **Phase 2** | Physical **device** on WiFi | Same API to `BASE_URL` | Out of this SPEC’s server v1; firmware registry |
+| **Phase 2 — active / in progress** | **Lexie Card** on WiFi (ID-1 footprint, beside the book — [hardware/lexie-plaud-form-factor.html](../../../hardware/lexie-plaud-form-factor.html)) | Same API to `BASE_URL` | Firmware contract: [DEVICE-INTEGRATION.md](lexie-word-explainer.DEVICE-INTEGRATION.md) (WX-023); **bench platform:** [lx-4-waveshare-device.PRD.md](../prds/lx-4-waveshare-device.PRD.md) (WX-034); provisioning: WX-025 |
 
 **Overlap (allowed):** you may maintain **lexie-ops** and the **PRD** while the FastAPI app is in progress. **Normative** behavior lives in the **SPEC** once it is “ready for implementation review.”
 

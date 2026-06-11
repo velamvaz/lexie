@@ -1,0 +1,16 @@
+menu "Lexie Configuration"
+
+    config LEXIE_STRESS_TEST
+        bool "Run automated E2E stress test at boot"
+        default y
+        help
+            When enabled, device replays stress_phrase.wav from SPIFFS N times
+            instead of waiting for BOOT PTT. Disable for product PTT mode.
+
+    config LEXIE_STRESS_CYCLES
+        int "Stress test cycle count"
+        range 1 100
+        default 10
+        depends on LEXIE_STRESS_TEST
+
+endmenu

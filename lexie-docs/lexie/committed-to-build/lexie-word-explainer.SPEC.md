@@ -15,7 +15,7 @@ This document locks **API contracts**, **operational rules**, **edge cases**, an
 
 ### 1.1 Orchestration vs inference (no “all-local AI” claim)
 
-- **Device (Phase 2):** WiFi only; no cellular modem. It performs **one job**: send recorded audio in an HTTP `POST` to a configured **`BASE_URL`**. It does **not** call OpenAI or the public model APIs directly.
+- **Device (Phase 2 — Lexie Card):** WiFi only; no cellular modem. It performs **one job**: send recorded audio in an HTTP `POST` to a configured **`BASE_URL`**. It does **not** call OpenAI or the public model APIs directly.
 - **Lexie server (FastAPI, your deployment):** **Orchestrates** the pipeline: calls **OpenAI** (Whisper, chat completions, TTS) with credentials stored in **server environment only**. This is the **trust boundary** for API keys.
 - **Inference** (STT, text generation, TTS audio): runs in **OpenAI’s cloud** in Phase 1 unless you later swap in self-hosted models. Marketing and docs must not imply all processing happens on a home PC.
 - **Single `age_profile`:** one row / document for the child. No tenant ID.
@@ -23,9 +23,9 @@ This document locks **API contracts**, **operational rules**, **edge cases**, an
 ### 1.2 Connectivity (device and browser clients)
 
 - **At home and away:** the same **public** `https://` **`BASE_URL`** (no reliance on a parent laptop process for production availability).
-- **At home:** bookmark (or test browser) uses home Wi‑Fi → internet → your host.
-- **Away:** bookmark joins a **parent phone’s mobile hotspot**; same `BASE_URL`.
-- **TLS required** in production; platform-issued cert is sufficient for the bookmark (pinning is optional, Phase 2+).
+- **At home:** **Lexie Card** (or Phase 1 test browser) uses home Wi‑Fi → internet → your host.
+- **Away:** Lexie Card joins a **parent phone’s mobile hotspot**; same `BASE_URL`.
+- **TLS required** in production; platform-issued cert is sufficient for the device (pinning is optional, Phase 2+).
 - **Phase 2 (device):** two saved **WiFi profiles** (e.g. home + hotspot SSIDs); provisioning mechanism **TBD** (SoftAP, BLE, USB) — not implemented in this SPEC’s server work, but the server assumes **one** configured API key per family deployment.
 
 **Not in scope for v1:** split-horizon DNS to hit a “LAN” URL at home; always use the public name.
@@ -171,7 +171,7 @@ This document locks **API contracts**, **operational rules**, **edge cases**, an
 
 | `error` (API) | Suggested on-screen / future device line (English) |
 |---------------|------------------------------------------------------|
-| `unauthorized` | We couldn’t connect. Ask a grown-up to check the bookmark. |
+| `unauthorized` | We couldn’t connect. Ask a grown-up to check Lexie on the desk (or the Wi‑Fi setup). |
 | `audio_too_short` | That was a little too short. Try the button again. |
 | `audio_too_long` | That was a little too long. Say one word, then let go. |
 | `transcription_empty` | I didn’t catch that. Try again, a little closer. |

@@ -1,12 +1,12 @@
 # Product PRD: Lexie Word Explainer
 
-**Feature:** Lexie Smart Bookmark — Push-to-Talk AI Word Explanation with Age-Adaptive Responses
+**Feature:** Lexie Word Explainer — **Lexie Card** (WiFi push-to-talk, age-adaptive explanations)
 
 **Status:** Draft
 
 **Date:** 2026-04-08
 
-**Last updated:** 2026-04-22 (admin one-pager, first-run, **error tone**, Phase 1 **acceptance**; Journey 5; locked defaults; see decision log)
+**Last updated:** 2026-05-03 (**Lexie Card** v1 form factor locked — ID-1 footprint, ≤ 8 mm, beside-the-book placement, no magnets; PRD narrative aligned; see decision log)
 
 **Registry ID:** LX-1
 
@@ -30,7 +30,7 @@
 
 ### What Success Looks Like
 
-A child clips Lexie onto whatever book she is reading. When she hits a word she does not understand, she presses the button on the bookmark, says the word (and optionally a short sentence of context), and hears a clear, warm, simple explanation spoken back to her in a few seconds — using words she already knows, often referencing something familiar from the book or her own life. She gets back to reading immediately. Over months and years, the explanations grow richer and more nuanced as her age profile is updated, without any change to the device itself.
+A child keeps **Lexie Card** — a thin, pocketable slab about the size of a credit card — **beside the open book** on a table or lap board (same spot each session; optional shallow tray or silicone feet for grip; **no clip, no magnets** in v1). When she hits a word she does not understand, she presses and holds the button on the card, says the word (and optionally a short sentence of context), and hears a clear, warm, simple explanation spoken back to her in a few seconds — using words she already knows, often referencing something familiar from the book or her own life. She gets back to reading immediately. Over months and years, the explanations grow richer and more nuanced as her age profile is updated, without any change to the device itself.
 
 ### Key Design Principles
 
@@ -54,14 +54,14 @@ A child clips Lexie onto whatever book she is reading. When she hits a word she 
 
 ### Overview
 
-Lexie is a small, clip-on physical bookmark that uses **WiFi** (it has no cellular radio). The child presses a single button, speaks a word or short phrase, and receives a spoken explanation within a few seconds. The bookmark is **single-purpose and low-ops** (and should stay physically **thin enough** to live on a book — not a claim that every BOM choice is “cheap”): it does not call OpenAI or the public internet by itself. It only talks to a **single configured Lexie backend** over **HTTPS** (the **orchestration** service you operate).
+**Lexie Card** is a small **WiFi**-only physical device (no cellular radio) in a **credit-card footprint** (ISO ID-1, **≤ ~8 mm** thick — see [`hardware/lexie-plaud-form-factor.html`](../../../hardware/lexie-plaud-form-factor.html)). The child presses a single **push-to-talk** control, speaks a word or short phrase, and receives a spoken explanation within a few seconds. The device is **single-purpose and low-ops** (pocketable, desk-stable beside the book — not a claim that every BOM choice is “cheap”): it does not call OpenAI or the public internet by itself. It only talks to a **single configured Lexie backend** over **HTTPS** (the **orchestration** service you operate).
 
 **Where “AI” runs:** The Lexie **server** (FastAPI) runs the pipeline: **OpenAI Whisper** (speech-to-text), **GPT-4o** (age-appropriate explanation, constraint guard), and **OpenAI TTS** (spoken response). Those are **cloud model APIs** — the important privacy/shape distinction is: the **device** is constrained to vocabulary requests only; the **orchestration host** holds credentials and enforces the contract. *This is not “all-local ML inference”* unless you later swap in self-hosted models.
 
 **Connectivity (decided):**
 
-- **At home:** The bookmark joins **home Wi‑Fi** and sends audio to the same **public base URL** as elsewhere (e.g. `https://lexie.example.com` on Fly.io, Railway, Render, or a small VPS). A **parent laptop** is for **development** (`uvicorn` locally), not the long-term way the family depends on the product being “on.”
-- **Away (e.g. in the car, travel):** The child uses a **parent phone’s mobile hotspot**; the bookmark is again a WiFi client with a path to the internet, and still calls the **same HTTPS `POST /explain`**. No BLE on the data path for v1.
+- **At home:** Lexie Card joins **home Wi‑Fi** and sends audio to the same **public base URL** as elsewhere (e.g. `https://lexie.example.com` on Fly.io, Railway, Render, or a small VPS). A **parent laptop** is for **development** (`uvicorn` locally), not the long-term way the family depends on the product being “on.”
+- **Away (e.g. in the car, travel):** The family uses a **parent phone’s mobile hotspot**; the card is again a WiFi client with a path to the internet, and still calls the **same HTTPS `POST /explain`**. No BLE on the data path for v1.
 
 **Profiles:** The server stores **one `age_profile`** for this child. The parent updates it as the child grows. The system prompt is strictly scoped: refuse non–word-meaning requests, and the device firmware is hardcoded to call only the `/explain` endpoint.
 
@@ -69,13 +69,13 @@ Lexie is a small, clip-on physical bookmark that uses **WiFi** (it has no cellul
 
 The interaction has three surfaces:
 
-- **The bookmark device** — the child's interface: one button, a speaker, an LED status light
+- **Lexie Card (physical device)** — the child's interface: one PTT control, a speaker, an LED status light (layout and zones in the hardware reference above)
 - **The Lexie server** — FastAPI (and optional SQLite) deployed to a **small public host** you control; the parent edits the age profile through a **web admin** (authenticated). Local laptop only for **dev and testing** before deploy.
 - **Phase 1 prototype** — a browser (or phone browser) that simulates push-to‑talk: record → `POST /explain` → play audio, to validate the pipeline and prompts before hardware
 
 ```
-[Lexie Bookmark]
-  ├── Button (press and hold to speak, release to send)
+[Lexie Card]
+  ├── PTT (press and hold to speak, release to send)
   ├── LED ring
   │     ├── Pulsing blue     — listening
   │     ├── Spinning teal    — thinking
@@ -138,18 +138,18 @@ The interaction has three surfaces:
 
 ```
   ┌──────────────────────────────────────┐
-  │  LEXIE BOOKMARK (clipped to page)    │
+  │  LEXIE CARD (beside open book)       │
   │                                      │
   │   ●  [LED: OFF]                      │
   │                                      │
   │   ╔══════════╗                       │
-  │   ║  BUTTON  ║  ← press and hold     │
+  │   ║   PTT    ║  ← press and hold     │
   │   ╚══════════╝                       │
   │                                      │
   │   ▶  Speaker                         │
   └──────────────────────────────────────┘
 
-  Child presses button → LED pulses blue
+  Child presses PTT → LED pulses blue
   Child speaks: "sorcerer"
   Child releases button
   LED spins teal (thinking)
@@ -325,7 +325,7 @@ A **single** parent-facing page served by the same FastAPI app (no separate “p
 
 | Property | PRD rule |
 |----------|----------|
-| **Auth** | `LEXIE_ADMIN_TOKEN` (bearer or header as in **SPEC**) — not shared with the child or the bookmark **device** key. |
+| **Auth** | `LEXIE_ADMIN_TOKEN` (bearer or header as in **SPEC**) — not shared with the child or the **Lexie Card** `LEXIE_DEVICE_KEY`. |
 | **Content** | One form: **child’s first name or nickname** (`child_name`), **age in years** (`age_years`), **reading level** (short free text, e.g. “advanced for age”, “grade-level”), **optional** `explanation_style` (hints for the system prompt). All fields map to the `age_profile` **entity shape** in this PRD. |
 | **Layout** | **Single column**, minimal chrome — engineering UI is fine. **Mobile-friendly (should):** usable on a **phone browser** (parent on the couch); tap targets and text large enough to read without zoom. No multi-step wizard required for v1. |
 | **Save** | **PATCH**-style update (partial OK); show **clear success** (“Saved” / “Profile updated”) and surface **auth errors** plainly to the parent only. |
@@ -363,7 +363,7 @@ Separate from **Journey 5** (ambiguous word / spell recovery). This covers: **no
 - **Word explanation:** OpenAI GPT-4o — system prompt enforces: explain like the child's age, use familiar examples, refuse non-vocabulary requests
 - **Text-to-speech:** OpenAI TTS API — returns MP3 audio streamed back to device
 - **Server framework:** Python FastAPI — lightweight, async; **deployed** to a small PaaS/VPS with TLS
-- **Device transport:** **HTTPS** to the configured `BASE_URL` from **any** WiFi that provides internet (home AP or parent **mobile hotspot**). The bookmark has no direct route to OpenAI; only the Lexie server does.
+- **Device transport:** **HTTPS** to the configured `BASE_URL` from **any** WiFi that provides internet (home AP or parent **mobile hotspot**). Lexie Card has no direct route to OpenAI; only the Lexie server does.
 - **Auth:** Device uses a pre-shared API key in firmware; server key in **host environment** (never in repo). Admin UI uses separate auth in SPEC.
 
 ### Cost, usage, and monitoring (single family)
@@ -437,17 +437,17 @@ Keep your explanation to 2–4 sentences.
 - **Target:** Full **Journey 5** **cascade** after Phase 1 is stable: **Levels 1–3** as in §4, with **clarification** TTS and a **next** PTT carrying the child’s answer or spelling
 - **Mechanism:** **Short-lived session**, turn counter, or equivalent — **defined in** [lexie-word-explainer.SPEC.md](../committed-to-build/lexie-word-explainer.SPEC.md) (and API changes if any); not a second product, the same `BASE_URL` and family deployment
 
-### Phase 2: Physical Device (Target: TBD)
+### Phase 2: Lexie Card (physical device)
 
-> Hardware platform decision needed first — see Open Questions.
+> **Canonical mechanical + UX layout:** [`hardware/lexie-plaud-form-factor.html`](../../../hardware/lexie-plaud-form-factor.html) (Lexie Card v1). **Active bench platform (2026-05-22):** **Waveshare ESP32-S3-AUDIO-Board** — see **WX-034** and [lx-4-waveshare-device.PRD.md](lx-4-waveshare-device.PRD.md). **Original Path A** (XIAO + breakouts) amended, not erased — **WX-024**. Earlier **clip-on bookmark** explorations in `hardware/lexie-bookmark-design.html` and `hardware/lexie-clip-detail.html` are **not** the v1 product story.
 
-- Device firmware (MicroPython on ESP32-S3 or Python on Pi Zero 2W)
-- I2S MEMS microphone integration
-- I2S amplified speaker integration
-- Single button with LED ring
-- Battery + USB-C charging
-- Pre-shared API key flashed to device at setup
-- Physical bookmark enclosure design
+- Device firmware on **ESP32-S3** (Waveshare integrated board for bench; Lexie Card enclosure remains long-term target)
+- Integrated dual-mic + codec path (**ES7210** in / **ES8311** out) — not discrete INMP441/MAX98357 on active path
+- Single **PTT** + **LED** on top edge (per hardware reference)
+- Battery + **USB-C** (charging + **USB serial provisioning** — **WX-025**)
+- `LEXIE_DEVICE_KEY` + `BASE_URL` + WiFi profiles flashed at setup (never in source)
+- **Network sovereignty:** Lexie firmware only; full erase of vendor demo firmware — [lx-4-network-policy.md](../../../project-management/lx-4-network-policy.md)
+- **Enclosure:** ID-1 footprint shells, **≤ ~8 mm** stack for product; **bench thickness flexible** on Path B
 
 ### Phase 3: Hardening + Extras (Future, optional)
 
@@ -467,7 +467,7 @@ Keep your explanation to 2–4 sentences.
 | **LX-2 — Context-Aware Explanation** | Extends LX-1; the server API and prompt already accommodate context text, so LX-2 is a refinement of the prompt and UX guidance, not a new system |
 | **LX-3 — Age Profile Management** | Provides the profile that LX-1 depends on; Phase 1 implements a minimal version of LX-3 as part of this feature |
 | **LX-4 — Physical Device Firmware** | Consumes the LX-1 server API; device and server are developed in parallel in Phase 2 |
-| **LX-5 — Wake Word Activation** | Deferred to Phase 2; requires always-on microphone which has hardware and privacy implications |
+| **LX-5 — Wake Word Activation** | Deferred past Lexie Card v1; requires always-on microphone which has hardware and privacy implications |
 | **LX-6 — Hosted Server** | **Superseded in practice** — the production server is **public HTTPS from Phase 1**; any “LX-6” doc is legacy naming for optional future platform hardening, not a separate migration step |
 
 ---
@@ -476,13 +476,13 @@ Keep your explanation to 2–4 sentences.
 
 | # | Question | Options | Recommendation |
 |---|----------|---------|----------------|
-| 1 | **Hardware platform for device firmware** | (A) ESP32-S3: smaller, cheaper (~$5–10 BOM), I2S native, MicroPython or C++, tight memory constraints for audio buffering. (B) Raspberry Pi Zero 2W: runs Linux, easier to develop and debug, supports Python natively, ~$15 + USB audio hat, slightly bulkier. | Start with Pi Zero 2W for Phase 2 development (easier iteration); consider ESP32-S3 for a final production-style build if size matters. |
+| 1 | **Hardware platform for device firmware** *(decided 2026-05-03; amended 2026-05-22)* | (A) **ESP32-S3** discrete (XIAO + I2S breakouts). (B) **Waveshare ESP32-S3-AUDIO-Board** integrated. (C) Raspberry Pi Zero 2W. | **ESP32-S3** retained. **Active bench: Waveshare (WX-034)**. Pi rejected (~30 s boot). Path A archived. See [lx-4-waveshare-device.PRD.md](lx-4-waveshare-device.PRD.md). |
 | 2 | **Audio format between device and server** | (A) Raw PCM streamed over HTTP. (B) Opus or MP3 compressed audio to reduce WiFi payload. | Start with raw PCM / WAV for simplicity in Phase 1 prototype; evaluate compression in Phase 2 if latency is an issue. |
 | 3 | **Age profile update mechanism** | (A) Parent edits a JSON file manually. (B) Simple web admin page served by FastAPI. | Build the web admin page — editing JSON is error-prone and not parent-friendly. |
 | 4 | **Latency target** | What is an acceptable round-trip from button release to first audio byte? | Target **≤ 5 s p95** end-to-end for the **deployed** service + OpenAI path; **avoid cold starts** on the host (one warm small instance for a single family is usually enough). |
 | 5 | **Logging and privacy** (decided) | Off by default vs opt-in | **Default off (locked):** no transcript/response persistence. Parent **opts in** (`LEXIE_LOG_REQUESTS=1`, **SPEC**) for tuning. **No raw audio** in either case. Retention in **SPEC**. |
 | 6 | **PaaS choice** | Fly vs Railway vs Render vs small VPS? | Pick by **TTL ops comfort**: trial deploy with Dockerfile; set **monthly** OpenAI and host **budget** alerts. |
-| 7 | **WiFi provisioning (Phase 2 device)** | How are home + hotspot SSIDs and `BASE_URL` stored on the bookmark? | **TBD in hardware SPEC** (e.g. SoftAP, companion BLE for setup, USB); at least **two** saved networks are a likely requirement. |
+| 7 | **WiFi provisioning (Phase 2 device)** *(decided 2026-05-03)* | SoftAP vs BLE vs **USB serial** one-time setup. | **USB serial, one-time setup** (same USB-C as charge): provisioning script writes **`config.json`** to flash — **3** WiFi profiles (home + two parent hotspots) + `BASE_URL` + `LEXIE_DEVICE_KEY`. Firmware tries SSIDs in order on boot. **SoftAP** = optional Phase 3 polish. See **WX-025**. |
 | 8 | **Headword TTS?** (speak the target word once after the meaning) (decided) | **Off** default, opt-in to on / always on | **Off (locked).** `LEXIE_HEADWORD_TTS=1` enables append headword TTS (see **SPEC**). |
 | 9 | **Cascading recovery and transport** (decided) | (A) **Phase 1** = stateless **single** `POST /explain` per PTT; **Level 0** inference only. (B) **Multi-turn** cascade = **short-lived session** (or turn counter) for Levels 1–3. | **Option A** for **Phase 1** MVP; **Option B** in **Phase 1b**. **Journey 5** is **phased** — see **§6** and **decision log**. **SPEC** will define session shape for **1b**. |
 
@@ -505,7 +505,11 @@ Keep your explanation to 2–4 sentences.
 | 2026-04-22 | **Local parent ops app** | Optional local **only** app (not child-facing) that **polls** Lexie `GET /health` and future admin/metrics endpoints; CORS/proxy in SPEC; OpenAI billing remains cost source of truth |
 | 2026-04-22 | **Unfamiliar pronunciation & cascading recovery (Journey 5)** | Young readers may mispronounce or spell phonetically; product **infers** meaning first, then **escalates**: brief oral fork → **spell letter-by-letter** for disambiguation (recovery, not default) → **bounded** kind exit. Optional **headword TTS** after meaning remains a separate gate. |
 | 2026-04-22 | **Open Q9 — Phase 1 vs full Journey 5 (Option A)** | **Phase 1 MVP** ships **single-turn** `POST /explain` only: **Level 0** best-effort inference + **one** explanation audio, **constraint guard**, and SPEC error paths — **no** server **session** for multi-PTT recovery. **Journey 5** **Levels 1–3** (oral fork, spell step, kind stop) ship in **Phase 1b** with **session** (or equivalent) in the **SPEC**. The full **Journey 5** design stays **must-have** for the product; delivery is **phased** to unblock the core pipeline first. |
-| 2026-04-22 | **Recovery cap (Journey 5, Phase 1b)** | **At most one** Level 1 oral-fork **episode** and **at most one** Level 2 spell **episode** per session after the **initial** ask; then **Level 3** is mandatory. **No** third recovery round. **Worst case:** **3** child PTTs on the bookmark/browser before a forced **kind** exit. |
+| 2026-04-22 | **Recovery cap (Journey 5, Phase 1b)** | **At most one** Level 1 oral-fork **episode** and **at most one** Level 2 spell **episode** per session after the **initial** ask; then **Level 3** is mandatory. **No** third recovery round. **Worst case:** **3** child PTTs on the Lexie Card / browser before a forced **kind** exit. |
 | 2026-04-22 | **Default logging = off (opt-in)** | `LEXIE_LOG_REQUESTS` defaults to **0**: no **transcript** or **explanation** persistence. Parent **opts in** to `1` for tuning. **Privacy-first** for a child. **No raw audio** in either case. |
 | 2026-04-22 | **Headword TTS = off (opt-in)** | `LEXIE_HEADWORD_TTS` defaults to **0**: TTS is **explanation (meaning) only**. Parent may set `1` to add a short pronunciation pass after the meaning. **Cost and latency** favor default off. |
 | 2026-04-22 | **Admin one-pager, first-run, error tone, Phase 1 acceptance** | **Admin:** single FastAPI-served form for `age_profile`, **mobile-friendly** when possible, no child analytics in v1. **First run:** ordered steps from host + secrets + profile + `GET /health` + browser PTT to **first** explain. **Error tone:** technical failures use **calm, one-idea** lines — no stack-speak to the child. **Acceptance:** checklist in **§6** (deployed `BASE_URL`, journeys 1–3 + Level 0, error tone, repeatable first run, **SPEC** §11). |
+| 2026-05-03 | **Phase 2 form factor: Lexie Card** | **Credit-card footprint** (ISO ID-1), **≤ ~8 mm** thickness target, **beside the book** on a stable surface — **no clip-on bookmark**, **no magnets** / MagSafe / steel pads in v1 (swallowed-magnet and UX simplicity). Optional **shallow tray** or **silicone feet** for anti-slip only. Single source of truth: **`hardware/lexie-plaud-form-factor.html`**. |
+| 2026-05-03 | **LX-4 electronics stack** | **Seeed XIAO ESP32-S3** + **INMP441** + **MAX98357A** + slim speaker + **503040** LiPo; **MicroPython**; **WAV/PCM** to server first; **USB** provisioning (**WX-024**, **WX-025**). |
+| 2026-05-22 | **LX-4 bench platform → Waveshare Path B (WX-034)** | **Waveshare ESP32-S3-AUDIO-Board** for primary firmware bring-up; integrated ES7210/ES8311; Path A parts spare; **full erase** of vendor demo FW required; network allowlist in [lx-4-network-policy.md](../../../project-management/lx-4-network-policy.md); UX SLAs unchanged; PRD split: [lx-4-waveshare-device](lx-4-waveshare-device.PRD.md), [lx-4-device-firmware](lx-4-device-firmware.PRD.md), [lx-4-device-ux-sla](lx-4-device-ux-sla.PRD.md). |
+| 2026-05-22 | **Waveshare board delivered — bench execution** | Hardware on hand; **WX-035** active (erase vendor FW before Wi‑Fi); pin map draft [PINMAP-WAVESHARE-AUDIO](../committed-to-build/lexie-word-explainer.PINMAP-WAVESHARE-AUDIO.md); LX-4 PRDs v1.1. |

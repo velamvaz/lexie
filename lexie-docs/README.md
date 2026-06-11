@@ -1,6 +1,6 @@
-# Lexie — AI-Powered Smart Bookmark
+# Lexie — AI word explainer (Lexie Card)
 
-Lexie is a physical clip-on bookmark that helps children understand words they encounter while reading. The child presses a button, speaks a word (or a word with context), and Lexie responds with a clear, age-appropriate spoken explanation.
+Lexie is **Lexie Card** — a thin, **WiFi**-connected physical device about the **size of a credit card** that sits **beside the open book** (not clipped to pages in v1). The child **presses and holds** to talk, speaks a word (or a word with context), and Lexie responds with a clear, age-appropriate spoken explanation.
 
 ## Why Lexie Exists
 
@@ -66,10 +66,11 @@ Develop with `uvicorn` on a laptop; **production** is the deployed URL (not a ho
 | Phase | Description | Status |
 |-------|-------------|--------|
 | 1 | FastAPI + OpenAI pipeline, **deployed HTTPS host**, browser prototype | **SPEC ready** — [committed-to-build/lexie-word-explainer.SPEC.md](lexie/committed-to-build/lexie-word-explainer.SPEC.md) |
-| 2 | ESP32-S3 or Pi Zero 2W firmware + physical bookmark | Future |
+| 2 | **Lexie Card** — ESP32-S3 firmware (**Waveshare** bench board), ID-1 footprint, same `/explain` API · [lx-4-waveshare-device.PRD.md](lexie/prds/lx-4-waveshare-device.PRD.md) · [hardware/lexie-plaud-form-factor.html](../hardware/lexie-plaud-form-factor.html) | Active (LX-4) |
 | 3 | OTA firmware, optional wake word / hardening (server already public in Phase 1) | Future |
 
 ## Related Artifacts
 
-- [Device design exploration (HTML)](lexie/architecture/device-design-exploration.html) — Phase 2 hardware form factor exploration (open in a browser)
+- [**Lexie Card** v1 spec (HTML)](../hardware/lexie-plaud-form-factor.html) — canonical Phase 2 mechanical layout (ID-1, ≤ 8 mm, beside the book, no magnets)  
+- [Device design exploration (HTML)](lexie/architecture/device-design-exploration.html) — earlier UX exploration; v1 hardware story is **Lexie Card** above
 - [Lexie Word Explainer — **Master checklist (builder)**](lexie/committed-to-build/lexie-word-explainer.MASTER-CHECKLIST.md) · [API & data model](lexie/committed-to-build/lexie-word-explainer.API-and-data-model.md) — entities, reference DDL, metadata · [Journeys & observability](lexie/committed-to-build/lexie-word-explainer.journeys-and-observability.md) · [Budget & rollout (ROM, milestones)](lexie/committed-to-build/lexie-word-explainer.BUDGET-AND-ROLLOUT.md) · [Runbook (operator triage)](lexie/committed-to-build/lexie-word-explainer.RUNBOOK.md) · [validation matrix](lexie/committed-to-build/lexie-word-explainer.validation-matrix.md) · [testing strategy](lexie/committed-to-build/lexie-word-explainer.TESTING-strategy.md) · [phased delivery](lexie/committed-to-build/phased-delivery-plan.md) — support [SPEC](lexie/committed-to-build/lexie-word-explainer.SPEC.md)

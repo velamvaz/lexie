@@ -74,7 +74,7 @@ Use **1Password** as the **canonical** store for every long-lived secret. **Neve
 - [ ] **D2 — Confirm **`https://<BASE_URL>/health`** returns `200` (RUNBOOK step A).  
 - [ ] **D3 — From **phone** on **cellular** (not only home Wi‑Fi), open the same `/health` URL.  
 - [ ] **D4 — (Optional) Add external **uptime** ping to `/health`.  
-- [ ] **D5** — Note `BASE_URL` in 1Password (e.g. a **Secure Note** *Lexie — production URL*) for firmware / bookmarks later.
+- [ ] **D5** — Note `BASE_URL` in 1Password (e.g. a **Secure Note** *Lexie — production URL*) for Lexie Card firmware / provisioning later.
 
 ---
 

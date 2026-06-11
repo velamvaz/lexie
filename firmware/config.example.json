@@ -1,0 +1,9 @@
+{
+  "networks": [
+    { "ssid": "HomeWiFi", "password": "REPLACE_ME" },
+    { "ssid": "Parent1Hotspot", "password": "REPLACE_ME" },
+    { "ssid": "Parent2Hotspot", "password": "REPLACE_ME" }
+  ],
+  "base_url": "https://lexie-server.fly.dev",
+  "device_key": "REPLACE_ME_FROM_1PASSWORD"
+}

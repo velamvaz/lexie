@@ -5,6 +5,14 @@
 project-management/status-report.html
 .env
 .env.local
+config.local.json
+**/config.local.json
+firmware/lexie-waveshare-idf/spiffs_image/config.json
+firmware/**/build/
+firmware/**/*.log
+firmware/**/sdkconfig.old
+project-management/logs/
+*.swp
 **/__pycache__/
 **/.pytest_cache/
 *.pyc

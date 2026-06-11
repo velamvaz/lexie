@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lexie — Spring Jaw Clip Detail</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f4f0;
+      color: #1c1c1e;
+      padding: 48px 56px;
+    }
+    header {
+      border-bottom: 2px solid #1c1c1e;
+      padding-bottom: 16px;
+      margin-bottom: 40px;
+    }
+    header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    header p  { font-size: 12px; color: #636366; margin-top: 5px; }
+
+    .section { margin-bottom: 56px; }
+    .section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.4px;
+      text-transform: uppercase; color: #636366; margin-bottom: 16px;
+    }
+    .row { display: flex; gap: 56px; align-items: flex-start; flex-wrap: wrap; }
+
+    .callout {
+      max-width: 340px;
+      background: #deedfb;
+      border-left: 3px solid #0a84ff;
+      padding: 14px 18px;
+      font-size: 12px;
+      line-height: 1.7;
+      border-radius: 0 4px 4px 0;
+      margin-top: 16px;
+    }
+    .callout strong { display: block; margin-bottom: 4px; font-size: 13px; }
+
+    .note {
+      max-width: 340px;
+      background: #f0f0ea;
+      border-left: 3px solid #636366;
+      padding: 12px 16px;
+      font-size: 12px;
+      line-height: 1.7;
+      border-radius: 0 4px 4px 0;
+      margin-top: 12px;
+    }
+
+    table { border-collapse: collapse; font-size: 12px; margin-top: 12px; }
+    th { text-align: left; padding: 5px 20px 5px 0; font-size: 10px; text-transform: uppercase;
+         letter-spacing: 0.8px; color: #636366; border-bottom: 1px solid #d1d1d6; }
+    td { padding: 7px 20px 7px 0; border-bottom: 1px solid #e5e5ea; vertical-align: top; }
+    td:first-child { font-weight: 600; white-space: nowrap; }
+
+    footer { margin-top: 40px; font-size: 11px; color: #8e8e93;
+             border-top: 1px solid #e5e5ea; padding-top: 14px; }
+  </style>
+</head>
+<body>
+
+  <div role="note" style="background:#7f1d1d;color:#fef2f2;padding:14px 20px;font:14px/1.45 -apple-system,sans-serif;margin:-48px -56px 28px -56px;border-bottom:3px solid #450a0a;">
+    <strong>Superseded — not v1 hardware.</strong> Phase 2 product is <strong>Lexie Card</strong> (no spring jaw / book clip). See <a href="lexie-plaud-form-factor.html" style="color:#93c5fd;">lexie-plaud-form-factor.html</a> and <a href="README.md" style="color:#93c5fd;">hardware/README.md</a>.
+  </div>
+
+<header>
+  <h1>Lexie — Spring Jaw Clip: Detailed Design</h1>
+  <p>Spring jaw · obstruction · L-bar layout · PETG · WX-024 · 2026-05-03</p>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 1: ANATOMY OVERVIEW
+     ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">1 — How it works: the three parts</div>
+  <div class="row">
+
+    <!-- MAIN ANATOMY DIAGRAM -->
+    <svg width="520" height="440" style="display:block;overflow:visible">
+
+      <!-- ── LEGEND COLORS ──
+           Upper jaw:  #2d6a4f (dark green)
+           Spring:     #1d4e35 (darker green)
+           Device body / lower jaw:  #1a1a1e (near black)
+           Book cover: #8B6914 (brown)
+           Book pages: #f0ebe3 (cream)
+           Gap arrow:  #ff453a (red)
+      -->
+
+      <!-- ╔══════════════════════════════════════════╗
+           ║ CROSS-SECTION VIEW (looking from RIGHT   ║
+           ║ side of book+device)                     ║
+           ║                                          ║
+           ║ x axis = DEPTH (left=front, right=back)  ║
+           ║ y axis = HEIGHT (up=top, down=bottom)    ║
+           ╚══════════════════════════════════════════╝
+
+           Scale: 10px = 1mm for both axes.
+           Book front face: x=260
+           Device back = book front face = x=260
+           Device front face: x=260-120=140   (12mm device depth)
+           Upper jaw back: x=260+110=370      (11mm over book)
+
+           Book top surface: y=210
+           Upper jaw top:    y=210-30=180     (3mm jaw thickness)
+           Jaw gap (book cover): y=210 to y=260  (5mm = 50px)
+           Device top clamping face: y=260
+           Device body: y=260 downward
+      -->
+
+      <!-- === UPPER JAW (sits on TOP of book, like a finger on the book spine-side) === -->
+      <rect x="260" y="180" width="110" height="30" rx="4"
+            fill="#2d5a27" opacity="0.95"/>
+      <!-- Jaw underside (clamping surface texture) -->
+      <rect x="260" y="203" width="110" height="7" rx="0 0 3 3"
+            fill="#1d4a18" opacity="0.6"/>
+      <!-- Upper jaw front lip (small drop to help grip) -->
+      <rect x="258" y="180" width="8" height="38" rx="2" fill="#2d5a27" opacity="0.9"/>
+      <!-- Upper jaw label -->
+      <line x1="370" y1="195" x2="430" y2="150" stroke="#2d5a27" stroke-width="1.2"/>
+      <text x="433" y="148" font-size="11" fill="#2d5a27" font-weight="700">Upper jaw</text>
+      <text x="433" y="162" font-size="9"  fill="#636366">(tab, 3mm thick, 11mm long)</text>
+      <text x="433" y="175" font-size="9"  fill="#636366">Sits on top face of book.</text>
+      <text x="433" y="188" font-size="9"  fill="#636366">PETG, 1.8mm wall.</text>
+
+      <!-- === BOOK (cross-section, showing front cover board and page block) === -->
+      <!-- Book front cover board (hard cover board, ~5mm thick) -->
+      <rect x="260" y="210" width="240" height="50" rx="0" fill="#8B6914" opacity="0.9"/>
+      <!-- Book page block (lighter, extends further into book depth) -->
+      <rect x="260" y="260" width="240" height="60" rx="0" fill="#f0ebe3" opacity="0.95"
+            stroke="#c5bfb0" stroke-width="1"/>
+      <!-- Page lines inside page block -->
+      <line x1="265" y1="270" x2="495" y2="270" stroke="#d8d0c4" stroke-width="0.6"/>
+      <line x1="265" y1="280" x2="495" y2="280" stroke="#d8d0c4" stroke-width="0.6"/>
+      <line x1="265" y1="290" x2="495" y2="290" stroke="#d8d0c4" stroke-width="0.6"/>
+      <line x1="265" y1="300" x2="495" y2="300" stroke="#d8d0c4" stroke-width="0.6"/>
+      <!-- Book label -->
+      <text x="360" y="240" text-anchor="middle" font-size="10" fill="white" font-weight="700">Book front cover board (~5mm)</text>
+      <text x="360" y="286" text-anchor="middle" font-size="9"  fill="#6b5c42">Page block</text>
+
+      <!-- === SPRING / HINGE (PETG arch connecting upper jaw to device back) === -->
+      <!-- The arch: starts at top-back of device (x=260, y=260), arcs up and right
+           to top-back of upper jaw (x=370, y=180).
+           Drawn as a filled path (the PETG wall thickness ~12px = 1.2mm) -->
+      <path d="M 260 262   Q 310 130   370 182
+               L 370 197   Q 315 155   272 262  Z"
+            fill="#1d4a18" opacity="0.95"/>
+      <!-- Spring label -->
+      <line x1="318" y1="175" x2="318" y2="120" stroke="#1d4a18" stroke-width="1.2"/>
+      <text x="320" y="116" font-size="11" fill="#1d4a18" font-weight="700">PETG spring / hinge</text>
+      <text x="320" y="130" font-size="9"  fill="#636366">1.2mm wall · natural flex</text>
+      <text x="320" y="143" font-size="9"  fill="#636366">No metal spring needed.</text>
+
+      <!-- === DEVICE BODY (lower jaw — the full device hangs from here) === -->
+      <!-- Device clamping top face (the thin lip that presses against front cover) -->
+      <rect x="140" y="258" width="120" height="14" rx="3 0 0 3" fill="#2c2c2c"/>
+      <!-- Device main body -->
+      <rect x="140" y="272" width="120" height="155" rx="6 0 0 6" fill="#1a1a1e"/>
+      <!-- Button on device front face -->
+      <rect x="145" y="285" width="32" height="32" rx="7" fill="#0a84ff"/>
+      <text x="161" y="304" text-anchor="middle" font-size="7" fill="white" font-weight="700">BTN</text>
+      <!-- LED ring -->
+      <circle cx="207" cy="301" r="14" fill="none" stroke="#ffd60a" stroke-width="2.5"/>
+      <circle cx="207" cy="301" r="2.5" fill="#ffd60a" opacity="0.7"/>
+      <!-- Speaker grille -->
+      <rect x="145" y="335" width="110" height="40" rx="4" fill="#111113"/>
+      <g fill="#2a2a2d">
+        <circle cx="157" cy="345" r="2"/> <circle cx="168" cy="345" r="2"/>
+        <circle cx="179" cy="345" r="2"/> <circle cx="190" cy="345" r="2"/>
+        <circle cx="201" cy="345" r="2"/> <circle cx="212" cy="345" r="2"/>
+        <circle cx="157" cy="356" r="2"/> <circle cx="168" cy="356" r="2"/>
+        <circle cx="179" cy="356" r="2"/> <circle cx="190" cy="356" r="2"/>
+        <circle cx="201" cy="356" r="2"/> <circle cx="212" cy="356" r="2"/>
+        <circle cx="157" cy="367" r="2"/> <circle cx="168" cy="367" r="2"/>
+        <circle cx="179" cy="367" r="2"/> <circle cx="190" cy="367" r="2"/>
+        <circle cx="201" cy="367" r="2"/> <circle cx="212" cy="367" r="2"/>
+      </g>
+      <!-- Continues down indicator -->
+      <text x="200" y="415" text-anchor="middle" font-size="8" fill="#636366">· · ·</text>
+      <text x="200" y="428" text-anchor="middle" font-size="7" fill="#636366">device continues 165mm total</text>
+      <!-- Device label -->
+      <line x1="140" y1="340" x2="80" y2="290" stroke="#1a1a1e" stroke-width="1.2"/>
+      <text x="15"  y="285" font-size="11" fill="#1a1a1e" font-weight="700">Device body</text>
+      <text x="15"  y="299" font-size="9"  fill="#636366">(lower jaw)</text>
+      <text x="15"  y="313" font-size="9"  fill="#636366">Front face has button,</text>
+      <text x="15"  y="327" font-size="9"  fill="#636366">LED, speaker (faces reader).</text>
+
+      <!-- === JAW GAP CALLOUT === -->
+      <!-- Gap = where book cover board sits, between upper jaw bottom and device clamping face -->
+      <!-- Upper jaw bottom: y=210, Device clamping top: y=258, gap = 48px = ~5mm -->
+      <line x1="252" y1="210" x2="252" y2="258" stroke="#ff453a" stroke-width="1.5" marker-end="url(#arrowred)"/>
+      <line x1="252" y1="258" x2="252" y2="210" stroke="#ff453a" stroke-width="1.5" marker-end="url(#arrowred)"/>
+      <text x="248" y="237" text-anchor="end" font-size="9" fill="#ff453a" font-weight="700">JAW</text>
+      <text x="248" y="249" text-anchor="end" font-size="9" fill="#ff453a" font-weight="700">GAP</text>
+      <text x="248" y="261" text-anchor="end" font-size="9" fill="#ff453a">~5mm</text>
+      <text x="248" y="273" text-anchor="end" font-size="8" fill="#636366">(book cover</text>
+      <text x="248" y="283" text-anchor="end" font-size="8" fill="#636366"> sits here)</text>
+
+      <!-- Dashed marker: book front face (key reference line) -->
+      <line x1="260" y1="165" x2="260" y2="340" stroke="#636366" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="264" y="163" font-size="8" fill="#636366">book front face</text>
+      <text x="264" y="173" font-size="8" fill="#636366">(= device back face)</text>
+
+      <!-- Axis labels -->
+      <text x="180" y="430" text-anchor="middle" font-size="9" fill="#8e8e93" font-style="italic">← front of book (reader side)</text>
+      <text x="390" y="430" text-anchor="middle" font-size="9" fill="#8e8e93" font-style="italic">back / spine →</text>
+      <line x1="140" y1="422" x2="500" y2="422" stroke="#d1d1d6" stroke-width="0.8"/>
+      <text x="70"  y="18"  font-size="9" fill="#636366">↑ up</text>
+      <text x="70"  y="422" font-size="9" fill="#636366">↓ down</text>
+      <line x1="80" y1="25" x2="80" y2="415" stroke="#d1d1d6" stroke-width="0.8"/>
+
+      <!-- View label -->
+      <text x="300" y="18" text-anchor="middle" font-size="10" fill="#636366" font-weight="600"
+            letter-spacing="0.5">SIDE CROSS-SECTION — looking from right edge of book</text>
+
+      <!-- Arrow markers -->
+      <defs>
+        <marker id="arrowred" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#ff453a"/>
+        </marker>
+      </defs>
+    </svg>
+
+    <!-- TEXT EXPLANATION -->
+    <div style="max-width:280px; padding-top:30px">
+      <h2 style="font-size:14px;font-weight:700;margin-bottom:14px;">The three parts</h2>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="border-left:4px solid #2d5a27;padding-left:12px">
+          <p style="font-size:13px;font-weight:700;color:#2d5a27;margin-bottom:4px;">Upper jaw (green)</p>
+          <p style="font-size:12px;line-height:1.6;color:#444">A flat tab that reaches OVER the top of the book and rests on the top surface. Like the top arm of a binder clip. 11mm long, 3mm thick. Printed in PETG.</p>
+        </div>
+        <div style="border-left:4px solid #1d4a18;padding-left:12px">
+          <p style="font-size:13px;font-weight:700;color:#1d4a18;margin-bottom:4px;">Spring / hinge (dark green arch)</p>
+          <p style="font-size:12px;line-height:1.6;color:#444">The curved PETG wall that connects the upper jaw to the device body at the back. Its natural springiness (1.2mm wall thickness in PETG) keeps the jaws pressed together. No metal spring needed.</p>
+        </div>
+        <div style="border-left:4px solid #1a1a1e;padding-left:12px">
+          <p style="font-size:13px;font-weight:700;margin-bottom:4px;">Device body = lower jaw (black)</p>
+          <p style="font-size:12px;line-height:1.6;color:#444">The device body itself acts as the lower jaw. A thin clamping lip at the top presses against the book front cover from the front. The rest of the device hangs below — button, LED, and speaker all face the reader.</p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:20px">
+        <strong>The key insight</strong>
+        The jaw gap is the space between the upper jaw's bottom and the device body's top clamping face. The book's front cover board (~5mm) slides into this gap. PETG spring pressure holds it snugly. When the child clips it on, she just hooks the upper jaw tab over the top edge of the book — identical to clipping on a reading light.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 2: HOW TO CLIP ON (3-step sequence)
+     ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">2 — How to clip on: step by step</div>
+  <div style="display:flex;gap:32px;align-items:flex-start">
+
+    <!-- STEP 1: Approaching -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+      <svg width="160" height="240" style="display:block">
+        <!-- Book (front face, slightly angled) -->
+        <rect x="40" y="60" width="100" height="160" rx="4" fill="#8B6914" opacity="0.9"/>
+        <rect x="36" y="56" width="108" height="8" rx="3" fill="#6b5015"/>
+        <!-- Book top edge label -->
+        <text x="90" y="52" text-anchor="middle" font-size="8" fill="#6b5015" font-weight="600">book top edge</text>
+        <!-- Device (hovering above book) -->
+        <rect x="50" y="2" width="60" height="48" rx="6" fill="#1a1a1e"/>
+        <!-- Upper jaw extending right -->
+        <rect x="104" y="8" width="30" height="12" rx="3" fill="#2d5a27"/>
+        <!-- Gap between device and book top -->
+        <line x1="50" y1="50" x2="110" y2="50" stroke="#ff453a" stroke-width="1" stroke-dasharray="3 2"/>
+        <!-- Button on device -->
+        <rect x="56" y="10" width="22" height="22" rx="5" fill="#0a84ff"/>
+        <!-- Arrow down -->
+        <text x="90" y="80" text-anchor="middle" font-size="22" fill="#0a84ff" opacity="0.8">↓</text>
+        <text x="90" y="100" text-anchor="middle" font-size="8" fill="#636366">lower device toward</text>
+        <text x="90" y="112" text-anchor="middle" font-size="8" fill="#636366">top edge of book</text>
+      </svg>
+      <div style="background:#e8e8e2;border-radius:4px;padding:8px 14px;text-align:center">
+        <p style="font-size:11px;font-weight:700;color:#1c1c1e">Step 1</p>
+        <p style="font-size:11px;color:#636366;margin-top:2px">Hold device above<br>the book's top-right corner</p>
+      </div>
+    </div>
+
+    <!-- STEP 2: Hooking over -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+      <svg width="160" height="240" style="display:block">
+        <!-- Book -->
+        <rect x="30" y="40" width="100" height="180" rx="4" fill="#8B6914" opacity="0.9"/>
+        <rect x="26" y="36" width="108" height="8" rx="3" fill="#6b5015"/>
+        <!-- Device being pushed down (overlapping with book top) -->
+        <rect x="40" y="10" width="60" height="50" rx="6" fill="#1a1a1e"/>
+        <!-- Upper jaw tab sliding OVER book top -->
+        <rect x="94" y="16" width="40" height="12" rx="3" fill="#2d5a27"/>
+        <!-- Upper jaw is now over book top surface -->
+        <rect x="94" y="36" width="40" height="10" rx="2" fill="#2d5a27" opacity="0.6"/>
+        <!-- Gap fill showing book top entering the jaw -->
+        <rect x="94" y="28" width="40" height="8" fill="#8B6914" opacity="0.5"/>
+        <!-- Arrow showing motion -->
+        <path d="M 75 0 Q 100 20 94 36" stroke="#0a84ff" stroke-width="2" fill="none"
+              marker-end="url(#arrowblue)"/>
+        <!-- Button -->
+        <rect x="46" y="18" width="22" height="22" rx="5" fill="#0a84ff"/>
+        <!-- Squeeze arrow hint -->
+        <text x="20" y="25" font-size="14" fill="#2d5a27">→</text>
+        <text x="142" y="45" font-size="14" fill="#2d5a27">←</text>
+        <text x="80" y="130" text-anchor="middle" font-size="8" fill="#636366">upper jaw slides over</text>
+        <text x="80" y="142" text-anchor="middle" font-size="8" fill="#636366">the book top edge</text>
+
+        <defs>
+          <marker id="arrowblue" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#0a84ff"/>
+          </marker>
+        </defs>
+      </svg>
+      <div style="background:#e8e8e2;border-radius:4px;padding:8px 14px;text-align:center">
+        <p style="font-size:11px;font-weight:700;color:#1c1c1e">Step 2</p>
+        <p style="font-size:11px;color:#636366;margin-top:2px">Hook upper jaw over the<br>book's top edge. PETG flexes<br>open to accept the cover.</p>
+      </div>
+    </div>
+
+    <!-- STEP 3: Clipped on, reading -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+      <svg width="160" height="240" style="display:block">
+        <!-- Book (open, both pages) -->
+        <rect x="5"  y="30" width="70"  height="195" rx="3" fill="#faf9f6" stroke="#d1c9b8" stroke-width="1"/>
+        <rect x="78" y="30" width="70"  height="195" rx="3" fill="#faf9f6" stroke="#d1c9b8" stroke-width="1"/>
+        <rect x="72" y="30" width="8"   height="195"        fill="#8B6914"/>
+        <rect x="3"  y="26" width="150" height="8"   rx="3" fill="#6b5015"/>
+        <!-- Text lines on right page -->
+        <g fill="#d1c9b8">
+          <rect x="83" y="50" width="58" height="3" rx="1"/>
+          <rect x="83" y="58" width="52" height="3" rx="1"/>
+          <!-- Highlighted word -->
+          <rect x="83" y="66" width="30" height="3" rx="1" fill="#ffd60a" opacity="0.7"/>
+          <rect x="116" y="66" width="24" height="3" rx="1"/>
+          <rect x="83" y="74" width="58" height="3" rx="1"/>
+          <rect x="83" y="82" width="44" height="3" rx="1"/>
+        </g>
+        <!-- Device clipped to top-right of book -->
+        <rect x="100" y="34" width="50" height="95" rx="5" fill="#1a1a1e"/>
+        <!-- Upper jaw gripping book top (above book top line y=30) -->
+        <rect x="108" y="20" width="40" height="12" rx="3" fill="#2d5a27"/>
+        <!-- Device clamping lip -->
+        <rect x="100" y="31" width="50" height="8" rx="2" fill="#2c2c2c"/>
+        <!-- Button -->
+        <rect x="106" y="44" width="18" height="18" rx="4" fill="#0a84ff"/>
+        <!-- LED -->
+        <circle cx="137" cy="53" r="9" fill="none" stroke="#ffd60a" stroke-width="2"/>
+        <!-- Speaker -->
+        <rect x="106" y="74" width="38" height="20" rx="3" fill="#111113"/>
+        <circle cx="113" cy="80" r="1.5" fill="#2a2a2d"/>
+        <circle cx="119" cy="80" r="1.5" fill="#2a2a2d"/>
+        <circle cx="125" cy="80" r="1.5" fill="#2a2a2d"/>
+        <circle cx="113" cy="87" r="1.5" fill="#2a2a2d"/>
+        <circle cx="119" cy="87" r="1.5" fill="#2a2a2d"/>
+        <circle cx="125" cy="87" r="1.5" fill="#2a2a2d"/>
+        <!-- Thumb reaching for button -->
+        <ellipse cx="90" cy="53" rx="12" ry="9" fill="#f5d5b8" opacity="0.9"/>
+        <ellipse cx="86" cy="53" rx="8"  ry="7" fill="#eba882" opacity="0.7"/>
+        <!-- Reach arrow -->
+        <line x1="96" y1="53" x2="104" y2="53" stroke="#0a84ff" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <!-- Reading label -->
+        <text x="40" y="110" text-anchor="middle" font-size="7" fill="#1c1c1e" font-weight="600">child</text>
+        <text x="40" y="121" text-anchor="middle" font-size="7" fill="#1c1c1e" font-weight="600">reads here</text>
+      </svg>
+      <div style="background:#d4edda;border:1px solid #2d5a27;border-radius:4px;padding:8px 14px;text-align:center">
+        <p style="font-size:11px;font-weight:700;color:#2d5a27">Step 3 — Done</p>
+        <p style="font-size:11px;color:#444;margin-top:2px">Device hangs on front of book,<br>always accessible. Child reads<br>normally, button within thumb reach.</p>
+      </div>
+    </div>
+
+    <!-- Notes column -->
+    <div style="max-width:220px;padding-top:8px">
+      <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;">Clip-on feels like...</h3>
+      <p style="font-size:12px;line-height:1.7;color:#444">The same motion as clipping a reading light onto a page or putting a chip clip on a bag. Hook the tab over the edge, let go. The PETG spring does the work.</p>
+
+      <div class="note">
+        <strong style="display:block;margin-bottom:4px;">For a 6-year-old:</strong>
+        The child will hold the book with both hands. The device clips to the top-right corner. When she hits a word, her right thumb reaches the button without moving the book. She presses and holds, speaks the word, releases — Lexie responds.
+      </div>
+
+      <div class="note" style="margin-top:10px">
+        <strong style="display:block;margin-bottom:4px;">Left-handed version:</strong>
+        Clip to top-left corner instead. Same device, same clip — just mirrored orientation.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 3: PETG SPRING DIMENSIONS
+     ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">3 — PETG spring: dimensions for 3D printing</div>
+  <div class="row">
+
+    <!-- SPRING CLOSE-UP SVG -->
+    <svg width="420" height="300" style="display:block;overflow:visible">
+
+      <!-- Spring detail: zoomed cross-section of just the hinge area, scale ~15px/mm -->
+
+      <!-- Upper jaw (top plate) -->
+      <rect x="220" y="80" width="140" height="40" rx="4" fill="#2d5a27" opacity="0.9"/>
+      <text x="290" y="105" text-anchor="middle" font-size="9" fill="white" font-weight="600">Upper jaw</text>
+      <!-- Dimension: jaw thickness -->
+      <line x1="368" y1="80" x2="390" y2="80" stroke="#636366" stroke-width="0.8"/>
+      <line x1="368" y1="120" x2="390" y2="120" stroke="#636366" stroke-width="0.8"/>
+      <line x1="378" y1="80" x2="378" y2="120" stroke="#636366" stroke-width="0.8"/>
+      <text x="395" y="104" font-size="9" fill="#636366">3mm</text>
+
+      <!-- Jaw overhang dimension -->
+      <line x1="220" y1="68" x2="360" y2="68" stroke="#636366" stroke-width="0.8"/>
+      <line x1="220" y1="63" x2="220" y2="73" stroke="#636366" stroke-width="0.8"/>
+      <line x1="360" y1="63" x2="360" y2="73" stroke="#636366" stroke-width="0.8"/>
+      <text x="290" y="62" text-anchor="middle" font-size="9" fill="#636366">11mm overhang over book</text>
+
+      <!-- Spring wall (arch) -->
+      <path d="M 218 122   Q 180 195   218 225
+               L 230 225   Q 195 195   230 122  Z"
+            fill="#1d4a18" opacity="0.95"/>
+
+      <!-- Spring wall thickness dimension -->
+      <line x1="175" y1="172" x2="145" y2="172" stroke="#636366" stroke-width="0.8"/>
+      <text x="100" y="176" font-size="9" fill="#636366">1.2mm wall</text>
+      <text x="100" y="188" font-size="9" fill="#636366">(PETG flex zone)</text>
+
+      <!-- Spring inner radius -->
+      <path d="M 218 122 Q 182 195 218 225" stroke="#636366" stroke-width="0.8" fill="none" stroke-dasharray="3 2"/>
+      <line x1="218" y1="175" x2="197" y2="175" stroke="#636366" stroke-width="0.8"/>
+      <text x="100" y="212" font-size="9" fill="#636366">Inner radius ~6mm</text>
+      <text x="100" y="224" font-size="9" fill="#636366">(tighter = stiffer grip)</text>
+
+      <!-- Jaw gap (where book goes) -->
+      <line x1="218" y1="120" x2="218" y2="228" stroke="#ff453a" stroke-width="1.5" stroke-dasharray="2 2"/>
+      <rect x="138" y="120" width="82" height="108" fill="#8B6914" opacity="0.15"/>
+      <text x="180" y="174" text-anchor="middle" font-size="9" fill="#8B6914" font-weight="700">← book</text>
+      <text x="180" y="186" text-anchor="middle" font-size="9" fill="#8B6914">sits here</text>
+
+      <!-- Gap dimension -->
+      <line x1="218" y1="120" x2="218" y2="228" stroke="none"/>
+      <line x1="130" y1="120" x2="218" y2="120" stroke="#ff453a" stroke-width="0.8"/>
+      <line x1="130" y1="228" x2="218" y2="228" stroke="#ff453a" stroke-width="0.8"/>
+      <line x1="135" y1="120" x2="135" y2="228" stroke="#ff453a" stroke-width="0.8"/>
+      <text x="128" y="178" text-anchor="end" font-size="9" fill="#ff453a" font-weight="700">Gap:</text>
+      <text x="128" y="190" text-anchor="end" font-size="9" fill="#ff453a">7mm</text>
+      <text x="128" y="202" text-anchor="end" font-size="8" fill="#636366">(resting)</text>
+      <text x="128" y="214" text-anchor="end" font-size="8" fill="#636366">4–8mm range</text>
+      <text x="128" y="226" text-anchor="end" font-size="8" fill="#636366">covers all books</text>
+
+      <!-- Device top clamping lip -->
+      <rect x="138" y="228" width="82" height="18" rx="2 0 0 2" fill="#2c2c2c"/>
+      <text x="178" y="241" text-anchor="middle" font-size="8" fill="#aaa">clamping lip</text>
+
+      <!-- Device body below -->
+      <rect x="138" y="246" width="82" height="40" rx="0 0 3 3" fill="#1a1a1e"/>
+      <text x="178" y="272" text-anchor="middle" font-size="8" fill="#636366">device body continues…</text>
+
+      <!-- View label -->
+      <text x="210" y="20" text-anchor="middle" font-size="10" fill="#636366"
+            font-weight="600" letter-spacing="0.4">PETG SPRING — zoomed cross-section (×2 scale)</text>
+    </svg>
+
+    <!-- Specs table + notes -->
+    <div style="max-width:280px">
+      <h2 style="font-size:13px;font-weight:700;margin-bottom:12px;">Spring dimensions for TinkerCAD</h2>
+
+      <table>
+        <thead><tr><th>Feature</th><th>Dimension</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Upper jaw length</td><td>11mm</td><td>Enough to grip book top without visible overhang</td></tr>
+          <tr><td>Upper jaw thickness</td><td>3mm</td><td>Rigid enough not to flex, thin enough to fit</td></tr>
+          <tr><td>Spring wall thickness</td><td>1.2mm</td><td>PETG at 1.2mm flexes ~3mm without cracking</td></tr>
+          <tr><td>Spring inner radius</td><td>6mm</td><td>Tighter = stiffer grip. 6mm works for most books.</td></tr>
+          <tr><td>Jaw gap (resting)</td><td>7mm</td><td>Accepts 4–8mm book covers with spring pressure</td></tr>
+          <tr><td>Clamping lip thickness</td><td>2mm</td><td>Thin edge pressing against front cover</td></tr>
+          <tr><td>Device depth</td><td>12mm</td><td>Houses XIAO + mic + amp side by side</td></tr>
+          <tr><td>Print material</td><td>PETG</td><td>More flex than PLA before breaking; no metal spring</td></tr>
+          <tr><td>Spring wall infill</td><td>3 perimeters, 0% infill</td><td>Pure perimeter walls = maximum flex</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top:16px">
+        <strong>TinkerCAD tip</strong>
+        Model the clip as a single solid shape: start with the device body box, then add the upper jaw box extending from the back-top edge, then add the curved spring connecting their rear faces. Use the "hole" tool to create the jaw gap. Export as STL and print the spring wall at 0.2mm layer height for best flex.
+      </div>
+
+      <div class="note" style="margin-top:10px">
+        <strong>Test before ordering:</strong> Cut the clip profile from 1.5mm cardboard first. Clip it to the actual book your daughter is reading. Check the gap is right for that book's cover. Then adjust jaw gap in TinkerCAD before sending to print service.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 4: WHAT THE CHILD SEES DURING READING
+     ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">4 — Child's view: device on book during reading</div>
+  <svg width="540" height="300" style="display:block">
+
+    <!-- ── OPEN BOOK (front view, looking straight at it) ── -->
+    <!-- Spine -->
+    <rect x="258" y="20" width="10" height="260" rx="2" fill="#8B6914"/>
+    <!-- Left page -->
+    <rect x="50"  y="20" width="208" height="260" rx="4 0 0 4" fill="#faf9f6" stroke="#d1c9b8" stroke-width="1"/>
+    <!-- Right page -->
+    <rect x="268" y="20" width="208" height="260" rx="0 4 4 0" fill="#faf9f6" stroke="#d1c9b8" stroke-width="1"/>
+    <!-- Top cover edge -->
+    <rect x="48"  y="14" width="420" height="8"  rx="3" fill="#6b5015"/>
+    <!-- Bottom cover edge -->
+    <rect x="48"  y="276" width="420" height="8" rx="3" fill="#6b5015"/>
+
+    <!-- Text lines left page -->
+    <g fill="#c5bfb0">
+      <rect x="65"  y="40"  width="175" height="4" rx="1"/>
+      <rect x="65"  y="50"  width="160" height="4" rx="1"/>
+      <rect x="65"  y="60"  width="180" height="4" rx="1"/>
+      <rect x="65"  y="70"  width="145" height="4" rx="1"/>
+      <rect x="65"  y="80"  width="175" height="4" rx="1"/>
+      <rect x="65"  y="100" width="180" height="4" rx="1"/>
+      <rect x="65"  y="110" width="155" height="4" rx="1"/>
+      <rect x="65"  y="120" width="175" height="4" rx="1"/>
+      <rect x="65"  y="130" width="140" height="4" rx="1"/>
+    </g>
+    <!-- Text lines right page -->
+    <g fill="#c5bfb0">
+      <rect x="283" y="40"  width="175" height="4" rx="1"/>
+      <rect x="283" y="50"  width="158" height="4" rx="1"/>
+      <rect x="283" y="60"  width="180" height="4" rx="1"/>
+      <!-- Highlighted word on right page -->
+      <rect x="283" y="70"  width="62"  height="4" rx="1" fill="#ffd60a" opacity="0.7"/>
+      <rect x="350" y="70"  width="90"  height="4" rx="1"/>
+      <rect x="283" y="80"  width="175" height="4" rx="1"/>
+      <rect x="283" y="100" width="165" height="4" rx="1"/>
+      <rect x="283" y="110" width="155" height="4" rx="1"/>
+      <rect x="283" y="120" width="178" height="4" rx="1"/>
+    </g>
+    <!-- Highlighted word callout -->
+    <text x="314" y="66" font-size="8" fill="#b28900" font-weight="600">"sorcerer" — unfamiliar word</text>
+
+    <!-- ── LEXIE DEVICE clipped to top-right ── -->
+    <!-- Upper jaw (on top of book) - visible as a flat strip along the top -->
+    <rect x="400" y="6" width="70" height="10" rx="3" fill="#2d5a27"/>
+    <!-- Device body hanging down the front-right -->
+    <rect x="400" y="14" width="70" height="200" rx="0 0 8 8" fill="#1a1a1e"/>
+    <!-- Clamping lip (where device back meets book front) -->
+    <rect x="400" y="14" width="4"  height="200" fill="#2c2c2c"/>
+    <!-- Button -->
+    <rect x="408" y="28" width="28" height="28" rx="7" fill="#0a84ff"/>
+    <text x="422" y="45" text-anchor="middle" font-size="7" fill="white" font-weight="700">BTN</text>
+    <!-- LED ring -->
+    <circle cx="448" cy="42" r="15" fill="none" stroke="#ffd60a" stroke-width="2.5"/>
+    <!-- LED ring dots -->
+    <circle cx="448" cy="27" r="2.5" fill="#ffd60a" opacity="0.6"/>
+    <circle cx="463" cy="31" r="2.5" fill="#ffd60a" opacity="0.6"/>
+    <circle cx="463" cy="53" r="2.5" fill="#ffd60a" opacity="0.6"/>
+    <circle cx="448" cy="57" r="2.5" fill="#ffd60a" opacity="0.6"/>
+    <circle cx="433" cy="53" r="2.5" fill="#ffd60a" opacity="0.6"/>
+    <circle cx="433" cy="31" r="2.5" fill="#ffd60a" opacity="0.6"/>
+    <!-- Speaker -->
+    <rect x="408" y="80"  width="54" height="45" rx="5" fill="#111113"/>
+    <g fill="#2a2a2d">
+      <circle cx="420" cy="92" r="2.5"/> <circle cx="432" cy="92" r="2.5"/>
+      <circle cx="444" cy="92" r="2.5"/> <circle cx="456" cy="92" r="2.5"/>
+      <circle cx="420" cy="103" r="2.5"/><circle cx="432" cy="103" r="2.5"/>
+      <circle cx="444" cy="103" r="2.5"/><circle cx="456" cy="103" r="2.5"/>
+      <circle cx="420" cy="114" r="2.5"/><circle cx="432" cy="114" r="2.5"/>
+      <circle cx="444" cy="114" r="2.5"/><circle cx="456" cy="114" r="2.5"/>
+    </g>
+    <!-- LEXIE text -->
+    <text x="435" y="175" text-anchor="middle" font-size="7" fill="#3a3a3c" letter-spacing="3">LEXIE</text>
+    <!-- USB-C -->
+    <rect x="423" y="210" width="18" height="4" rx="2" fill="#f5f4f0"/>
+
+    <!-- Child's thumb reaching button -->
+    <ellipse cx="387" cy="42" rx="16" ry="12" fill="#f5d5b8" opacity="0.9"/>
+    <ellipse cx="383" cy="42" rx="11" ry="9"  fill="#eba882" opacity="0.7"/>
+    <!-- Reach arrow -->
+    <line x1="396" y1="42" x2="406" y2="42" stroke="#0a84ff" stroke-width="2" stroke-dasharray="3 2"
+          marker-end="url(#arrowblue2)"/>
+
+    <!-- Labels -->
+    <text x="154" y="290" text-anchor="middle" font-size="9" fill="#636366">Left page — reading done</text>
+    <text x="355" y="290" text-anchor="middle" font-size="9" fill="#636366">Right page — currently reading</text>
+    <text x="435" y="245" text-anchor="middle" font-size="8" fill="#636366">Lexie device</text>
+    <text x="435" y="257" text-anchor="middle" font-size="8" fill="#636366">(top-right clip)</text>
+    <text x="370" y="60"  text-anchor="middle" font-size="9" fill="#0a84ff">← child's thumb</text>
+
+    <!-- Truthful: device overlaps right page — show obstruction zone -->
+    <rect x="400" y="20" width="70" height="240" fill="#ff453a" opacity="0.12"/>
+    <text x="435" y="230" text-anchor="middle" font-size="8" fill="#c41e3a" font-weight="600">obstructed strip</text>
+    <text x="435" y="242" text-anchor="middle" font-size="7" fill="#636366">(~55–70 mm from outer edge)</text>
+
+    <defs>
+      <marker id="arrowblue2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6 Z" fill="#0a84ff"/>
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 5 — VIEW OBSTRUCTION (honest) + alternatives
+     ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">5 — Does Lexie block the text? (honest answer)</div>
+
+  <p style="font-size:14px;line-height:1.75;max-width:720px;margin-bottom:20px">
+    <strong>Yes, a little, if the body hangs on the page.</strong>
+    With a top-edge clip and the device hanging down the <em>front</em> of the right page, the Lexie body covers a <strong>narrow vertical strip</strong> along the outer margin (roughly the width of the device: ~55–70&nbsp;mm). Lines of text that run into that strip are partly hidden. The left page is clear. Section&nbsp;4 above now shows that strip in light red so you can see exactly what is covered.
+  </p>
+
+  <div class="row" style="align-items:flex-start">
+
+    <!-- Comparison SVG: two mini books side by side -->
+    <svg width="520" height="220" style="display:block;overflow:visible">
+
+      <!-- LEFT: Top-right clip — obstruction -->
+      <text x="130" y="18" text-anchor="middle" font-size="10" fill="#636366" font-weight="600">A — Top-right body on page</text>
+
+      <rect x="20" y="30" width="100" height="170" rx="3" fill="#faf9f6" stroke="#d1c9b8"/>
+      <rect x="122" y="30" width="100" height="170" rx="3" fill="#faf9f6" stroke="#d1c9b8"/>
+      <rect x="116" y="30" width="8" height="170" fill="#8B6914"/>
+      <!-- Text lines on right page -->
+      <g fill="#c5bfb0">
+        <rect x="128" y="45" width="88" height="3" rx="1"/>
+        <rect x="128" y="54" width="82" height="3" rx="1"/>
+        <rect x="128" y="63" width="90" height="3" rx="1"/>
+        <rect x="128" y="72" width="75" height="3" rx="1"/>
+        <rect x="128" y="81" width="88" height="3" rx="1"/>
+      </g>
+      <!-- Obstruction overlay -->
+      <rect x="168" y="30" width="54" height="170" fill="#ff453a" opacity="0.18"/>
+      <!-- Device on top-right -->
+      <rect x="168" y="26" width="54" height="120" rx="4" fill="#1a1a1e"/>
+      <rect x="176" y="38" width="18" height="18" rx="4" fill="#0a84ff"/>
+      <text x="130" y="208" text-anchor="middle" font-size="8" fill="#c41e3a" font-weight="600">Strip covered</text>
+
+      <!-- RIGHT: Right-edge clip — no page overlap -->
+      <text x="390" y="18" text-anchor="middle" font-size="10" fill="#636366" font-weight="600">B — Right-edge clip (alternative)</text>
+
+      <rect x="280" y="30" width="100" height="170" rx="3" fill="#faf9f6" stroke="#d1c9b8"/>
+      <rect x="382" y="30" width="100" height="170" rx="3" fill="#faf9f6" stroke="#d1c9b8"/>
+      <rect x="374" y="30" width="10" height="170" fill="#8B6914"/>
+      <g fill="#c5bfb0">
+        <rect x="288" y="45" width="88" height="3" rx="1"/>
+        <rect x="288" y="54" width="82" height="3" rx="1"/>
+        <rect x="390" y="45" width="88" height="3" rx="1"/>
+        <rect x="390" y="54" width="82" height="3" rx="1"/>
+        <rect x="390" y="63" width="90" height="3" rx="1"/>
+        <rect x="390" y="72" width="75" height="3" rx="1"/>
+      </g>
+      <!-- Device OUTSIDE page, to the right of page block -->
+      <rect x="484" y="40" width="28" height="140" rx="4" fill="#1a1a1e"/>
+      <rect x="488" y="52" width="20" height="20" rx="4" fill="#0a84ff"/>
+      <circle cx="498" cy="95" r="10" fill="none" stroke="#ffd60a" stroke-width="1.5"/>
+      <!-- Jaw gripping right edge of pages -->
+      <rect x="478" y="70" width="10" height="50" rx="2" fill="#2d5a27"/>
+      <text x="390" y="208" text-anchor="middle" font-size="8" fill="#2d5a27" font-weight="600">No text covered</text>
+      <text x="390" y="220" text-anchor="middle" font-size="7" fill="#636366">Body sits past outer margin</text>
+    </svg>
+
+    <div style="max-width:340px">
+      <h2 style="font-size:13px;font-weight:700;margin-bottom:12px;">Ways to reduce obstruction</h2>
+      <table>
+        <thead><tr><th>Approach</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td>Narrower device width</td><td>Thinner strip on page (trade: harder to fit electronics)</td></tr>
+          <tr><td>Clip as far right as possible</td><td>Uses more of the printed margin; less overlap with body text on many books</td></tr>
+          <tr><td>Right-edge jaw (diagram B)</td><td><strong>Zero</strong> page overlap — entire body sits outside the page. Trade: device sticks out to the side; thumb reach is slightly different</td></tr>
+          <tr><td>L-bar (Section&nbsp;6)</td><td>Thin top bar + arm behind book — <strong>near-zero</strong> text obstruction; harder CAD / wire routing</td></tr>
+          <tr><td>Slide Lexie between uses</td><td>Clip only when a word comes up; rest of the time it sits on the table — not ideal for flow</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top:16px">
+        <strong>Practical recommendation</strong>
+        For v1, pick one: accept a ~55&nbsp;mm margin strip on the right page, use a <strong>right-edge clip</strong> (zero overlap), or move to the <strong>L-bar</strong> layout in Section&nbsp;6 — thin bar on top only; heavy parts behind the book.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 6 — L-BAR LAYOUT (zero page obstruction)
+     ══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">6 — L-bar layout (thin top bar + arm behind book)</div>
+
+  <p style="font-size:14px;line-height:1.75;max-width:860px;margin-bottom:24px">
+    The <strong>L-bar</strong> splits Lexie into two limbs: a <strong>thin horizontal bar</strong> that sits along the <strong>top edge</strong> of the open book (clip + mic + small controls), and a <strong>vertical arm</strong> that folds <strong>behind</strong> the book (battery, XIAO, amp). The <strong>speaker</strong> lives on the <strong>inner face</strong> of that arm (the side facing the child) so sound fires toward the reader, not into the cover. The reading surface stays almost completely clear — only a shallow strip along the very top margin is “used” by the bar.
+  </p>
+
+  <div class="row" style="gap:40px">
+
+    <!-- ── VIEW 6A: Child front (open book) ── -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <p style="font-size:11px;font-weight:700;color:#636366;letter-spacing:0.8px">6A — What the child sees (front)</p>
+      <svg width="380" height="300" style="display:block">
+
+        <!-- Open book -->
+        <rect x="30" y="70" width="150" height="210" rx="4" fill="#faf9f6" stroke="#d1c9b8"/>
+        <rect x="182" y="70" width="150" height="210" rx="4" fill="#faf9f6" stroke="#d1c9b8"/>
+        <rect x="176" y="70" width="10" height="210" fill="#8B6914"/>
+        <!-- Top cover strip -->
+        <rect x="28" y="64" width="306" height="10" rx="3" fill="#6b5015"/>
+
+        <!-- Text on pages (lots of lines) -->
+        <g fill="#c5bfb0">
+          <rect x="42" y="88" width="126" height="3" rx="1"/><rect x="42" y="98" width="118" height="3" rx="1"/>
+          <rect x="42" y="108" width="130" height="3" rx="1"/><rect x="42" y="118" width="105" height="3" rx="1"/>
+          <rect x="42" y="128" width="126" height="3" rx="1"/><rect x="42" y="148" width="120" height="3" rx="1"/>
+          <rect x="42" y="158" width="132" height="3" rx="1"/><rect x="42" y="168" width="100" height="3" rx="1"/>
+          <rect x="42" y="178" width="126" height="3" rx="1"/><rect x="42" y="198" width="115" height="3" rx="1"/>
+          <rect x="42" y="208" width="128" height="3" rx="1"/><rect x="42" y="218" width="108" height="3" rx="1"/>
+          <rect x="42" y="228" width="126" height="3" rx="1"/><rect x="42" y="248" width="122" height="3" rx="1"/>
+          <rect x="42" y="258" width="118" height="3" rx="1"/>
+        </g>
+        <g fill="#c5bfb0">
+          <rect x="194" y="88" width="126" height="3" rx="1"/><rect x="194" y="98" width="120" height="3" rx="1"/>
+          <rect x="194" y="108" width="130" height="3" rx="1"/><rect x="194" y="118" width="95" height="3" rx="1"/>
+          <rect x="194" y="128" width="126" height="3" rx="1"/><rect x="194" y="148" width="128" height="3" rx="1"/>
+          <rect x="194" y="158" width="110" height="3" rx="1"/><rect x="194" y="168" width="126" height="3" rx="1"/>
+          <rect x="194" y="178" width="100" height="3" rx="1"/><rect x="194" y="198" width="126" height="3" rx="1"/>
+          <rect x="194" y="208" width="118" height="3" rx="1"/><rect x="194" y="218" width="126" height="3" rx="1"/>
+          <rect x="194" y="228" width="105" height="3" rx="1"/><rect x="194" y="248" width="126" height="3" rx="1"/>
+          <rect x="194" y="258" width="115" height="3" rx="1"/>
+        </g>
+
+        <!-- L-BAR horizontal limb (thin) — sits on top of spread, ~6mm tall visually = 18px -->
+        <rect x="32" y="52" width="298" height="18" rx="3" fill="#2c2c2e" stroke="#1a1a1e" stroke-width="1"/>
+        <!-- Mic holes along bar -->
+        <circle cx="100" cy="61" r="2" fill="#1a1a1e"/><circle cx="120" cy="61" r="2" fill="#1a1a1e"/>
+        <circle cx="140" cy="61" r="2" fill="#1a1a1e"/><circle cx="160" cy="61" r="2" fill="#1a1a1e"/>
+        <circle cx="200" cy="61" r="2" fill="#1a1a1e"/><circle cx="220" cy="61" r="2" fill="#1a1a1e"/>
+        <circle cx="240" cy="61" r="2" fill="#1a1a1e"/><circle cx="260" cy="61" r="2" fill="#1a1a1e"/>
+        <text x="181" y="58" text-anchor="middle" font-size="6" fill="#8e8e93">mic holes</text>
+        <!-- Button + LED on outer corner of bar -->
+        <rect x="300" y="54" width="22" height="14" rx="3" fill="#0a84ff"/>
+        <circle cx="292" cy="61" r="5" fill="none" stroke="#ffd60a" stroke-width="1.5"/>
+        <circle cx="292" cy="61" r="1.5" fill="#ffd60a"/>
+
+        <!-- Dashed: where vertical arm goes (behind plane — ghost behind right page) -->
+        <rect x="308" y="88" width="18" height="175" fill="#1a1a1e" opacity="0.12" stroke="#636366" stroke-width="1" stroke-dasharray="4 3"/>
+        <text x="317" y="180" text-anchor="middle" font-size="7" fill="#636366" transform="rotate(-90,317,180)">arm behind book</text>
+
+        <!-- Top margin strip (only zone touched) -->
+        <rect x="32" y="70" width="298" height="14" fill="#0a84ff" opacity="0.08"/>
+        <text x="181" y="81" text-anchor="middle" font-size="7" fill="#0a84ff" font-weight="600">~6–8 mm top margin only</text>
+
+        <text x="190" y="22" text-anchor="middle" font-size="10" fill="#1c1c1e" font-weight="600">L-bar — front view</text>
+        <text x="190" y="36" text-anchor="middle" font-size="8" fill="#636366">Thin bar on top · full text area clear below</text>
+      </svg>
+    </div>
+
+    <!-- ── VIEW 6B: Side cross-section ── -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <p style="font-size:11px;font-weight:700;color:#636366;letter-spacing:0.8px">6B — Side cross-section (from reader’s right)</p>
+      <svg width="320" height="300" style="display:block">
+
+        <text x="160" y="16" text-anchor="middle" font-size="10" fill="#1c1c1e" font-weight="600">L-bar — side schematic</text>
+        <text x="160" y="30" text-anchor="middle" font-size="8" fill="#636366">← reader · book edge-on →</text>
+
+        <!-- Reader arrow -->
+        <text x="18" y="150" text-anchor="middle" font-size="8" fill="#0a84ff" transform="rotate(-90,18,150)">reader</text>
+
+        <!-- Book block: front cover, pages, back cover -->
+        <!-- Front cover (toward reader, left) -->
+        <rect x="70" y="100" width="8" height="160" fill="#8B6914" opacity="0.9"/>
+        <!-- Page block -->
+        <rect x="78" y="100" width="35" height="160" fill="#f0ebe3" stroke="#d8d0c4"/>
+        <!-- Back cover -->
+        <rect x="113" y="100" width="6" height="160" fill="#6b5015"/>
+
+        <!-- Top bar on top of book -->
+        <rect x="65" y="88" width="58" height="14" rx="2" fill="#2c2c2e"/>
+        <!-- Spring jaw under bar (simplified) -->
+        <path d="M 65 102 L 65 108 Q 70 112 78 108 L 78 100" fill="#2d5a27" opacity="0.8"/>
+
+        <!-- Elbow -->
+        <path d="M 115 88 L 123 88 L 123 95 Q 125 100 128 105" fill="none" stroke="#1a1a1e" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- Vertical arm BEHIND back cover (extends to the right of back cover in this view = away from reader) -->
+        <rect x="118" y="95" width="22" height="175" rx="3" fill="#1a1a1e"/>
+        <!-- Inner face of arm (left edge of rect = faces reader) — speaker grille -->
+        <rect x="118" y="120" width="4" height="55" rx="1" fill="#111113"/>
+        <g fill="#2a2a2d">
+          <circle cx="120" cy="130" r="1.5"/><circle cx="120" cy="138" r="1.5"/><circle cx="120" cy="146" r="1.5"/>
+          <circle cx="120" cy="154" r="1.5"/><circle cx="120" cy="162" r="1.5"/>
+        </g>
+        <text x="108" y="148" text-anchor="end" font-size="7" fill="#ffd60a" font-weight="600">speaker</text>
+        <text x="108" y="158" text-anchor="end" font-size="7" fill="#ffd60a">faces reader</text>
+
+        <!-- XIAO + battery inside arm (ghost) -->
+        <rect x="128" y="115" width="10" height="28" fill="#0a84ff" opacity="0.5"/>
+        <text x="145" y="132" font-size="6" fill="#636366">XIAO</text>
+        <rect x="128" y="175" width="10" height="45" fill="#ff453a" opacity="0.5"/>
+        <text x="145" y="200" font-size="6" fill="#636366">LiPo</text>
+
+        <!-- Labels -->
+        <text x="74" y="95" text-anchor="middle" font-size="7" fill="#636366" transform="rotate(-90,74,95)">front</text>
+        <text x="116" y="95" text-anchor="middle" font-size="7" fill="#636366">top bar</text>
+        <text x="155" y="200" font-size="8" fill="#636366">vertical arm</text>
+        <text x="155" y="212" font-size="8" fill="#636366">(behind book)</text>
+
+        <!-- Sound waves toward reader -->
+        <path d="M 70 145 Q 50 145 35 145" stroke="#ffd60a" stroke-width="1" fill="none" opacity="0.5"/>
+        <path d="M 70 135 Q 48 130 32 125" stroke="#ffd60a" stroke-width="0.8" fill="none" opacity="0.35"/>
+        <path d="M 70 155 Q 48 160 32 165" stroke="#ffd60a" stroke-width="0.8" fill="none" opacity="0.35"/>
+      </svg>
+    </div>
+
+    <!-- ── VIEW 6C: Looking at back of right page ── -->
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <p style="font-size:11px;font-weight:700;color:#636366;letter-spacing:0.8px">6C — Behind the right page (what you’d see lifting the book)</p>
+      <svg width="280" height="300" style="display:block">
+
+        <text x="140" y="16" text-anchor="middle" font-size="10" fill="#1c1c1e" font-weight="600">L-bar — rear / outer view</text>
+
+        <!-- Back of right page / cover (tan) -->
+        <rect x="40" y="40" width="200" height="240" rx="6" fill="#7d6b4d"/>
+        <!-- Vertical arm attached along outer edge -->
+        <rect x="210" y="50" width="38" height="220" rx="5" fill="#1a1a1e"/>
+        <!-- Speaker grille on arm face that points toward spine (left side of arm rect) -->
+        <rect x="210" y="90" width="6" height="70" rx="2" fill="#111113"/>
+        <g fill="#2a2a2d">
+          <circle cx="213" cy="100" r="2"/><circle cx="213" cy="110" r="2"/><circle cx="213" cy="120" r="2"/>
+          <circle cx="213" cy="130" r="2"/><circle cx="213" cy="140" r="2"/><circle cx="213" cy="150" r="2"/>
+        </g>
+        <text x="200" y="128" text-anchor="end" font-size="7" fill="#ffd60a">sound →</text>
+        <!-- USB-C on outer edge of arm -->
+        <rect x="226" y="240" width="14" height="5" rx="2" fill="#f5f4f0"/>
+        <text x="233" y="258" text-anchor="middle" font-size="6" fill="#8e8e93">USB-C</text>
+        <!-- Top bar visible from behind (sticks out top) -->
+        <rect x="160" y="32" width="100" height="14" rx="3" fill="#2c2c2c"/>
+        <text x="210" y="42" text-anchor="middle" font-size="6" fill="#8e8e93">top bar (from behind)</text>
+
+        <text x="140" y="288" text-anchor="middle" font-size="8" fill="#636366">Arm rides the outer / back edge — not on the text surface</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Specs row -->
+  <div style="margin-top:28px;max-width:900px">
+    <h2 style="font-size:13px;font-weight:700;margin-bottom:12px;">L-bar — rough mechanical targets (for CAD)</h2>
+    <table>
+      <thead><tr><th>Part</th><th>Target size</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td>Horizontal bar</td><td>~150–180 mm long × 12–16 mm wide × 6–8 mm tall</td><td>Spans open spread; holds spring clip, mic ports, LED, button at outer corner</td></tr>
+        <tr><td>Vertical arm</td><td>~140–170 mm tall × 18–25 mm wide × 12–15 mm deep</td><td>Hides behind book; XIAO, amp, battery; speaker on inner face</td></tr>
+        <tr><td>Elbow</td><td>Internal radius ~8–12 mm PETG</td><td>Routes flat flex or wires from bar to arm</td></tr>
+        <tr><td>Clip</td><td>Same PETG jaw as Section&nbsp;1–3</td><td>Jaw lives in the bar; bites top edge of cover + pages</td></tr>
+        <tr><td>Speaker aim</td><td>Grille on inner face of arm, angled slightly toward reader</td><td>Avoids firing into glued back cover only</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout" style="margin-top:18px">
+      <strong>Tradeoffs vs. simple “bookmark slab”</strong>
+      Two-part shell + elbow + wire routing through the hinge zone; print orientation matters (spring in bar vs. arm strength). You gain <strong>clear reading</strong> and a more “lamp-like” silhouette; you pay in <strong>CAD time</strong> and <strong>assembly</strong>. For a first print, consider a <strong>right-edge clip</strong> (simpler) before the full L-bar — or prototype L-bar in cardboard first.
+    </div>
+  </div>
+</div>
+
+<footer>
+  Lexie Spring Jaw Clip Detail &nbsp;·&nbsp; WX-024 &nbsp;·&nbsp; 2026-05-03
+  &nbsp;·&nbsp; Sections 1–3: spring jaw · 4–5: obstruction · 6: L-bar · See also: lexie-bookmark-design.html
+</footer>
+
+</body>
+</html>
